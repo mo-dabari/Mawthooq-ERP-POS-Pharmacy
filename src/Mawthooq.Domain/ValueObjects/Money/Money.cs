@@ -13,7 +13,7 @@ namespace Mawthooq.Domain.ValueObjects.Money
         public Currency Currency { get; init; }
         public Money(decimal amount, Currency currency)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount, nameof(amount));
+            ArgumentOutOfRangeException.ThrowIfNegative(amount, nameof(amount));
 
             if (!Enum.IsDefined(typeof(Currency), currency))
                 throw new InvalidEnumArgumentException(nameof(currency), (int)currency, typeof(Currency));
@@ -22,12 +22,23 @@ namespace Mawthooq.Domain.ValueObjects.Money
             Currency = currency;
         }
 
-        public static Money operator +(Money firstMony, Money scondMony)
+        public static Money operator +(Money left, Money right)
         {
-            if (firstMony.Currency != scondMony.Currency)
+            if (left.Currency != right.Currency)
                 throw new InvalidOperationException("Different currencies cannot be collected");
 
-            return new Money(firstMony.Amount + scondMony.Amount, scondMony.Currency);
+            return new Money(left.Amount + right.Amount, left.Currency);
+        }
+
+        public static Money operator -(Money left, Money right)
+        {
+            if (left.Currency != right.Currency)
+                throw new InvalidOperationException("Different currencies cannot be collected");
+
+            if (left.Amount < right.Amount)
+                throw new InvalidOperationException("Money cannot be negative");
+
+            return new Money(left.Amount - right.Amount, left.Currency);
         }
 
         public bool Equals(Money? other)
@@ -56,6 +67,17 @@ namespace Mawthooq.Domain.ValueObjects.Money
         public override int GetHashCode()
         {
             return HashCode.Combine(Amount, Currency);
+        }
+
+        public Money Multiply(int factor)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(factor, nameof(factor));
+            return new Money(Amount * factor, Currency);
+        }
+
+        public static Money Zero(Currency currency)
+        {
+            return new Money(0m, currency);
         }
     }
 }
