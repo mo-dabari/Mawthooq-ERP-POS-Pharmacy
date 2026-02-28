@@ -24,6 +24,9 @@ namespace Mawthooq.Domain.ValueObjects.Money
 
         public static Money operator +(Money left, Money right)
         {
+            ArgumentNullException.ThrowIfNull(left, nameof(left));
+            ArgumentNullException.ThrowIfNull(right, nameof(right));
+
             if (left.Currency != right.Currency)
                 throw new InvalidOperationException("Different currencies cannot be collected");
 
@@ -32,11 +35,11 @@ namespace Mawthooq.Domain.ValueObjects.Money
 
         public static Money operator -(Money left, Money right)
         {
+            ArgumentNullException.ThrowIfNull(left, nameof(left));
+            ArgumentNullException.ThrowIfNull(right, nameof(right));
+            
             if (left.Currency != right.Currency)
                 throw new InvalidOperationException("Different currencies cannot be collected");
-
-            if (left.Amount < right.Amount)
-                throw new InvalidOperationException("Money cannot be negative");
 
             return new Money(left.Amount - right.Amount, left.Currency);
         }
