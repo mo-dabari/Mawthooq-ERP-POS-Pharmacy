@@ -34,13 +34,13 @@ namespace Mawthooq.Domain.Inventory
             ExpiryDate = expiryDate;
         }
 
-        public void IncreaseQuantity(int quantity)
+        internal void IncreaseQuantity(int quantity)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
             Quantity += quantity;
         }
 
-        public void DecreaseQuantity(int quantity)
+        internal void DecreaseQuantity(int quantity)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
             if (Quantity < quantity)
