@@ -14,7 +14,7 @@ namespace Mawthooq.Domain.Product
         public bool IsActive { get; private set; }
         public string? Barcode { get; private set; }
 
-        public Product(int productId, string name, string sku, int categoryId)
+        public Product(int productId, string name, string sku, int categoryId, bool isActive = true, string? barcode = null)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId, nameof(productId));
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId, nameof(categoryId));
@@ -26,8 +26,29 @@ namespace Mawthooq.Domain.Product
             CategoryId = categoryId;
             Name = name;
             SKU = sku;
-            IsActive = true;
-            Barcode = null;
+            IsActive = isActive;
+            Barcode = barcode;
+        }
+
+        private Product(string name, string sku, int categoryId, bool isActive = true, string? barcode = null)
+        {
+
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId, nameof(categoryId));
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+            ArgumentException.ThrowIfNullOrWhiteSpace(sku, nameof(sku));
+
+            Name = name;
+            SKU = sku;
+            CategoryId = categoryId;
+            IsActive = isActive;
+            Barcode = barcode;
+
+        }
+
+        public static Product Create(string name, string sku, int categoryId, bool isActive = true, string? barcode = null)
+        {
+            return new Product(name, sku, categoryId, isActive, barcode);
         }
 
         public void ChangeProductName(string name)
@@ -49,6 +70,13 @@ namespace Mawthooq.Domain.Product
             if (!IsActive)
                 return;
             IsActive = false;
+        }
+
+        public void SetBarcode(string? barcode)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(barcode, nameof(barcode));
+            if (Barcode == barcode) return;
+            Barcode = barcode;
         }
     }
 }
