@@ -8,47 +8,39 @@ namespace Mawthooq.Domain.Product
     public class Product
     {
         public int ProductId { get; }
-        public int CategoryId { get; }
+        public int CategoryId { get; private set; }
         public string Name { get; private set; }
-        public string SKU { get; }
+        public string ImageUrl { get; private set; }
+        public string SKU { get; private set; }
         public bool IsActive { get; private set; }
-        public string? Barcode { get; private set; }
+        public string Barcode { get; private set; }
 
-        public Product(int productId, string name, string sku, int categoryId, bool isActive = true, string? barcode = null)
+        public Product(int productId, string name, string sku, string barcode, string imageUrl, int categoryId, bool isActive = true)
+        : this(name, sku, barcode, imageUrl, categoryId, isActive)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId, nameof(productId));
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId, nameof(categoryId));
 
-            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-            ArgumentException.ThrowIfNullOrWhiteSpace(sku, nameof(sku));
+            ValidateArguments(name, sku, imageUrl, barcode, categoryId);
 
             ProductId = productId;
-            CategoryId = categoryId;
-            Name = name;
-            SKU = sku;
-            IsActive = isActive;
-            Barcode = barcode;
         }
 
-        private Product(string name, string sku, int categoryId, bool isActive = true, string? barcode = null)
+        private Product(string name, string sku, string barcode, string imageUrl, int categoryId, bool isActive = true)
         {
-
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId, nameof(categoryId));
-
-            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-            ArgumentException.ThrowIfNullOrWhiteSpace(sku, nameof(sku));
+            ValidateArguments(name, sku, imageUrl, barcode, categoryId);
 
             Name = name;
             SKU = sku;
+            Barcode = barcode;
+            ImageUrl = imageUrl;
             CategoryId = categoryId;
             IsActive = isActive;
-            Barcode = barcode;
 
         }
 
-        public static Product Create(string name, string sku, int categoryId, bool isActive = true, string? barcode = null)
+        public static Product Create(string name, string sku, string barcode, string imageUrl, int categoryId, bool isActive = true)
         {
-            return new Product(name, sku, categoryId, isActive, barcode);
+            return new Product(name, sku, barcode, imageUrl, categoryId, isActive);
         }
 
         public void ChangeProductName(string name)
@@ -58,25 +50,54 @@ namespace Mawthooq.Domain.Product
             Name = name;
         }
 
+        public void ChangeSKU(string sKU)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(sKU, nameof(sKU));
+            if (SKU == sKU) return;
+            SKU = sKU;
+        }
+
+        public void SetBarcode(string barcode)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(barcode, nameof(barcode));
+            if (Barcode == barcode) return;
+            Barcode = barcode;
+        }
+
+        public void ChangeImageUrl(string imageUrl)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(imageUrl, nameof(imageUrl));
+            if (ImageUrl == imageUrl) return;
+            ImageUrl = imageUrl;
+        }
+
+        public void ChangeCategory(int categoryId)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId, nameof(categoryId));
+            if (CategoryId == categoryId) return;
+            CategoryId = categoryId;
+        }
+
         public void Activate()
         {
             if (IsActive)
                 return;
             IsActive = true;
         }
-
         public void Deactivate()
         {
             if (!IsActive)
                 return;
             IsActive = false;
         }
-
-        public void SetBarcode(string? barcode)
+        private void ValidateArguments(string name, string sku, string imageUrl, string barcode, int categoryId)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId, nameof(categoryId));
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+            ArgumentException.ThrowIfNullOrWhiteSpace(imageUrl, nameof(imageUrl));
+            ArgumentException.ThrowIfNullOrWhiteSpace(sku, nameof(sku));
             ArgumentException.ThrowIfNullOrWhiteSpace(barcode, nameof(barcode));
-            if (Barcode == barcode) return;
-            Barcode = barcode;
         }
     }
 }
