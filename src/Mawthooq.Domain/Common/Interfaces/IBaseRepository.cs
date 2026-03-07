@@ -8,9 +8,8 @@ namespace Mawthooq.Domain.Common.Interfaces
     public interface IBaseRepository <T, TId> where T : class
     {
         T? GetById(TId id);
-        void Add(T entity);
+        T Add(T entity);
         void Update(T entity);
         void Delete(T entity);
-        IEnumerable<T> GetAll();
     }
 }
