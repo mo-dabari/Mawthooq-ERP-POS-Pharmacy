@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Domain.Category;
-using Mawthooq.Domain.Product;
+using Mawthooq.Domain.Categories;
+using Mawthooq.Domain.Products;
 
-namespace Mawthooq.Application.Product.UseCases.GetProductByID
+namespace Mawthooq.Application.Products.UseCases.GetProductByID
 {
     public class GetProductByIdUseCase
     {

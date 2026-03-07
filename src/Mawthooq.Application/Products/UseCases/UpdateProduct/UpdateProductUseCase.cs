@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Application.Product.UseCases.UpdateProduct;
-using Mawthooq.Domain.Category;
-using Mawthooq.Domain.Product;
+using Mawthooq.Application.Products.UseCases.UpdateProduct;
+using Mawthooq.Domain.Categories;
+using Mawthooq.Domain.Products;
 
-namespace Mawthooq.Application.Product
+namespace Mawthooq.Application.Products.UseCases.UpdateProduct
 {
     public class UpdateProductUseCase
     {
