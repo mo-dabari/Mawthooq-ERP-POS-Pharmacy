@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mawthooq.Domain.ValueObjects.Address;
+using Mawthooq.Domain.ValueObjects;
 
 namespace Mawthooq.Domain.Branches
 {
@@ -14,16 +14,25 @@ namespace Mawthooq.Domain.Branches
         public Address Location { get; private set; }
         public bool IsActive { get; private set; }
 
-        public Branch(int branchID, string name, Address location)
+        public Branch(int branchID, string name, Address location) : this(name, location)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(branchID, nameof(branchID));
+            BranchID = branchID;
+        }
+
+        private Branch(string name, Address location)
+        {
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
             ArgumentNullException.ThrowIfNull(location, nameof(location));
 
-            BranchID = branchID;
             Name = name;
             Location = location;
             IsActive = true;
+        }
+
+        public static Branch Create(string name, Address location)
+        {
+            return new Branch(name, location);
         }
 
         public void ChangeBranchName(string newBranchName)
