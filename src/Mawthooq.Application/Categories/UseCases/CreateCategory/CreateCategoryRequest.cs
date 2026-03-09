@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Mawthooq.Application.Categories.UseCases.CreateCategory
 {
-    public class CreateCategoryRequest
+    public record class CreateCategoryRequest(string Name, string Description)
     {
 
     }
