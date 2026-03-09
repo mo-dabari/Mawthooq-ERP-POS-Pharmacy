@@ -39,12 +39,19 @@ namespace Mawthooq.Domain.Users
         public string FullName => $"{FirstName} {LastName}";
 
         public User(
-            int userId, NationalId nationalId,
-            string firstName, string middleName, string lastName,
-            Phone phone, DateOnly dateOfBirth, Role role)
+            int userId, NationalId nationalId,string firstName, string middleName, string lastName,Phone phone, DateOnly dateOfBirth, Role role)
+            : this(nationalId, firstName, middleName, lastName, phone, dateOfBirth, role)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(userId, nameof(userId));
 
+            UserId = userId;
+        }
+
+        private User(
+            NationalId nationalId,
+            string firstName, string middleName, string lastName,
+            Phone phone, DateOnly dateOfBirth, Role role)
+        {
             ArgumentNullException.ThrowIfNull(nationalId, nameof(nationalId));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(firstName, nameof(firstName));
@@ -59,7 +66,6 @@ namespace Mawthooq.Domain.Users
             if (!Enum.IsDefined(typeof(Role), role))
                 throw new InvalidEnumArgumentException(nameof(role), (int)role, typeof(Role));
 
-            UserId = userId;
             NationalId = nationalId;
             FirstName = firstName;
             LastName = lastName;
@@ -69,6 +75,14 @@ namespace Mawthooq.Domain.Users
             Role = role;
 
             _contactNumbers.Add(phone);
+        }
+
+        public static User Create(
+            NationalId nationalId,
+            string firstName, string middleName, string lastName,
+            Phone phone, DateOnly dateOfBirth, Role role)
+        {
+            return new User(nationalId, firstName, middleName, lastName, phone, dateOfBirth, role);
         }
 
         public void AddPhone(Phone phone)
