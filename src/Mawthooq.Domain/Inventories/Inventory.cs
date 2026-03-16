@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Inventories.ValueObjects;
+using Mawthooq.Domain.Inventories.Entities;
 using Mawthooq.Domain.ValueObjects.Money;
-using Mawthooq.Domain.ValueObjects.Money.Enums;
+using Mawthooq.Domain.Inventories.Enums;
+using System.ComponentModel;
 
 namespace Mawthooq.Domain.Inventories
 {
@@ -14,8 +16,12 @@ namespace Mawthooq.Domain.Inventories
         public int ProductId { get; }
         public Money SellingPrice { get; private set; }
         public int BranchId { get; }
-        private List<Batch> _batches;
+        private List<Batch> _batches = new();
+        private List<DamagedBatch> _damagedBatches = new();
+        private List<AdjustmentLog> _adjustmentLogs = new();
         public IReadOnlyList<Batch> BatchValues => _batches.AsReadOnly();
+        public IReadOnlyList<DamagedBatch> DamagedBatchValues => _damagedBatches.AsReadOnly();
+        public IReadOnlyList<AdjustmentLog> AdjustmentLogs => _adjustmentLogs.AsReadOnly();
 
         public Inventory(int productId, int branchId, Money sellingPrice)
         {
@@ -27,7 +33,6 @@ namespace Mawthooq.Domain.Inventories
             ProductId = productId;
             BranchId = branchId;
             SellingPrice = sellingPrice;
-            _batches = new();
         }
 
         private static DateOnly Today => DateOnly.FromDateTime(DateTime.UtcNow);
@@ -39,20 +44,22 @@ namespace Mawthooq.Domain.Inventories
             .Sum(b => b.Quantity);
         }
 
+        public int GetTotalQuantity() => _batches.Sum(b => b.Quantity);
+
         private Batch GetTheOldestBatch()
         {
             return _batches.FirstOrDefault(b => b.ExpiryDate > Today)
         ?? throw new InvalidOperationException("No valid batches available.");
         }
 
-        public void ReceiveStock(int batchId, int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate)
+        public void ReceiveStock(int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate)
         {
             ArgumentNullException.ThrowIfNull(purchaseCost, nameof(purchaseCost));
 
             if (SellingPrice.Currency != purchaseCost.Currency)
                 throw new InvalidOperationException("Batch currency must match inventory currency.");
 
-            Batch batch = new(batchId, quantity, purchaseCost, receivedDate, expiryDate);
+            Batch batch = Batch.Create(quantity, purchaseCost, receivedDate, expiryDate);
 
             InsertBatchOrdered(batch);
         }
@@ -148,6 +155,74 @@ namespace Mawthooq.Domain.Inventories
                 throw new InvalidOperationException("Selling price must be greater than zero.");
 
             SellingPrice = newPrice;
+        }
+
+        public DamagedBatch ReportDamagedStock(int batchId, int quantity, DamagedReason reason)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
+
+            if (!Enum.IsDefined(reason))
+                throw new InvalidEnumArgumentException(nameof(reason), (int)reason, typeof(DamagedReason));
+
+            Batch? batch = _batches.FirstOrDefault(b => b.BatchId == batchId);
+
+            if (batch is null)
+                throw new InvalidOperationException("Batch not found.");
+
+            if (batch.Quantity < quantity)
+                throw new InvalidOperationException("Insufficient batch quantity to report as damaged.");
+
+            batch.DecreaseQuantity(quantity);
+
+            _damagedBatches.Add(DamagedBatch.Create(quantity, reason));
+
+            if (batch.Quantity == 0)
+                _batches.Remove(batch);
+
+            return DamagedBatchValues.Last();
+        }
+
+        public void AdjustQuantity(int newQuantity, AdjustmentReason reason)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(newQuantity, nameof(newQuantity));
+
+            if (!Enum.IsDefined(reason))
+                throw new InvalidEnumArgumentException(nameof(reason), (int)reason, typeof(AdjustmentReason));
+
+            int currentQuantity = GetTotalQuantity();
+
+            if (currentQuantity == newQuantity)
+                throw new InvalidOperationException("No adjustment needed, quantities are equal.");
+
+            _adjustmentLogs.Add(AdjustmentLog.Create(currentQuantity, newQuantity, reason));
+
+            int difference = newQuantity - currentQuantity;
+
+            if (difference > 0)
+            {
+                Batch? latestBatch = _batches.LastOrDefault();
+                if (latestBatch is null)
+                    throw new InvalidOperationException("No batches available to adjust.");
+                latestBatch.IncreaseQuantity(difference);
+            }
+            else
+                DeductStock(-difference);
+        }
+
+        public void ReturnStockToBatch(int batchId, int quantity)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchId, nameof(batchId));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
+
+            Batch? batch = _batches.FirstOrDefault(b => b.BatchId == batchId);
+
+            if (batch is null)
+                throw new InvalidOperationException("Batch not found.");
+
+            batch.DecreaseQuantity(quantity);
+
+            if (batch.Quantity == 0)
+                _batches.Remove(batch);
         }
     }
 }
