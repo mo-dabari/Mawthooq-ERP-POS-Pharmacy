@@ -15,17 +15,23 @@ namespace Mawthooq.Domain.Customers
         private List<Phone> _contactNumbers = new();
         public bool IsActive { get; private set; }
         public IReadOnlyList<Phone> contactNumbers => _contactNumbers.AsReadOnly();
+        public string FullName => $"{FirstName} {LastName}";
         public DateTime CreatedAt { get; }
         public Customer(int customerId, string firstName, string lastName, Phone phone)
+        : this(firstName, lastName, phone)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(customerId, nameof(customerId));
 
+            CustomerId = customerId;
+        }
+
+        private Customer(string firstName, string lastName, Phone phone)
+        {
             ArgumentException.ThrowIfNullOrWhiteSpace(firstName, nameof(firstName));
             ArgumentException.ThrowIfNullOrWhiteSpace(lastName, nameof(lastName));
 
             ArgumentNullException.ThrowIfNull(phone, nameof(phone));
 
-            CustomerId = customerId;
             FirstName = firstName;
             LastName = lastName;
             Phone = phone;
@@ -33,6 +39,11 @@ namespace Mawthooq.Domain.Customers
             CreatedAt = DateTime.UtcNow;
 
             _contactNumbers.Add(phone);
+        }
+
+        public static Customer Create(string firstName, string lastName, Phone phone)
+        {
+            return new Customer(firstName, lastName, phone);
         }
         public void AddPhone(Phone phone)
         {
