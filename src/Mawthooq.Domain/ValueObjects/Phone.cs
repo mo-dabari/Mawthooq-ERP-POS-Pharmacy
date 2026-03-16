@@ -1,28 +1,58 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Mawthooq.Domain.ValueObjects.Enums;
 
 namespace Mawthooq.Domain.ValueObjects
 {
     public record class Phone
     {
-        private static readonly Regex E164Regex =
-        new(@"^\+[1-9]\d{7,14}$", RegexOptions.Compiled);
+        private const RegexOptions _options = RegexOptions.Compiled;
+        private static readonly Dictionary<CountryCode, Regex> _patterns = new()
+    {
+        // Egypt
+        { CountryCode.EG, new Regex(@"^01[0125]\d{8}$", _options) },
 
+        // Saudi Arabia
+        { CountryCode.SA, new Regex(@"^05\d{8}$", _options  ) },
+
+        // UAE
+        { CountryCode.AE, new Regex(@"^05\d{8}$", _options) },
+
+        // Qatar
+        { CountryCode.QA, new Regex(@"^[3-7]\d{7}$", _options) },
+
+        // Kuwait
+        { CountryCode.KW, new Regex(@"^[569]\d{7}$", _options) },
+
+        // Oman
+        { CountryCode.OM, new Regex(@"^9\d{7}$", _options) },
+
+        // Bahrain
+        { CountryCode.BH, new Regex(@"^3\d{7}$", _options) },
+
+        // Jordan
+        { CountryCode.JO, new Regex(@"^07\d{8}$", _options) }
+    };
+        public CountryCode CountryCode { get; }
         public string Value { get; }
 
-        public Phone(string value)
+        public Phone(CountryCode countryCode, string value)
         {
+            if (!Enum.IsDefined(typeof(CountryCode), countryCode))
+                throw new InvalidEnumArgumentException(nameof(countryCode), (int)countryCode, typeof(CountryCode));
+
             ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
 
-            value = value.Trim();
-            if (!E164Regex.IsMatch(value))
-                throw new ArgumentException(
-                    "Phone number must be in valid E.164 format. Example: +14155552671");
+            string normalized = value.Trim();
 
-            Value = value;
+            if (!_patterns[countryCode].IsMatch(normalized))
+                throw new ArgumentException($"The provided phone number does not match the allowed pattern for country code {countryCode}.", nameof(value));
+
+            Value = normalized;
         }
     }
 }
