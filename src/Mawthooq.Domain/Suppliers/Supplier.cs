@@ -68,6 +68,18 @@ namespace Mawthooq.Domain.Suppliers
             CurrentBalance += amount;
         }
 
+        public void DeductBalance(Money amount)
+        {
+            ArgumentNullException.ThrowIfNull(amount, nameof(amount));
+            if (amount.Currency != CreditLimit.Currency)
+                throw new ArgumentException($"Amount currency {amount.Currency} does not match supplier currency {CreditLimit.Currency}.");
+
+            if (CurrentBalance.Amount < amount.Amount)
+                throw new InvalidOperationException("Insufficient balance to deduct the specified amount.");
+
+            CurrentBalance -= amount;
+        }
+
         public void UpdateCreditLimit(Money newCreditLimit)
         {
             ArgumentNullException.ThrowIfNull(newCreditLimit, nameof(newCreditLimit));
