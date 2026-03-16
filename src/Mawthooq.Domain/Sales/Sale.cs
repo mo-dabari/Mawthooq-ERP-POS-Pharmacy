@@ -33,41 +33,56 @@ namespace Mawthooq.Domain.Sales
 
 
         public Sale(int saleId, int branchId, Currency currency)
+        : this(branchId, currency)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(saleId, nameof(saleId));
+            SaleId = saleId;
+        }
+
+        private Sale(int branchId, Currency currency)
+        {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(branchId, nameof(branchId));
 
             if (!Enum.IsDefined(typeof(Currency), currency))
                 throw new InvalidEnumArgumentException(nameof(currency), (int)currency, typeof(Currency));
 
-            SaleId = saleId;
             BranchId = branchId;
             Currency = currency;
             Status = SaleStatus.Open;
             SaleDate = DateTime.UtcNow;
         }
 
-        public void AddLine(int saleLineId, int productId, int quantity, Money sellingPrice, Money purchaseCost)
+        public static Sale Create(int branchId, Currency currency)
+        {
+            return new Sale(branchId,currency);
+        }
+
+        public void AddLine(SaleLine newSaleLine)
         {
             if (Status != SaleStatus.Open)
                 throw new InvalidOperationException("Cannot modify a confirmed or cancelled sale.");
 
-            if (sellingPrice.Currency != Currency)
+            if (newSaleLine.SellingPrice.Currency != Currency)
                 throw new InvalidOperationException("Currency mismatch.");
 
-            if (purchaseCost.Currency != Currency)
+            if (newSaleLine.PurchaseCost.Currency != Currency)
                 throw new InvalidOperationException("Purchase cost currency must match sale currency.");
 
             SaleLine? existing = _lines.FirstOrDefault(
-                l => l.ProductId == productId &&
-                l.SellingPrice == sellingPrice);
+                l => l.ProductId == newSaleLine.ProductId &&
+                l.SellingPrice == newSaleLine.SellingPrice);
 
             if (existing is not null)
             {
-                existing.IncreaseQuantity(quantity);
+                existing.IncreaseQuantity(newSaleLine.Quantity);
                 return;
             }
-            _lines.Add(new SaleLine(saleLineId, productId, quantity, sellingPrice, purchaseCost));
+            _lines.Add(new SaleLine(
+                newSaleLine.SaleLineId,
+                newSaleLine.ProductId,
+                newSaleLine.Quantity,
+                newSaleLine.SellingPrice,
+                newSaleLine.PurchaseCost));
         }
 
         public void RemoveLine(int saleLineId)

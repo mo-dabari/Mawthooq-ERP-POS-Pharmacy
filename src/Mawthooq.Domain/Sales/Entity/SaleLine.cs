@@ -18,11 +18,17 @@ namespace Mawthooq.Domain.Sales.Entity
         public Money TotalPurchaseCost => PurchaseCost.Multiply(Quantity);
         public Money GrossProfit => TotalAmount - TotalPurchaseCost;
 
-        internal SaleLine(int saleLineId, int productId, int quantity, Money sellingPrice, Money purchaseCost)
+        public SaleLine(int saleLineId, int productId, int quantity, Money sellingPrice, Money purchaseCost)
+        : this(productId, quantity, sellingPrice, purchaseCost)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(saleLineId, nameof(saleLineId));
+            SaleLineId = saleLineId;
+        }
+
+        private SaleLine(int productId, int quantity, Money sellingPrice, Money purchaseCost)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId, nameof(productId));
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sellingPrice.Amount, nameof(quantity));
 
             ArgumentNullException.ThrowIfNull(sellingPrice, nameof(sellingPrice));
             ArgumentNullException.ThrowIfNull(purchaseCost, nameof(purchaseCost));
@@ -33,11 +39,15 @@ namespace Mawthooq.Domain.Sales.Entity
             if (purchaseCost.Amount <= 0)
                 throw new InvalidOperationException("The product purchase cost cannot be 0 or negative.");
 
-            SaleLineId = saleLineId;
             ProductId = productId;
             Quantity = quantity;
             SellingPrice = sellingPrice;
             PurchaseCost = purchaseCost;
+        }
+
+        public static SaleLine Create(int productId, int quantity, Money sellingPrice, Money purchaseCost)
+        {
+            return new SaleLine(productId, quantity, sellingPrice, purchaseCost);
         }
 
         internal void IncreaseQuantity(int quantity)
