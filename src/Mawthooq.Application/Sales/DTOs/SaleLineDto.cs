@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Mawthooq.Application.Common.DTOs;
+
+namespace Mawthooq.Application.Sales.DTOs
+{
+    public record class SaleLineDto(
+        int SaleLineId,
+        int ProductId,
+        int Quantity,
+        MoneyDto SellingPrice,
+        MoneyDto PurchaseCost,
+        MoneyDto TotalAmount,
+        MoneyDto TotalPurchaseCost,
+        MoneyDto GrossProfit
+        )
+    {
+
+    }
+}
