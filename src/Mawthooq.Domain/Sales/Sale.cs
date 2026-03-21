@@ -19,14 +19,14 @@ namespace Mawthooq.Domain.Sales
         public SaleStatus Status { get; private set; }
         private List<SaleLine> _lines = new();
         public IReadOnlyList<SaleLine> Lines => _lines.AsReadOnly();
-
+        public Money DiscountAmount { get; private set; }
+        public Money FinalAmount => TotalAmount - DiscountAmount;
         public Money TotalAmount => _lines.Aggregate(
             Money.Zero(Currency),
             (sum, line) => sum + line.TotalAmount);
         public Money TotalPurchaseCost => _lines.Aggregate(
             Money.Zero(Currency),
             (sum, line) => sum + line.TotalPurchaseCost);
-
         public Money TotalGrossProfit => _lines.Aggregate(
         Money.Zero(Currency),
         (sum, line) => sum + line.GrossProfit);
@@ -48,41 +48,41 @@ namespace Mawthooq.Domain.Sales
 
             BranchId = branchId;
             Currency = currency;
-            Status = SaleStatus.Open;
             SaleDate = DateTime.UtcNow;
+            Status = SaleStatus.Open;
+            DiscountAmount = Money.Zero(currency);
         }
 
         public static Sale Create(int branchId, Currency currency)
         {
-            return new Sale(branchId,currency);
+            return new Sale(branchId, currency);
         }
 
-        public void AddLine(SaleLine newSaleLine)
+        public void AddLine(int productId, int quantity, Money sellingPrice, Money purchaseCost)
         {
             if (Status != SaleStatus.Open)
                 throw new InvalidOperationException("Cannot modify a confirmed or cancelled sale.");
 
-            if (newSaleLine.SellingPrice.Currency != Currency)
+            if (sellingPrice.Currency != Currency)
                 throw new InvalidOperationException("Currency mismatch.");
 
-            if (newSaleLine.PurchaseCost.Currency != Currency)
+            if (purchaseCost.Currency != Currency)
                 throw new InvalidOperationException("Purchase cost currency must match sale currency.");
 
             SaleLine? existing = _lines.FirstOrDefault(
-                l => l.ProductId == newSaleLine.ProductId &&
-                l.SellingPrice == newSaleLine.SellingPrice);
+                l => l.ProductId == productId &&
+                l.SellingPrice == sellingPrice);
 
             if (existing is not null)
             {
-                existing.IncreaseQuantity(newSaleLine.Quantity);
+                existing.IncreaseQuantity(quantity);
                 return;
             }
-            _lines.Add(new SaleLine(
-                newSaleLine.SaleLineId,
-                newSaleLine.ProductId,
-                newSaleLine.Quantity,
-                newSaleLine.SellingPrice,
-                newSaleLine.PurchaseCost));
+            _lines.Add(SaleLine.Create(
+                productId: productId,
+                quantity: quantity,
+                sellingPrice: sellingPrice,
+                purchaseCost: purchaseCost));
         }
 
         public void RemoveLine(int saleLineId)
@@ -119,5 +119,20 @@ namespace Mawthooq.Domain.Sales
             Status = SaleStatus.Cancelled;
         }
 
+        public void ApplyInvoiceDiscount(Money discountAmount)
+        {
+            ArgumentNullException.ThrowIfNull(discountAmount, nameof(discountAmount));
+
+            if (Status != SaleStatus.Open)
+                throw new InvalidOperationException("Cannot modify a confirmed or cancelled sale.");
+
+            if (discountAmount.Currency != Currency)
+                throw new InvalidOperationException("Currency mismatch.");
+
+            if (discountAmount.Amount > TotalAmount.Amount)
+                throw new InvalidOperationException("Discount amount cannot exceed total sale amount.");
+
+            DiscountAmount = discountAmount;
+        }
     }
 }
