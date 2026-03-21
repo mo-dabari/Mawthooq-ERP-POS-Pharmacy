@@ -16,18 +16,27 @@ namespace Mawthooq.Domain.Returns.Entity
         public RefundStatus Status { get; private set; }
         public PaymentMethod PaymentMethod { get; }
         public Refund(int refundId, Money amount, PaymentMethod paymentMethod)
+        : this(amount, paymentMethod)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(refundId, nameof(refundId));
+            RefundId = refundId;
+        }
 
-            ArgumentNullException.ThrowIfNull(amount);
+        private Refund(Money amount, PaymentMethod paymentMethod)
+        {
+            ArgumentNullException.ThrowIfNull(amount,nameof(amount));
 
             if (!Enum.IsDefined(typeof(PaymentMethod), paymentMethod))
                 throw new InvalidEnumArgumentException(nameof(paymentMethod), (int)paymentMethod, typeof(PaymentMethod));
 
-            RefundId = refundId;
             Amount = amount;
             Status = RefundStatus.Pending;
             PaymentMethod = paymentMethod;
+        }
+
+        public static Refund Create(Money amount, PaymentMethod paymentMethod)
+        {
+            return new Refund(amount, paymentMethod);
         }
 
         public void Approve()

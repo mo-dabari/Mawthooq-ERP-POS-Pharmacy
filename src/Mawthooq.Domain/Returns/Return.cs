@@ -17,14 +17,23 @@ namespace Mawthooq.Domain.Returns
         private List<ReturnLine> _returnedProducts = new List<ReturnLine>();
         public IReadOnlyList<ReturnLine> ReturnedProducts => _returnedProducts.AsReadOnly();
 
-        public Return(int returnId, int saleId)
+        public Return(int returnId, int saleId) :this(saleId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(returnId, nameof(returnId));
+            ReturnId = returnId;
+        }
+
+        private Return(int saleId)
+        {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(saleId, nameof(saleId));
 
-            ReturnId = returnId;
             SaleId = saleId;
             ReturnDate = DateTime.UtcNow;
+        }
+
+        public static Return Create(int saleId)
+        {
+            return new Return(saleId);
         }
         public void AddReturnedProduct(ReturnLine returnedProduct)
         {
@@ -39,7 +48,7 @@ namespace Mawthooq.Domain.Returns
             }
             _returnedProducts.Add(returnedProduct);
         }
-        public void AddRefund(Refund refund)
+        public void AddRefund(Refund? refund)
         {
             ArgumentNullException.ThrowIfNull(refund, nameof(refund));
             Refund? existingRefund = _refunds.FirstOrDefault(r => r.PaymentMethod == refund.PaymentMethod);
