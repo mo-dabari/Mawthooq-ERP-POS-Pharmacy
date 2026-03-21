@@ -6,8 +6,11 @@ using Mawthooq.Domain.Common.Interfaces;
 
 namespace Mawthooq.Domain.Returns
 {
-    public interface IReturnRepository : IBaseRepository<Return, int>
+    public interface IReturnRepository
     {
-
+        Return AddReturn(Return returnEntity);
+        Return? GetReturnById(int returnId);
+        Return? GetReturnBySaleId(int saleId);
+        void Update(Return returnEntity);
     }
 }

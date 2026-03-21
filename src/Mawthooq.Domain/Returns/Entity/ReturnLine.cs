@@ -13,8 +13,9 @@ namespace Mawthooq.Domain.Returns.Entity
         public byte Quantity { get; private set; }
         public ReturnReason Reason { get; }
         public ProductReturnStatus Status { get; }
+        public DateOnly ExpiryDate { get; }
 
-        public ReturnLine(int productId, byte quantity, ReturnReason reason, ProductReturnStatus status)
+        public ReturnLine(int productId, byte quantity, ReturnReason reason, ProductReturnStatus status, DateOnly expiryDate)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId, nameof(productId));
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
@@ -25,10 +26,14 @@ namespace Mawthooq.Domain.Returns.Entity
             if (!Enum.IsDefined(typeof(ProductReturnStatus), status))
                 throw new InvalidEnumArgumentException(nameof(status), (int)status, typeof(ProductReturnStatus));
 
+            if (expiryDate == default)
+                throw new ArgumentException("Expiry date cannot be the default value.", nameof(expiryDate));
+
             ProductId = productId;
             Quantity = quantity;
             Reason = reason;
             Status = status;
+            ExpiryDate = expiryDate;
         }
 
         public void IncreaseQuantity(byte quantity)
