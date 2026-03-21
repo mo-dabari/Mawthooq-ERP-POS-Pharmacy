@@ -12,27 +12,35 @@ namespace Mawthooq.Domain.Payments
 {
     public class Payment
     {
-        public int PaymentId { get; }
-        public int SaleId { get; private set; }
+        public int PaymentId { get; private set; }
+        public int SaleId { get; }
         public DateTime PaidAt { get; }
         public Currency Currency { get; }
-        private List<PaymentLine> _paymentLines;
+        private List<PaymentLine> _paymentLines = new();
         public IReadOnlyList<PaymentLine> PaymentLines => _paymentLines.AsReadOnly();
         public Money TotalAmount => _paymentLines.Aggregate(Money.Zero(Currency), (sum, line) => sum + line.Amount);
 
-        public Payment(int paymentId, int saleId, Currency currency)
+        public Payment(int paymentId, int saleId, Currency currency) : this(saleId, currency)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(paymentId, nameof(paymentId));
+            PaymentId = paymentId;
+        }
+
+        private Payment(int saleId, Currency currency)
+        {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(saleId, nameof(saleId));
 
             if (!Enum.IsDefined(typeof(Currency), currency))
                 throw new InvalidEnumArgumentException(nameof(currency), (int)currency, typeof(Currency));
 
-            PaymentId = paymentId;
             SaleId = saleId;
             Currency = currency;
             PaidAt = DateTime.UtcNow;
-            _paymentLines = new();
+        }
+
+        public static Payment Create(int saleId, Currency currency)
+        {
+            return new Payment(saleId, currency);
         }
 
         public void AddPaymentLine(Money amount, PaymentMethod paymentMethod)
@@ -48,6 +56,14 @@ namespace Mawthooq.Domain.Payments
                 return;
             }
             _paymentLines.Add(new PaymentLine(amount, paymentMethod));
+        }
+        public void SetPaymentId(int paymentId)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(paymentId, nameof(paymentId));
+            if (PaymentId != 0)
+                throw new InvalidOperationException("Payment ID has already been set.");
+
+            PaymentId = paymentId;
         }
     }
 }

@@ -6,8 +6,9 @@ using Mawthooq.Domain.Common.Interfaces;
 
 namespace Mawthooq.Domain.Payments
 {
-    public interface IPaymentRepository : IBaseRepository<Payment, int>
+    public interface IPaymentRepository
     {
-
+        Payment? Add(Payment payment);
+        Payment? GetBySaleId(int saleId);
     }
 }
