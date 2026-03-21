@@ -13,7 +13,8 @@ namespace Mawthooq.Domain.Sales.Entity
         public int Quantity { get; private set; }
         public Money SellingPrice { get; }
         public Money PurchaseCost { get; }
-
+        public Money DiscountAmount { get; private set; }
+        public Money FinalPrice => TotalAmount - DiscountAmount;
         public Money TotalAmount => SellingPrice.Multiply(Quantity);
         public Money TotalPurchaseCost => PurchaseCost.Multiply(Quantity);
         public Money GrossProfit => TotalAmount - TotalPurchaseCost;
@@ -43,6 +44,7 @@ namespace Mawthooq.Domain.Sales.Entity
             Quantity = quantity;
             SellingPrice = sellingPrice;
             PurchaseCost = purchaseCost;
+            DiscountAmount = Money.Zero(sellingPrice.Currency);
         }
 
         public static SaleLine Create(int productId, int quantity, Money sellingPrice, Money purchaseCost)
@@ -54,6 +56,19 @@ namespace Mawthooq.Domain.Sales.Entity
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
             Quantity += quantity;
+        }
+
+        public void ApplyDiscount(Money discountAmount)
+        {
+            ArgumentNullException.ThrowIfNull(discountAmount, nameof(discountAmount));
+
+            if (discountAmount.Currency != SellingPrice.Currency)
+                throw new InvalidOperationException("Currency mismatch.");
+
+            if (discountAmount.Amount > TotalAmount.Amount)
+                throw new InvalidOperationException("Discount amount cannot exceed total sale amount.");
+
+            DiscountAmount = discountAmount;
         }
     }
 }
