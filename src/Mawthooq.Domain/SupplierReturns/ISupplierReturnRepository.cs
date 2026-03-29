@@ -9,6 +9,7 @@ namespace Mawthooq.Domain.SupplierReturns
 {
     public interface ISupplierReturnRepository : IBaseRepository<SupplierReturn, int>
     {
+        IReadOnlyList<SupplierReturn> GetSupplierReturns(int supplierId);
 
     }
 }
