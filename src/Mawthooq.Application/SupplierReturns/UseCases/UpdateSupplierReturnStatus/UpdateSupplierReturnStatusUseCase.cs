@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.Common.DTOs.Mappers;
-using Mawthooq.Application.Inventories.UseCases.ReturnStockToSupplier.Mappers;
+using Mawthooq.Application.SupplierReturns.Mappers;
 using Mawthooq.Domain.Inventories;
 using Mawthooq.Domain.Inventories.Entities;
 using Mawthooq.Domain.SupplierReturns;

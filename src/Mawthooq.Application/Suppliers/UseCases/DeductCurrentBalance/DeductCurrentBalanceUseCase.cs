@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs.Mappers;
-using Mawthooq.Application.Inventories.UseCases.ReturnStockToSupplier;
 using Mawthooq.Domain.Suppliers;
 
 namespace Mawthooq.Application.Suppliers.UseCases.DeductCurrentBalance
@@ -19,7 +18,7 @@ namespace Mawthooq.Application.Suppliers.UseCases.DeductCurrentBalance
         public DeductCurrentBalanceResponse Execute(DeductCurrentBalanceRequest request)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
-            
+
             Supplier? supplier = _supplierRepository.GetById(request.SupplierId);
 
             if (supplier == null)
