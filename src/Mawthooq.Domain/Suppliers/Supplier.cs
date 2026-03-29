@@ -26,9 +26,14 @@ namespace Mawthooq.Domain.Suppliers
 
 
         public Supplier(int supplierId, string firstName, string lastName, Email email, Address address, PaymentTerms paymentTerms, Money creditLimit)
+        : this(firstName, lastName, email, address, paymentTerms, creditLimit)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(supplierId, nameof(supplierId));
+            SupplierId = supplierId;
+        }
 
+        private Supplier(string firstName, string lastName, Email email, Address address, PaymentTerms paymentTerms, Money creditLimit)
+        {
             ArgumentException.ThrowIfNullOrWhiteSpace(firstName, nameof(firstName));
             ArgumentException.ThrowIfNullOrWhiteSpace(lastName, nameof(lastName));
 
@@ -47,11 +52,16 @@ namespace Mawthooq.Domain.Suppliers
             CurrentBalance = Money.Zero(creditLimit.Currency);
         }
 
+        public static Supplier Create(string firstName, string lastName, Email email, Address address, PaymentTerms paymentTerms, Money creditLimit)
+        {
+            return new Supplier(firstName, lastName, email, address, paymentTerms, creditLimit);
+        }
+
         public void AddPhone(Phone phone)
         {
             ArgumentNullException.ThrowIfNull(phone, nameof(phone));
             if (_phones.Any(p => p.Equals(phone)))
-                return;
+                throw new InvalidOperationException("Already Phone exist");
 
             _phones.Add(phone);
         }
