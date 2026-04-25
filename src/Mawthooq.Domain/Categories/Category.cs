@@ -7,7 +7,7 @@ namespace Mawthooq.Domain.Categories
 {
     public class Category
     {
-        public int CategoryId { get; }
+        public int CategoryId { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
         public bool IsActive { get; private set; }
@@ -32,6 +32,13 @@ namespace Mawthooq.Domain.Categories
         public static Category Create(string name, string description)
         {
             return new Category(name, description);
+        }
+        public void SetCategoryId(int categoryID)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryID, nameof(categoryID));
+            if (CategoryId != 0)
+                throw new InvalidOperationException("Category ID is already set and cannot be changed.");
+            CategoryId = categoryID;
         }
 
         public void ChangeName(string name)
