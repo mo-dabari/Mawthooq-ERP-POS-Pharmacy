@@ -10,7 +10,8 @@ namespace Mawthooq.Application.Sales.UseCases.CreateSale
     public record class CreateSaleRequest(
         int BranchId,
         IReadOnlyList<CreateSaleLineRequest> SaleLines,
-        Currency Currency)
+        Currency Currency,
+        int? CustomerId = null)
     {
     }
 }
