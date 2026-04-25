@@ -35,15 +35,22 @@ namespace Mawthooq.Domain.ValueObjects
         { CountryCode.BH, new Regex(@"^3\d{7}$", _options) },
 
         // Jordan
-        { CountryCode.JO, new Regex(@"^07\d{8}$", _options) }
+        { CountryCode.JO, new Regex(@"^07\d{8}$", _options) },
+
+        // Palestine
+        { CountryCode.PS, new Regex(@"^05[69]\d{7}$", _options) }
     };
         public CountryCode CountryCode { get; }
         public string Value { get; }
+        public PhoneType PhoneType { get; }
 
-        public Phone(CountryCode countryCode, string value)
+        public Phone(CountryCode countryCode, string value, PhoneType phoneType = PhoneType.Primary)
         {
             if (!Enum.IsDefined(typeof(CountryCode), countryCode))
                 throw new InvalidEnumArgumentException(nameof(countryCode), (int)countryCode, typeof(CountryCode));
+
+            if (!Enum.IsDefined(typeof(PhoneType), phoneType))
+                throw new InvalidEnumArgumentException(nameof(phoneType), (int)phoneType, typeof(PhoneType));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
 
@@ -53,6 +60,9 @@ namespace Mawthooq.Domain.ValueObjects
                 throw new ArgumentException($"The provided phone number does not match the allowed pattern for country code {countryCode}.", nameof(value));
 
             Value = normalized;
+            CountryCode = countryCode;
+            PhoneType = phoneType;
         }
+        public override string ToString() => $"+{(int)CountryCode}{Value}";
     }
 }

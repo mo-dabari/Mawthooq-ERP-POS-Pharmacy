@@ -19,6 +19,7 @@ namespace Mawthooq.Domain.ValueObjects
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(buildingNumber, nameof(buildingNumber));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(street, nameof(street));
+
             ArgumentException.ThrowIfNullOrWhiteSpace(city, nameof(city));
             ArgumentException.ThrowIfNullOrWhiteSpace(governorate, nameof(governorate));
             ArgumentException.ThrowIfNullOrWhiteSpace(country, nameof(country));
@@ -29,7 +30,6 @@ namespace Mawthooq.Domain.ValueObjects
             Governorate = governorate;
             Country = country;
         }
-
         public override string ToString()
         {
             return $"{BuildingNumber}-{Street}-{City}-{Governorate}-{Country}";
@@ -37,7 +37,7 @@ namespace Mawthooq.Domain.ValueObjects
 
         public bool Equals(Address address)
         {
-            ArgumentNullException.ThrowIfNull(address , nameof(address));
+            ArgumentNullException.ThrowIfNull(address, nameof(address));
 
             return
                 BuildingNumber == address.BuildingNumber &&
