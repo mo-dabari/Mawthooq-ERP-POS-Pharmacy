@@ -43,9 +43,14 @@ namespace Mawthooq.Application.Sales.UseCases.CreateSale
                 SaleId: saveSale.SaleId,
                 BranchId: saveSale.BranchId,
                 Currency: saveSale.Currency,
+                CustomerId: saveSale.CustomerId,
                 SaleDate: saveSale.SaleDate,
                 Status: saveSale.Status,
-                Lines: saveSale.Lines.Select(line => line.ToDto()).ToImmutableList()
+                Lines: saveSale.Lines.Select(line => line.ToDto()).ToImmutableList(),
+                FinalAmount: saveSale.FinalAmount.ToDto(),
+                TotalAmount: saveSale.TotalAmount.ToDto(),
+                TotalPurchaseCost: saveSale.TotalPurchaseCost.ToDto(),
+                TotalGrossProfit: saveSale.TotalGrossProfit.ToDto()
             );
         }
     }
