@@ -6,7 +6,7 @@ using Mawthooq.Domain.ValueObjects.Enums;
 
 namespace Mawthooq.Application.Common.DTOs
 {
-    public record class PhoneDto (CountryCode CountryCode, string Number)
+    public record class PhoneDto (CountryCode CountryCode, string Number, PhoneType PhoneType)
     {
 
     }
