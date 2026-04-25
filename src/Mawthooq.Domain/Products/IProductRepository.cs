@@ -8,6 +8,9 @@ namespace Mawthooq.Domain.Products
 {
     public interface IProductRepository : IBaseRepository<Product, int>
     {
+        IEnumerable<Product> GetProductsIsActive();
+        Product? GetProductByName(string ProductName);
+        Product Add(Product product);
 
     }
 }
