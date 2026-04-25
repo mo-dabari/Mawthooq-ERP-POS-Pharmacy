@@ -18,7 +18,6 @@ namespace Mawthooq.Domain.Users
         public string FirstName { get; }
         public string MiddleName { get; }
         public string LastName { get; }
-        public Phone Phone { get; private set; }
         private List<Phone> _contactNumbers = new();
         public IReadOnlyList<Phone> contactNumbers => _contactNumbers.AsReadOnly();
         public DateOnly DateOfBirth { get; }
@@ -39,8 +38,8 @@ namespace Mawthooq.Domain.Users
         public string FullName => $"{FirstName} {LastName}";
 
         public User(
-            int userId, NationalId nationalId,string firstName, string middleName, string lastName,Phone phone, DateOnly dateOfBirth, Role role)
-            : this(nationalId, firstName, middleName, lastName, phone, dateOfBirth, role)
+            int userId, NationalId nationalId, string firstName, string middleName, string lastName, DateOnly dateOfBirth, Role role)
+            : this(nationalId, firstName, middleName, lastName, dateOfBirth, role)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(userId, nameof(userId));
 
@@ -50,15 +49,13 @@ namespace Mawthooq.Domain.Users
         private User(
             NationalId nationalId,
             string firstName, string middleName, string lastName,
-            Phone phone, DateOnly dateOfBirth, Role role)
+            DateOnly dateOfBirth, Role role)
         {
             ArgumentNullException.ThrowIfNull(nationalId, nameof(nationalId));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(firstName, nameof(firstName));
             ArgumentException.ThrowIfNullOrWhiteSpace(middleName, nameof(middleName));
             ArgumentException.ThrowIfNullOrWhiteSpace(lastName, nameof(lastName));
-
-            ArgumentNullException.ThrowIfNull(phone, nameof(phone));
 
             if (today.AddYears(-18) < dateOfBirth)
                 throw new InvalidOperationException("The date of birth must not be earlier than 18.");
@@ -70,11 +67,8 @@ namespace Mawthooq.Domain.Users
             FirstName = firstName;
             LastName = lastName;
             MiddleName = middleName;
-            Phone = phone;
             DateOfBirth = dateOfBirth;
             Role = role;
-
-            _contactNumbers.Add(phone);
         }
 
         public static User Create(
@@ -82,7 +76,7 @@ namespace Mawthooq.Domain.Users
             string firstName, string middleName, string lastName,
             Phone phone, DateOnly dateOfBirth, Role role)
         {
-            return new User(nationalId, firstName, middleName, lastName, phone, dateOfBirth, role);
+            return new User(nationalId, firstName, middleName, lastName, dateOfBirth, role);
         }
 
         public void AddPhone(Phone phone)
@@ -95,18 +89,36 @@ namespace Mawthooq.Domain.Users
                 _contactNumbers.Add(phone);
         }
 
-        public void ChangePhone(Phone phone)
+        public void SetPhones(List<Phone> phones)
+        {
+            ArgumentNullException.ThrowIfNull(phones, nameof(phones));
+
+            if (phones.Count > 3)
+                throw new InvalidOperationException("A user cannot have more than 3 contact numbers.");
+
+            _contactNumbers = phones;
+        }
+
+        public void ChangePhone(Phone oldphone, Phone newphone)
+        {
+            ArgumentNullException.ThrowIfNull(oldphone, nameof(oldphone));
+            ArgumentNullException.ThrowIfNull(newphone, nameof(newphone));
+
+            for (int i = 0; i < _contactNumbers.Count; i++)
+            {
+                if (_contactNumbers[i].Equals(oldphone))
+                {
+                    _contactNumbers[i] = newphone;
+                    return;
+                }
+            }
+        }
+
+        public void RemovePhone(Phone phone)
         {
             ArgumentNullException.ThrowIfNull(phone, nameof(phone));
 
-            if (!Phone.Equals(phone))
-            {
-                Phone = phone;
-                if (_contactNumbers.Count > 0)
-                    _contactNumbers[0] = phone;
-                else
-                    _contactNumbers.Add(phone);
-            }
+            _contactNumbers.Remove(phone);
         }
 
         public void ChangeRole(Role role)
