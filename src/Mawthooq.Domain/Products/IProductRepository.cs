@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Domain.Common.Interfaces;
+using Mawthooq.Domain.Products.ValueObjects;
+using Mawthooq.Domain.Products.ValueObjects.Barcodes;
+using Mawthooq.Domain.SharedKernel.Abstractions;
 
 namespace Mawthooq.Domain.Products
 {
-    public interface IProductRepository : IBaseRepository<Product, int>
+    public interface IProductRepository : IBaseRepository<Product, ProductId>
     {
-        IEnumerable<Product> GetProductsIsActive();
-        Product? GetProductByName(string ProductName);
-        Product Add(Product product);
-
+        bool ExistsBySku(SKU sku);
+        bool ExistsByBarcode(Barcode barcode);
     }
 }
