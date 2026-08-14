@@ -393,7 +393,7 @@ namespace Mawthooq.Domain.Products
             RaiseDomainEvent(new ProductNearExpiryThresholdChangedEvent(ProductId, NearExpiryThresholdInDays, DateTime.UtcNow));
 
         }
-        public void ChangeImageFile(Image image)
+        public void ChangeImage(Image image)
         {
             ArgumentNullException.ThrowIfNull(image, nameof(image));
 
