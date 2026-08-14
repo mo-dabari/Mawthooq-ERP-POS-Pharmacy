@@ -121,6 +121,7 @@ namespace Mawthooq.Domain.Products
                 nearExpiryThresholdInDays,
                 image,
                 DateTime.UtcNow));
+
             product.CreatePackagingVersion(packaging, firstReservedBarcode);
 
             return product;
@@ -296,12 +297,15 @@ namespace Mawthooq.Domain.Products
             if (existPackagingVersions is null)
                 throw new InvalidOperationException($"The Packaging Version Not Exists");
 
+            if (existPackagingVersions.Status == Status.Active) return;
+
             existPackagingVersions.ActivatePackagingVersion();
 
             RaiseDomainEvent(
-                new PackagingVersionActivatedEvent(
+                new PackagingVersionStatusEvent(
                         ProductId,
                         packagingVersionId,
+                        existPackagingVersions.Status,
                         DateTime.UtcNow));
         }
         public void DeactivatePackagingVersions(PackagingVersionId packagingVersionId)
@@ -313,13 +317,16 @@ namespace Mawthooq.Domain.Products
             if (existPackagingVersions is null)
                 throw new InvalidOperationException($"The Packaging Version Not Exists");
 
+            if (existPackagingVersions.Status == Status.Inactive) return;
+
             existPackagingVersions.DeactivatePackagingVersion();
 
             RaiseDomainEvent(
-                new PackagingVersionDeactivatedEvent(
-                        ProductId,
-                        packagingVersionId,
-                        DateTime.UtcNow));
+                 new PackagingVersionStatusEvent(
+                         ProductId,
+                         packagingVersionId,
+                         existPackagingVersions.Status,
+                         DateTime.UtcNow));
         }
         public void Rename(string newName)
         {
@@ -327,7 +334,7 @@ namespace Mawthooq.Domain.Products
 
             newName = newName.Trim();
 
-            if (TradeName.Equals(newName, StringComparison.Ordinal))
+            if (TradeName.Equals(newName, StringComparison.OrdinalIgnoreCase))
                 return;
 
             TradeName = newName;
@@ -343,7 +350,7 @@ namespace Mawthooq.Domain.Products
 
             CategoryId = categoryId;
 
-            RaiseDomainEvent(new ProductCategoryChangedEvent(ProductId, CategoryId, DateTime.UtcNow));
+            RaiseDomainEvent(new ProductCategoryChangedEvent(ProductId, categoryId, DateTime.UtcNow));
         }
         public void AllowReturnIfOpened()
         {
