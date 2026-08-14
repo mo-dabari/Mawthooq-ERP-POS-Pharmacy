@@ -369,7 +369,7 @@ namespace Mawthooq.Domain.Products
 
             RaiseDomainEvent(new ProductStatusChangedEvent(ProductId, Status, DateTime.UtcNow));
         }
-        public void Inactive()
+        public void Deactivate()
         {
             if (Status.Equals(Status.Inactive))
                 return;
