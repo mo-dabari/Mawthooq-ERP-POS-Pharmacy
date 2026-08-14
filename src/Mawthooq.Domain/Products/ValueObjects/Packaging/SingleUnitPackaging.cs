@@ -30,7 +30,7 @@ namespace Mawthooq.Domain.Products.ValueObjects.Packaging
         {
             return
             [
-                ProductUnitDefinition.Create(SingleUnit, 1, UnitRank.Tertiary)
+                ProductUnitDefinition.Create(SingleUnit, 1, UnitRank.Primary)
             ];
         }
     }

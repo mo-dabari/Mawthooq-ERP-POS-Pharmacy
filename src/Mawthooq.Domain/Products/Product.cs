@@ -73,6 +73,7 @@ namespace Mawthooq.Domain.Products
             CategoryId categoryId,
             ManufacturerId manufacturerId,
             LocalAgentId localAgentId,
+            Status status,
             ProductPackaging packaging,
             long firstReservedBarcode,
             Image image,
@@ -91,17 +92,18 @@ namespace Mawthooq.Domain.Products
                 localAgentId,
                 packaging,
                 nearExpiryThresholdInDays,
+                requiresExpiryTracking,
                 image);
 
             string trimmedName = name.Trim();
             Product product = new Product(
                 productId,
-                name,
+                trimmedName,
                 sku,
                 categoryId,
                 manufacturerId,
                 localAgentId,
-                Status.Active,
+                status,
                 requiresExpiryTracking,
                 canBeReturnedIfOpened,
                 nearExpiryThresholdInDays,
@@ -119,6 +121,7 @@ namespace Mawthooq.Domain.Products
                 nearExpiryThresholdInDays,
                 image,
                 DateTime.UtcNow));
+
             product.CreatePackagingVersion(packaging, firstReservedBarcode);
 
             return product;
@@ -152,7 +155,7 @@ namespace Mawthooq.Domain.Products
                 categoryId,
                 manufacturerId,
                 localAgentId,
-                Status.Active,
+                status,
                 requiresExpiryTracking,
                 canBeReturnedIfOpened,
                 nearExpiryThresholdInDays,
@@ -294,12 +297,15 @@ namespace Mawthooq.Domain.Products
             if (existPackagingVersions is null)
                 throw new InvalidOperationException($"The Packaging Version Not Exists");
 
+            if (existPackagingVersions.Status == Status.Active) return;
+
             existPackagingVersions.ActivatePackagingVersion();
 
             RaiseDomainEvent(
-                new PackagingVersionActivatedEvent(
+                new PackagingVersionStatusEvent(
                         ProductId,
                         packagingVersionId,
+                        existPackagingVersions.Status,
                         DateTime.UtcNow));
         }
         public void DeactivatePackagingVersions(PackagingVersionId packagingVersionId)
@@ -311,13 +317,16 @@ namespace Mawthooq.Domain.Products
             if (existPackagingVersions is null)
                 throw new InvalidOperationException($"The Packaging Version Not Exists");
 
+            if (existPackagingVersions.Status == Status.Inactive) return;
+
             existPackagingVersions.DeactivatePackagingVersion();
 
             RaiseDomainEvent(
-                new PackagingVersionDeactivatedEvent(
-                        ProductId,
-                        packagingVersionId,
-                        DateTime.UtcNow));
+                 new PackagingVersionStatusEvent(
+                         ProductId,
+                         packagingVersionId,
+                         existPackagingVersions.Status,
+                         DateTime.UtcNow));
         }
         public void Rename(string newName)
         {
@@ -325,7 +334,7 @@ namespace Mawthooq.Domain.Products
 
             newName = newName.Trim();
 
-            if (TradeName.Equals(newName, StringComparison.Ordinal))
+            if (TradeName.Equals(newName, StringComparison.OrdinalIgnoreCase))
                 return;
 
             TradeName = newName;
@@ -341,7 +350,7 @@ namespace Mawthooq.Domain.Products
 
             CategoryId = categoryId;
 
-            RaiseDomainEvent(new ProductCategoryChangedEvent(ProductId, CategoryId, DateTime.UtcNow));
+            RaiseDomainEvent(new ProductCategoryChangedEvent(ProductId, categoryId, DateTime.UtcNow));
         }
         public void AllowReturnIfOpened()
         {
@@ -367,7 +376,7 @@ namespace Mawthooq.Domain.Products
 
             RaiseDomainEvent(new ProductStatusChangedEvent(ProductId, Status, DateTime.UtcNow));
         }
-        public void Inactive()
+        public void Deactivate()
         {
             if (Status.Equals(Status.Inactive))
                 return;
@@ -391,7 +400,7 @@ namespace Mawthooq.Domain.Products
             RaiseDomainEvent(new ProductNearExpiryThresholdChangedEvent(ProductId, NearExpiryThresholdInDays, DateTime.UtcNow));
 
         }
-        public void ChangeImageFile(Image image)
+        public void ChangeImage(Image image)
         {
             ArgumentNullException.ThrowIfNull(image, nameof(image));
 
@@ -411,6 +420,7 @@ namespace Mawthooq.Domain.Products
             LocalAgentId localAgentId,
             ProductPackaging packaging,
             int nearExpiryThresholdInDays,
+            bool requiresExpiryTracking,
             Image image)
         {
             ArgumentNullException.ThrowIfNull(productId, nameof(productId));
@@ -424,6 +434,9 @@ namespace Mawthooq.Domain.Products
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 
             ArgumentOutOfRangeException.ThrowIfNegative(nearExpiryThresholdInDays, nameof(nearExpiryThresholdInDays));
+
+            if (requiresExpiryTracking && nearExpiryThresholdInDays == 0)
+                throw new InvalidOperationException("Near expiry threshold in days must be greater than zero when expiry tracking is required.");
         }
     }
 }
