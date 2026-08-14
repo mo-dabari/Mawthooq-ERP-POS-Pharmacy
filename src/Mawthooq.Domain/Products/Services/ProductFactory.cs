@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Categories.ValueObjects;
+using Mawthooq.Domain.LocalAgents.ValueObjects;
+using Mawthooq.Domain.Manufacturers.ValueObjects;
 using Mawthooq.Domain.Products.ValueObjects;
 using Mawthooq.Domain.Products.ValueObjects.Barcodes;
 using Mawthooq.Domain.Products.ValueObjects.Packaging;
+using Mawthooq.Domain.SharedKernel.Enums;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Domain.Products.Services
 {
@@ -24,7 +28,10 @@ namespace Mawthooq.Domain.Products.Services
             string name,
             SKU sku,
             CategoryId categoryId,
+            ManufacturerId manufacturerId,
+            LocalAgentId localAgentId,
             ProductPackaging packaging,
+            Image image,
             bool requiresExpiryTracking = true,
             bool canBeReturnedIfOpened = false,
             int nearExpiryThresholdInDays = 30)
@@ -34,15 +41,18 @@ namespace Mawthooq.Domain.Products.Services
 
 
             return Product.Create(
-                            productId,
-                            name,
-                            sku,
-                            categoryId,
-                            packaging,
-                            startBarcodeSequence,
-                            requiresExpiryTracking,
-                            canBeReturnedIfOpened,
-                            nearExpiryThresholdInDays); ;
+                        productId,
+                        name,
+                        sku,
+                        categoryId,
+                        manufacturerId,
+                        localAgentId,
+                        packaging,
+                        startBarcodeSequence,
+                        image,
+                        requiresExpiryTracking,
+                        canBeReturnedIfOpened,
+                        nearExpiryThresholdInDays);
         }
     }
 }
