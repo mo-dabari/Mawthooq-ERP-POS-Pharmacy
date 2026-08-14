@@ -73,6 +73,7 @@ namespace Mawthooq.Domain.Products
             CategoryId categoryId,
             ManufacturerId manufacturerId,
             LocalAgentId localAgentId,
+            Status status,
             ProductPackaging packaging,
             long firstReservedBarcode,
             Image image,
@@ -91,17 +92,18 @@ namespace Mawthooq.Domain.Products
                 localAgentId,
                 packaging,
                 nearExpiryThresholdInDays,
+                requiresExpiryTracking,
                 image);
 
             string trimmedName = name.Trim();
             Product product = new Product(
                 productId,
-                name,
+                trimmedName,
                 sku,
                 categoryId,
                 manufacturerId,
                 localAgentId,
-                Status.Active,
+                status,
                 requiresExpiryTracking,
                 canBeReturnedIfOpened,
                 nearExpiryThresholdInDays,
@@ -152,7 +154,7 @@ namespace Mawthooq.Domain.Products
                 categoryId,
                 manufacturerId,
                 localAgentId,
-                Status.Active,
+                status,
                 requiresExpiryTracking,
                 canBeReturnedIfOpened,
                 nearExpiryThresholdInDays,
