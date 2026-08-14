@@ -420,6 +420,7 @@ namespace Mawthooq.Domain.Products
             LocalAgentId localAgentId,
             ProductPackaging packaging,
             int nearExpiryThresholdInDays,
+            bool requiresExpiryTracking,
             Image image)
         {
             ArgumentNullException.ThrowIfNull(productId, nameof(productId));
@@ -433,6 +434,9 @@ namespace Mawthooq.Domain.Products
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 
             ArgumentOutOfRangeException.ThrowIfNegative(nearExpiryThresholdInDays, nameof(nearExpiryThresholdInDays));
+
+            if (requiresExpiryTracking && nearExpiryThresholdInDays == 0)
+                throw new InvalidOperationException("Near expiry threshold in days must be greater than zero when expiry tracking is required.");
         }
     }
 }
