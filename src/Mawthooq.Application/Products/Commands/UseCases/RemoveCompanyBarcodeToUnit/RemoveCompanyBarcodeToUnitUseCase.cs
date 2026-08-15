@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Domain.Products;
@@ -19,16 +20,16 @@ namespace Mawthooq.Application.Products.Commands.UseCases.RemoveCompanyBarcodeTo
             _productRepository = productRepository;
         }
 
-        public RemoveCompanyBarcodeToUnitResponse Execute(RemoveCompanyBarcodeToUnitRequest request)
+        public async Task<RemoveCompanyBarcodeToUnitResponse> ExecuteAsync(RemoveCompanyBarcodeToUnitRequest request, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var product = _productRepository.GetById(request.ProductIdDto.ToDomain());
+            var product = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)
                 throw new InvalidOperationException($"Product with ID {request.ProductIdDto.Value} not found.");
 
-            if (!_productRepository.ExistsByBarcode(request.BarcodeDto.ToDomain()))
+            if (!await _productRepository.ExistsByBarcodeAsync(request.BarcodeDto.ToDomain(), cancellationToken))
                 throw new InvalidOperationException($"Not Found barcode : {request.BarcodeDto.Value}");
 
             product.RemoveCompanyBarcodeFromVersion(
@@ -36,7 +37,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.RemoveCompanyBarcodeTo
                 request.UnitName,
                 request.BarcodeDto.ToDomain());
 
-            byte[] newRowVersion = _productRepository.Update(product, request.RowVersion);
+            byte[] newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
             var unit = product.PackagingVersions
                 .Single(pv => pv.PackagingVersionId.Value == request.PackagingVersionIdDto.Value)

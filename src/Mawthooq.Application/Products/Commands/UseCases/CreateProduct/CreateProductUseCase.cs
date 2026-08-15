@@ -32,25 +32,29 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             _barcodeGenerator = barcodeGenerator;
         }
 
-        public CreateProductResponse Execute(CreateProductRequest request)
+        public async Task<CreateProductResponse> ExecuteAsync(
+            CreateProductRequest request,
+            CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var info = request.ProductInformationDto;
 
-            Category? category = _categoryRepository.GetById(request.ProductInformationDto.CategoryIdDto.ToDomain());
+            Category? category = await _categoryRepository.GetByIdAsync(
+                info.CategoryIdDto.ToDomain(),
+                cancellationToken);
 
             if (category == null)
-                throw new InvalidOperationException($"Category with {request.ProductInformationDto.CategoryIdDto.Value} not found.");
+                throw new InvalidOperationException($"Category with {info.CategoryIdDto.Value} not found.");
 
-            SKU sKU = request.ProductInformationDto.Sku.ToDomain();
+            SKU sKU = info.Sku.ToDomain();
 
-            if (_productRepository.ExistsBySku(sKU))
+            if (await _productRepository.ExistsBySkuAsync(sKU, cancellationToken))
                 throw new InvalidOperationException($"SKU '{sKU.Value}' already exists.");
 
-            var product = request.ToDomain(category.CategoryId, sKU, _barcodeGenerator);
+            var product = await request.ToDomainAsync(category.CategoryId, sKU, _barcodeGenerator);
 
-            Product? savedProduct = _productRepository.Add(product);
+            var savedProduct = await _productRepository.AddAsync(product,cancellationToken);
 
             if (savedProduct is null)
                 throw new InvalidOperationException("Failed to create product");
