@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Commands.Mappers;
+using Mawthooq.Application.Products.Commands.UseCases.DiscontinueProduct;
 using Mawthooq.Domain.Products;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.AllowReturnIfOpened
@@ -18,24 +20,25 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AllowReturnIfOpened
             _productRepository = productRepository;
         }
 
-        public AllowReturnIfOpenedResponse Execute(AllowReturnIfOpenedRequest request)
+        public async Task<AllowReturnIfOpenedResponse> ExecuteAsync(DiscontinueProductRequest request, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var product = _productRepository.GetById(request.ProductIdDto.ToDomain());
+            var product = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new InvalidOperationException($"Product with ID {request.ProductIdDto.Value} not found.");
+                throw new InvalidOperationException($"Product with ID {request.ProductId.Value} not found.");
 
             product.AllowReturnIfOpened();
-            
-            var newRowVersion =_productRepository.Update(product,request.RowVersion);
+
+            var newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
             return new AllowReturnIfOpenedResponse(
                 product.ProductId.ToDto(),
                 product.TradeName,
                 product.CanBeReturnedIfOpened,
                 newRowVersion);
+
 
         }
     }
