@@ -12,9 +12,9 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProducts
     (
         string? SearchText = null,
 
-        int? FilterByCategoryId = null,
-
-        int? FilterByManufacturerId = null,
+        Guid? FilterByCategoryId = null,
+        
+        Guid? FilterByManufacturerId = null,
 
         ProductStatusFilter FilterByStatus = ProductStatusFilter.ActiveOnly,
 
