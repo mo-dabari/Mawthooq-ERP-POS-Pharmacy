@@ -7,6 +7,8 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProductLookup
 {
     public interface IGetProductLookupQueryRepository
     {
-        
+        Task<IReadOnlyList<GetProductLookupItemDto>> GetProductLookupAsync(
+            GetProductLookupQuery query,
+            CancellationToken cancellationToken = default);
     }
 }

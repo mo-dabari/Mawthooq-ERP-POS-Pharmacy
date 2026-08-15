@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace Mawthooq.Application.Products.Queries.UseCases.GetProductLookup
 {
-    public class GetProductLookupItemDto
-    {
-        
-    }
+    public sealed record GetProductLookupItemDto(
+         Guid ProductId,
+         string DisplayName,
+         string Sku,
+         string InternalBarcode);
 }
