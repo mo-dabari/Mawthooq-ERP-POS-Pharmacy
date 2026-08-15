@@ -10,7 +10,7 @@ namespace Mawthooq.Domain.Products
 {
     public interface IProductRepository : IBaseRepository<Product, ProductId>
     {
-        bool ExistsBySku(SKU sku);
-        bool ExistsByBarcode(Barcode barcode);
+        Task<bool> ExistsBySkuAsync(SKU sku, CancellationToken cancellationToken = default);
+        Task<bool> ExistsByBarcodeAsync(Barcode barcode, CancellationToken cancellationToken = default);
     }
 }

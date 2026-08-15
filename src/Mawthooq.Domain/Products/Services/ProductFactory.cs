@@ -23,7 +23,7 @@ namespace Mawthooq.Domain.Products.Services
             _barcodeGenerator = barcodeGenerator;
         }
 
-        public Product Create(
+        public async Task<Product> CreateAsync(
             ProductId productId,
             string name,
             SKU sku,
@@ -34,11 +34,11 @@ namespace Mawthooq.Domain.Products.Services
             Image image,
             bool requiresExpiryTracking = true,
             bool canBeReturnedIfOpened = false,
-            int nearExpiryThresholdInDays = 30)
+            int nearExpiryThresholdInDays = 30,
+            CancellationToken cancellationToken = default)
         {
             int unitsCount = packaging.GetUnitDefinitions().Count();
-            long startBarcodeSequence = _barcodeGenerator.GetNextBarcodeSequence(unitsCount);
-
+            long startBarcodeSequence = await _barcodeGenerator.GetNextBarcodeSequence(unitsCount, cancellationToken);
 
             return Product.Create(
                         productId,

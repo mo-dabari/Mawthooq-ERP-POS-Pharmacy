@@ -7,8 +7,8 @@ namespace Mawthooq.Domain.SharedKernel.Abstractions
 {
     public interface IBaseRepository<T, TId> where T : class
     {
-        T? GetById(TId id);
-        byte[] Update(T entity, byte[] expectedRowVersion);
-        T? Add(T entity);
+        Task<T?> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
+        Task<byte[]> UpdateAsync(T entity, byte[] expectedRowVersion, CancellationToken cancellationToken = default);
+        Task<T?> AddAsync(T entity, CancellationToken cancellationToken = default);
     }
 }
