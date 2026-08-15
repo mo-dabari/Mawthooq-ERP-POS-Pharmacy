@@ -47,7 +47,6 @@ namespace Mawthooq.Domain.Products.Services
                         categoryId,
                         manufacturerId,
                         localAgentId,
-                        Status.Active,
                         packaging,
                         startBarcodeSequence,
                         image,
