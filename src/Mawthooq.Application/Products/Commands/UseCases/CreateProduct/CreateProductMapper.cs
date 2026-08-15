@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
 using Mawthooq.Application.Common.Mappers;
 using Mawthooq.Application.LocalAgents.Mappers;
 using Mawthooq.Application.Manufacturers.Mappers;
-using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Application.Products.Commands.UseCases.CreateProduct;
 using Mawthooq.Domain.Categories.ValueObjects;
 using Mawthooq.Domain.LocalAgents.ValueObjects;
@@ -14,13 +14,18 @@ using Mawthooq.Domain.Manufacturers.ValueObjects;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.Services;
 using Mawthooq.Domain.Products.ValueObjects;
-using Mawthooq.Domain.Products.ValueObjects.Packaging;
 
 namespace Mawthooq.Application.Products.Commands.Mappers
 {
     public static class CreateProductMapper
     {
-        public static Product ToDomain(this CreateProductRequest request, CategoryId categoryId, SKU sKU, IInternalBarcodeSequenceGenerator barcodeGenerator)
+        public static async Task<Product> ToDomainAsync(
+            this CreateProductRequest request,
+            CategoryId categoryId,
+            SKU sKU,
+            IInternalBarcodeSequenceGenerator barcodeGenerator,
+            CancellationToken cancellationToken = default
+            )
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
             ArgumentNullException.ThrowIfNull(categoryId, nameof(categoryId));
@@ -35,7 +40,7 @@ namespace Mawthooq.Application.Products.Commands.Mappers
 
             var factory = new ProductFactory(barcodeGenerator);
 
-            var product = factory.Create(
+            var product = await factory.CreateAsync(
                ProductId.New(),
                info.TradeName,
                sKU,
@@ -46,9 +51,10 @@ namespace Mawthooq.Application.Products.Commands.Mappers
                image,
                info.RequiresExpiryTracking,
                info.CanBeReturnedIfOpened,
-               info.NearExpiryThresholdInDays);
+               info.NearExpiryThresholdInDays,
+               cancellationToken);
 
-            if (request.UserBarcodes is { Count: > 0 })
+            if (request.UserBarcodes.Count > 0)
             {
                 var firstVersionId = product.PackagingVersions.Single().PackagingVersionId;
 
