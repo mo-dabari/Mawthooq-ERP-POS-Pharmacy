@@ -6,7 +6,7 @@ using Mawthooq.Application.Common.DTOs;
 
 namespace Mawthooq.Application.Customers.UseCases.GetCustomerByID
 {
-    public record class GetCustomerByIdResponse(int CustomerId, string FullName, PhoneDto PhoneNumber, bool IsActive, DateTime CreatedAt)
+    public record class GetCustomerByIdResponse(int CustomerId, string FullName, bool IsActive, DateTime CreatedAt)
     {
 
     }

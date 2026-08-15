@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs.Mappers;
 using Mawthooq.Application.Returns.DTOs;
 using Mawthooq.Domain.Inventories;
+using Mawthooq.Domain.Inventories.ValueObjects;
 using Mawthooq.Domain.Payments;
 using Mawthooq.Domain.Payments.Entity;
 using Mawthooq.Domain.Returns;
@@ -14,7 +15,7 @@ using Mawthooq.Domain.Returns.Enums;
 using Mawthooq.Domain.Sales;
 using Mawthooq.Domain.Sales.Entity;
 using Mawthooq.Domain.Sales.Enums;
-using Mawthooq.Domain.ValueObjects.Money;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Application.Returns.UseCase
 {
@@ -64,7 +65,7 @@ namespace Mawthooq.Application.Returns.UseCase
 
                 createdReturn.AddReturnedProduct(returnLine);
 
-                inventory.ReceiveStock(returnedProduct.Quantity, inventory.BatchValues.Last().PurchaseCost, DateTime.UtcNow, returnedProduct.ExpiryDate);
+                // inventory.ReceiveStock(returnedProduct.Quantity, inventory.Batches.Last().PurchaseCost, DateTime.UtcNow, returnedProduct.ExpiryDate);
 
                 _inventoryRepository.Update(inventory);
 
@@ -124,7 +125,7 @@ namespace Mawthooq.Application.Returns.UseCase
         }
         private Inventory GetInventoryOrThrow(int productId, int branchId)
         {
-            Inventory? inventory = _inventoryRepository.GetInventoryByProductAndBranch(productId, branchId);
+            Inventory? inventory = _inventoryRepository.GetByInventoryKey(new InventoryKey(branchId, productId));
             if (inventory == null)
                 throw new InvalidOperationException($"Inventory not found for product ID {productId} in branch ID {branchId}");
             return inventory;

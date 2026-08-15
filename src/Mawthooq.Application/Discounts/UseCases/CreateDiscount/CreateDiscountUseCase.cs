@@ -22,6 +22,9 @@ namespace Mawthooq.Application.Discounts.UseCases.CreateDiscount
             Discount discount = Discount.Create(request.Name, request.ProductId, request.DiscountType, request.DiscountTarget, request.Value, request.IsActive);
             Discount? savedDiscount = _discountRepository.Add(discount);
 
+            if (savedDiscount is null)
+                throw new InvalidOperationException("Failed to create discount");
+
             return new CreateDiscountResponse(
                 savedDiscount.DiscountId,
                 savedDiscount.Name,

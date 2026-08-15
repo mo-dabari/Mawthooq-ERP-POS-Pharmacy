@@ -24,8 +24,6 @@ namespace Mawthooq.Application.Customers.UseCases.UpdateCustomer
             if (customer is null)
                 throw new InvalidOperationException("Customer not found");
 
-            customer.ChangePhone(request.PhoneNumber.ToDomain());
-
             if (request.IsActive)
                 customer.Activate();
             else
@@ -37,7 +35,6 @@ namespace Mawthooq.Application.Customers.UseCases.UpdateCustomer
             return new UpdateCustomerResponse(
                 customer.CustomerId,
                 customer.FullName,
-                customer.Phone.ToDto(),
                 customer.IsActive);
         }
     }

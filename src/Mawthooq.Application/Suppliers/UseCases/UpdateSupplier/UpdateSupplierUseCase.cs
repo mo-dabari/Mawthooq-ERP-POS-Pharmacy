@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs.Mappers;
 using Mawthooq.Domain.Suppliers;
-using Mawthooq.Domain.ValueObjects;
 
 namespace Mawthooq.Application.Suppliers.UseCases.UpdateSupplier
 {
@@ -33,7 +32,7 @@ namespace Mawthooq.Application.Suppliers.UseCases.UpdateSupplier
                 throw new InvalidOperationException("Must Be Credit Limit Bigger Then Or Equle Current Balance");
             supplier.UpdateCreditLimit(request.CreditLimit.ToDomain());
 
-            _supplierRepository.Update(supplier);
+            _supplierRepository.Update(supplier,request.rowVersion);
 
             return new UpdateSupplierResponse(
                 supplier.SupplierId,

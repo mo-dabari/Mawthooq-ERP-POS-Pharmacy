@@ -1,49 +1,39 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Mawthooq.Domain.Categories.Enums;
+using Mawthooq.Domain.Categories.ValueObjects;
 
 namespace Mawthooq.Domain.Categories
 {
     public class Category
     {
-        public int CategoryId { get; private set; }
-        public string Name { get; private set; }
+        public CategoryId CategoryId { get; }
+        public ProductCategory Name { get; private set; }
         public string Description { get; private set; }
-        public bool IsActive { get; private set; }
-        public Category(int categoryId, string name, string description) : this(name, description)
+        public bool Status { get; private set; }
+        private Category(CategoryId categoryId, ProductCategory name, string description)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId, nameof(categoryId));
-
-            ValidateArguments(name, description);
+            ValidateArguments(categoryId, name, description);
 
             CategoryId = categoryId;
-        }
-
-        private Category(string name, string description)
-        {
-            ValidateArguments(name, description);
-
             Name = name;
-            Description = description;
-            IsActive = true;
+            Description = description.Trim();
+            Status = true;
         }
 
-        public static Category Create(string name, string description)
+        public static Category Create(CategoryId categoryId, ProductCategory name, string description)
         {
-            return new Category(name, description);
-        }
-        public void SetCategoryId(int categoryID)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryID, nameof(categoryID));
-            if (CategoryId != 0)
-                throw new InvalidOperationException("Category ID is already set and cannot be changed.");
-            CategoryId = categoryID;
+            return new Category(categoryId, name, description);
         }
 
-        public void ChangeName(string name)
+        public void Rename(ProductCategory name)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+            if (!Enum.IsDefined(typeof(ProductCategory), name))
+                throw new InvalidEnumArgumentException(nameof(name), (int)name, typeof(ProductCategory));
+
             if (Name == name)
                 return;
 
@@ -53,6 +43,8 @@ namespace Mawthooq.Domain.Categories
         public void ChangeDescription(string description)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(description, nameof(description));
+            description = description.Trim();
+
             if (Description == description)
                 return;
 
@@ -61,23 +53,34 @@ namespace Mawthooq.Domain.Categories
 
         public void Activate()
         {
-            if (IsActive)
+            if (Status == true)
                 return;
 
-            IsActive = true;
+            Status = true;
         }
 
         public void Deactivate()
         {
-            if (!IsActive)
+            if (Status == false)
                 return;
 
-            IsActive = false;
+            Status = false;
         }
 
-        private void ValidateArguments(string name, string description)
+        public void ChangeStatus(bool isActive)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+            if (isActive)
+                Activate();
+            else
+                Deactivate();
+        }
+        private void ValidateArguments(CategoryId categoryId, ProductCategory name, string description)
+        {
+            ArgumentNullException.ThrowIfNull(categoryId, nameof(categoryId));
+
+            if (!Enum.IsDefined(typeof(ProductCategory), name))
+                throw new InvalidEnumArgumentException(nameof(name), (int)name, typeof(ProductCategory));
+
             ArgumentException.ThrowIfNullOrWhiteSpace(description, nameof(description));
         }
     }

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Payments.Enums;
-using Mawthooq.Domain.ValueObjects.Money;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Domain.Payments.Entity
 {

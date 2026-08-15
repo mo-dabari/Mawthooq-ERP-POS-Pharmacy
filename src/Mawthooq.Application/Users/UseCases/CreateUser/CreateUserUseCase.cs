@@ -20,8 +20,12 @@ namespace Mawthooq.Application.Users.UseCases.CreateUser
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             User user = User.Create(request.NationalId.ToDomain(), request.FirstName, request.MiddleName, request.LastName, request.PhoneNumber.ToDomain(), request.DateOfBirth, request.Role);
-            User savedUser = _userRepository.Add(user);
-            return new CreateUserResponse(savedUser.UserId, savedUser.NationalId.ToDto(), savedUser.FullName, savedUser.Phone.ToDto(), savedUser.DateOfBirth, savedUser.Age, savedUser.Role);
+            User? savedUser = _userRepository.Add(user);
+
+            if (savedUser is null)
+                throw new InvalidOperationException("Failed to create user");
+
+            return new CreateUserResponse(savedUser.UserId, savedUser.NationalId.ToDto(), savedUser.FullName, savedUser.DateOfBirth, savedUser.Age, savedUser.Role);
         }
     }
 }

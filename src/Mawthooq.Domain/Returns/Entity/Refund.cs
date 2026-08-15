@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Payments.Enums;
 using Mawthooq.Domain.Returns.Enums;
-using Mawthooq.Domain.ValueObjects.Money;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Domain.Returns.Entity
 {

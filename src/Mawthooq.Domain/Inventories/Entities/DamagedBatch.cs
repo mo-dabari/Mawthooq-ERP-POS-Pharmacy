@@ -7,7 +7,7 @@ using Mawthooq.Domain.Inventories.Enums;
 
 namespace Mawthooq.Domain.Inventories.Entities
 {
-    public record class DamagedBatch
+    public class DamagedBatch
     {
         public int DamagedBatchId { get; private set; }
         public int Quantity { get; }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.Payments.DTOs;
-using Mawthooq.Domain.ValueObjects.Money.Enums;
+using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Application.Payments.UseCases.GetPaymentBySaleId
 {

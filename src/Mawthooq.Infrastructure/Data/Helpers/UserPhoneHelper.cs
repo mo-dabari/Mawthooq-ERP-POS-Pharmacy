@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Mawthooq.Domain.SharedKernel.Enums;
 using Mawthooq.Domain.ValueObjects;
-using Mawthooq.Domain.ValueObjects.Enums;
 using Microsoft.Data.SqlClient;
 
 namespace Mawthooq.Infrastructure.Data.Helpers
@@ -21,7 +21,7 @@ namespace Mawthooq.Infrastructure.Data.Helpers
             string query = "SELECT DialingCode, PhoneNumber, PhoneType FROM UserPhones WHERE UserId = @UserId";
 
             using SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@UserId", userId).DbType = DbType.Int32;
+            command.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
 
             using SqlDataReader reader = command.ExecuteReader();
 
@@ -29,15 +29,18 @@ namespace Mawthooq.Infrastructure.Data.Helpers
             {
                 int dialingCode = reader.GetInt32(reader.GetOrdinal("DialingCode"));
                 string phoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber"));
-                PhoneType phoneType = (PhoneType)reader.GetInt32(reader.GetOrdinal("PhoneType"));
 
-                if (!Enum.IsDefined(typeof(CountryCode), dialingCode))
+                if (!Enum.TryParse(reader.GetString(reader.GetOrdinal("PhoneType")), out PhoneType parsedPhoneType))
+                    throw new Exception($"Invalid PhoneType value: {reader.GetString(reader.GetOrdinal("PhoneType"))}");
+
+                PhoneType phoneType = parsedPhoneType;
+
+                if (!Enum.TryParse(dialingCode.ToString(), out CountryCode countryCode))
                     throw new Exception($"Invalid DialingCode: {dialingCode}");
 
                 if (phoneNumber.StartsWith("0"))
                     phoneNumber = phoneNumber.Substring(1);
 
-                CountryCode countryCode = (CountryCode)dialingCode;
                 phones.Add(new Phone(countryCode, phoneNumber, phoneType));
             }
             return phones;
@@ -52,11 +55,11 @@ namespace Mawthooq.Infrastructure.Data.Helpers
             string query = "INSERT INTO UserPhones (UserId, CountryCode, DialingCode, PhoneNumber, PhoneType) VALUES (@UserId, @CountryCode, @DialingCode, @PhoneNumber, @PhoneType)";
 
             using SqlCommand command = new SqlCommand(query, connection, transaction);
-            command.Parameters.AddWithValue("@UserId", userId).DbType = DbType.Int32;
-            command.Parameters.AddWithValue("@CountryCode", phone.CountryCode.ToString()).DbType = DbType.String;
-            command.Parameters.AddWithValue("@DialingCode", ((int)phone.CountryCode).ToString()).DbType = DbType.String;
-            command.Parameters.AddWithValue("@PhoneNumber", phone.Value).DbType = DbType.String;
-            command.Parameters.AddWithValue("@PhoneType", (int)phone.PhoneType).DbType = DbType.Int32;
+            command.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
+            command.Parameters.Add("@CountryCode", SqlDbType.Char, 3).Value = phone.CountryCode.ToString();
+            command.Parameters.Add("@DialingCode", SqlDbType.VarChar, 5).Value = ((int)phone.CountryCode).ToString();
+            command.Parameters.Add("@PhoneNumber", SqlDbType.VarChar, 15).Value = phone.Value;
+            command.Parameters.Add("@PhoneType", SqlDbType.NVarChar).Value = phone.PhoneType.ToString();
 
             command.ExecuteNonQuery();
         }
@@ -91,12 +94,12 @@ namespace Mawthooq.Infrastructure.Data.Helpers
                                PhoneNumber = @OldPhoneNumber";
 
             using SqlCommand command = new SqlCommand(query, connection, transaction);
-            command.Parameters.AddWithValue("@UserId", userId).DbType = DbType.Int32;
-            command.Parameters.AddWithValue("@PhoneNumber", newPhone.Value).DbType = DbType.String;
-            command.Parameters.AddWithValue("@OldPhoneNumber", oldPhone.Value).DbType = DbType.String;
-            command.Parameters.AddWithValue("@CountryCode", newPhone.CountryCode.ToString()).DbType = DbType.String;
-            command.Parameters.AddWithValue("@DialingCode", ((int)newPhone.CountryCode).ToString()).DbType = DbType.String;
-            command.Parameters.AddWithValue("@PhoneType", (int)newPhone.PhoneType).DbType = DbType.Int32;
+            command.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
+            command.Parameters.Add("@PhoneNumber", SqlDbType.VarChar, 15).Value = newPhone.Value;
+            command.Parameters.Add("@OldPhoneNumber", SqlDbType.VarChar, 15).Value = oldPhone.Value;
+            command.Parameters.Add("@CountryCode", SqlDbType.Char, 3).Value = newPhone.CountryCode.ToString();
+            command.Parameters.Add("@DialingCode", SqlDbType.VarChar, 5).Value = ((int)newPhone.CountryCode).ToString();
+            command.Parameters.Add("@PhoneType", SqlDbType.NVarChar).Value = newPhone.PhoneType.ToString();
 
             command.ExecuteNonQuery();
         }
@@ -110,8 +113,8 @@ namespace Mawthooq.Infrastructure.Data.Helpers
             string query = "DELETE FROM UserPhones WHERE UserId = @UserId AND PhoneNumber = @PhoneNumber";
 
             using SqlCommand command = new SqlCommand(query, connection, transaction);
-            command.Parameters.AddWithValue("@UserId", userId).DbType = DbType.Int32;
-            command.Parameters.AddWithValue("@PhoneNumber", phone.Value).DbType = DbType.String;
+            command.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
+            command.Parameters.Add("@PhoneNumber", SqlDbType.VarChar, 15).Value = phone.Value;
 
             command.ExecuteNonQuery();
         }
@@ -124,7 +127,7 @@ namespace Mawthooq.Infrastructure.Data.Helpers
             string query = "DELETE FROM UserPhones WHERE UserId = @UserId";
 
             using SqlCommand command = new SqlCommand(query, connection, transaction);
-            command.Parameters.AddWithValue("@UserId", userId).DbType = DbType.Int32;
+            command.Parameters.Add("@UserId", SqlDbType.Int).Value = userId;
 
             command.ExecuteNonQuery();
         }

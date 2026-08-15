@@ -7,7 +7,7 @@ using Mawthooq.Domain.Users.Enums;
 
 namespace Mawthooq.Application.Users.UseCases.GetUserByID
 {
-    public record class GetUserByIdResponse(int UserId , NationalIdDto NationalId, string FullName, PhoneDto PhoneNumber, DateOnly DateOfBirth, byte Age, Role Role)
+    public record class GetUserByIdResponse(int UserId, NationalIdDto NationalId, string FullName, DateOnly DateOfBirth, byte Age, Role Role)
     {
 
     }

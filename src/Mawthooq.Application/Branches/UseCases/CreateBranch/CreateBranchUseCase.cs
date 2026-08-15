@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs.Mappers;
 using Mawthooq.Domain.Branches;
-using Mawthooq.Domain.ValueObjects;
 
 namespace Mawthooq.Application.Branches.UseCases.CreateBranch
 {
@@ -22,14 +21,14 @@ namespace Mawthooq.Application.Branches.UseCases.CreateBranch
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            Branch branch = Branch.Create(request.Name, request.Location.ToAddressDomain());
+            Branch branch = Branch.Create(request.Name, request.Address.ToAddressDomain());
 
             Branch? saveBranch = _branchRepository.Add(branch);
 
             if (saveBranch is null)
                 throw new InvalidOperationException("Failed to create branch.");
 
-            return new CreateBranchResponse(saveBranch.BranchID, saveBranch.Name, saveBranch.Location.ToAddressDto(), saveBranch.IsActive);
+            return new CreateBranchResponse(saveBranch.BranchID, saveBranch.Name, saveBranch.Address.ToAddressDto(), saveBranch.IsActive);
         }
     }
 }

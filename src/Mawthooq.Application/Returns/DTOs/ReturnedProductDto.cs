@@ -8,7 +8,7 @@ namespace Mawthooq.Application.Returns.DTOs
 {
     public record class ReturnedProductDto(
         int ProductId,
-        byte Quantity,
+        int Quantity,
         ReturnReason Reason,
         ProductReturnStatus Status,
         DateOnly ExpiryDate)

@@ -23,12 +23,10 @@ namespace Mawthooq.Application.Users.UseCases.UpdateUser
 
             if (user is null)
                 throw new KeyNotFoundException($"User with ID {request.UserId} was not found.");
-
-            user.ChangePhone(request.PhoneNumber.ToDomain());
             user.ChangeRole(request.Role);
 
-            _userRepository.Update(user);
-            return new UpdateUserResponse(user.UserId, user.Phone.ToDto(), user.Role);
+            _userRepository.Update(user, request.rowVersion);
+            return new UpdateUserResponse(user.UserId, request.PhoneNumber, user.Role);
         }
     }
 }

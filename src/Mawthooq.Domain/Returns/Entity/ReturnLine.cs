@@ -10,12 +10,12 @@ namespace Mawthooq.Domain.Returns.Entity
     public class ReturnLine
     {
         public int ProductId { get; }
-        public byte Quantity { get; private set; }
+        public int Quantity { get; private set; }
         public ReturnReason Reason { get; }
         public ProductReturnStatus Status { get; }
         public DateOnly ExpiryDate { get; }
 
-        public ReturnLine(int productId, byte quantity, ReturnReason reason, ProductReturnStatus status, DateOnly expiryDate)
+        public ReturnLine(int productId, int quantity, ReturnReason reason, ProductReturnStatus status, DateOnly expiryDate)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId, nameof(productId));
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
@@ -36,13 +36,13 @@ namespace Mawthooq.Domain.Returns.Entity
             ExpiryDate = expiryDate;
         }
 
-        public void IncreaseQuantity(byte quantity)
+        public void IncreaseQuantity(int quantity)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
             Quantity += quantity;
         }
 
-        public void DecreaseQuantity(byte quantity)
+        public void DecreaseQuantity(int quantity)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
             if (quantity > Quantity)

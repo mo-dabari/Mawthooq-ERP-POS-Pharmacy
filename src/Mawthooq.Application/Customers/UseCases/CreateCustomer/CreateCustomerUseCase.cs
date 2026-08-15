@@ -18,11 +18,10 @@ namespace Mawthooq.Application.Customers.UseCases.CreateCustomer
         public CreateCustomerResponse Execute(CreateCustomerRequest request)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
-            
+
             Customer customer = Customer.Create(
                 request.FirstName,
-                request.LastName,
-                request.PhoneNumber.ToDomain());
+                request.LastName);
 
             Customer? saveCustomer = _customerRepository.Add(customer);
 
@@ -32,7 +31,6 @@ namespace Mawthooq.Application.Customers.UseCases.CreateCustomer
             return new CreateCustomerResponse(
                 saveCustomer.CustomerId,
                 saveCustomer.FullName,
-                saveCustomer.Phone.ToDto(),
                 saveCustomer.IsActive);
         }
     }

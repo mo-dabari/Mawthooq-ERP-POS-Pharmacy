@@ -1,0 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Mawthooq.Application.Manufacturers.DTOs
+{
+    public sealed record ManufacturerIdDto(Guid Value);
+
+}

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Products;
+using Mawthooq.Domain.Products.ValueObjects;
 using Mawthooq.Infrastructure.Data;
 using Mawthooq.Infrastructure.Mappers;
 using Microsoft.Data.SqlClient;
@@ -48,29 +49,10 @@ namespace Mawthooq.Infrastructure.Repositories
             object result = command.ExecuteScalar();
 
             if (int.TryParse(result.ToString(), out int newProductId))
-                return new(newProductId, product.Name, product.SKU, product.Barcode, product.ImageUrl, product.CategoryId);
-
+                return new Product(newProductId, product.Name, product.SKU, product.CategoryId, product.Packaging, product.RequiresExpiryTracking, product.CanBeReturnedIfOpened, product.NearExpiryThresholdInDays);
 
             throw new InvalidOperationException("Failed to insert Product.");
         }
-
-        public void Delete(int productId)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId, nameof(productId));
-
-            using SqlConnection connection = (SqlConnection)_connectionFactory.CreateConnection();
-
-            string query = @"Delete From Product WHERE ProductId = @productId";
-
-            using SqlCommand command = new(query, connection);
-
-            command.Parameters.AddWithValue("@productId", productId).DbType = DbType.Int32;
-
-            connection.Open();
-
-            command.ExecuteNonQuery();
-        }
-
         public Product? GetById(int productId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId);
@@ -78,9 +60,14 @@ namespace Mawthooq.Infrastructure.Repositories
             using SqlConnection connection = (SqlConnection)_connectionFactory.CreateConnection();
 
             string query = @"Select
-                                Name, SKU, Barcode, ImageUrl, CategoryId, IsActive
+                                ProductId, Name, SKU, Barcode, ImageUrl, CategoryId,
+                                p.Unitbase, RequiresExpiryTracking, CanBeReturnedIfOpened, NearExpiryThresholdInDays, Status
                             From
                                 Product
+                            Inner Join
+                                ProductPackaging p
+                            on
+                                Product.ProductId = p.ProductId
                             Where
                                 ProductId = @productId";
 
@@ -96,19 +83,7 @@ namespace Mawthooq.Infrastructure.Repositories
                 return reader.ToProductDomain();
 
             return default;
-
         }
-
-        public Product? GetProductByName(string ProductName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Product> GetProductsIsActive()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Update(Product product)
         {
             ArgumentNullException.ThrowIfNull(product);
@@ -130,11 +105,47 @@ namespace Mawthooq.Infrastructure.Repositories
             command.Parameters.AddWithValue("@ImageUrl", product.ImageUrl).DbType = DbType.String;
             command.Parameters.AddWithValue("@SKU", product.SKU).DbType = DbType.String;
             command.Parameters.AddWithValue("@Barcode", product.Barcode).DbType = DbType.String;
-            command.Parameters.AddWithValue("@IsActive", product.IsActive).DbType = DbType.Boolean;
+            command.Parameters.AddWithValue("@IsActive", product.Status.ToString()).DbType = DbType.String;
 
             connection.Open();
 
             command.ExecuteNonQuery();
+        }
+        public bool ExistsBySku(SKU sku)
+        {
+            ArgumentNullException.ThrowIfNull(sku, nameof(sku));
+
+            using SqlConnection connection = (SqlConnection)_connectionFactory.CreateConnection();
+
+            string query = @"Select Count(1) From Product Where SKU = @SKU";
+
+            using SqlCommand command = new(query, connection);
+
+            command.Parameters.AddWithValue("@SKU", sku).DbType = DbType.String;
+
+            connection.Open();
+
+            int count = (int)command.ExecuteScalar();
+
+            return count > 0;
+        }
+        public bool ExistsByBarcode(Barcode barcode)
+        {
+            ArgumentNullException.ThrowIfNull(barcode, nameof(barcode));
+
+            using SqlConnection connection = (SqlConnection)_connectionFactory.CreateConnection();
+
+            string query = @"Select Count(1) From Product Where Barcode = @Barcode";
+
+            using SqlCommand command = new(query, connection);
+
+            command.Parameters.AddWithValue("@Barcode", barcode).DbType = DbType.String;
+
+            connection.Open();
+
+            int count = (int)command.ExecuteScalar();
+
+            return count > 0;
         }
     }
 }

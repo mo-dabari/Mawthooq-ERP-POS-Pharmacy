@@ -13,7 +13,8 @@ namespace Mawthooq.Application.Suppliers.UseCases.UpdateSupplier
         string LastName,
         EmailDto Email,
         AddressDto Address,
-        MoneyDto CreditLimit
+        MoneyDto CreditLimit,
+        byte[] rowVersion
     )
     {
 

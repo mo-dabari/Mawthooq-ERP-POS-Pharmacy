@@ -6,7 +6,7 @@ using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Domain.Discounts;
 using Mawthooq.Domain.Discounts.Enums;
 using Mawthooq.Domain.Sales;
-using Mawthooq.Domain.ValueObjects.Money;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Application.Discounts.UseCases.ApplyDiscountToSale
 {

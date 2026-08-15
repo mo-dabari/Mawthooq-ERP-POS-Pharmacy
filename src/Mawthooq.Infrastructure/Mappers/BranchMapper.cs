@@ -12,22 +12,17 @@ namespace Mawthooq.Infrastructure.Mappers
     {
         public static Branch ToBranchDomain(this SqlDataReader sqlData)
         {
+            Address branchAddress = new Address(
+                sqlData.GetInt32(sqlData.GetOrdinal("BuildingNumber")),
+                sqlData.GetString(sqlData.GetOrdinal("Street")),
+                sqlData.GetString(sqlData.GetOrdinal("City")),
+                sqlData.GetString(sqlData.GetOrdinal("State")),
+                sqlData.GetString(sqlData.GetOrdinal("Country"))
+            );
             var branch = new Branch(
               sqlData.GetInt32(sqlData.GetOrdinal("BranchId")),
               sqlData.GetString(sqlData.GetOrdinal("Name")),
-                sqlData.GetInt32(sqlData.GetOrdinal("AddressId")));
-
-            branch.SetBranchAddress
-            (
-                new Address
-                (
-                    sqlData.GetInt32(sqlData.GetOrdinal("BuildingNumber")),
-                    sqlData.GetString(sqlData.GetOrdinal("Street")),
-                    sqlData.GetString(sqlData.GetOrdinal("CityName")),
-                    sqlData.GetString(sqlData.GetOrdinal("GovernorateName")),
-                    sqlData.GetString(sqlData.GetOrdinal("CountryName"))
-                )
-            );
+                branchAddress);
 
             if (!sqlData.GetBoolean(sqlData.GetOrdinal("IsActive")))
                 branch.Deactivate();

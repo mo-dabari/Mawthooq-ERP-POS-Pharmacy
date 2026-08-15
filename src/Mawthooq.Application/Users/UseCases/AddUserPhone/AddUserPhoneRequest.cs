@@ -6,7 +6,10 @@ using Mawthooq.Application.Common.DTOs;
 
 namespace Mawthooq.Application.Users.UseCases.AddUserPhone
 {
-    public record class AddUserPhoneRequest(int UserId , PhoneDto Phone)
+    public record class AddUserPhoneRequest(
+        int UserId,
+        PhoneDto Phone,
+        byte[] rowVersion)
     {
 
     }

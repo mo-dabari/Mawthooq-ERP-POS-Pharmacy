@@ -26,7 +26,7 @@ namespace Mawthooq.Application.Branches.UseCases.UpdateBranch
                 throw new InvalidOperationException("Branch not found");
 
             branch.ChangeBranchName(request.Name);
-            branch.ChangeBranchAddress(request.Location.ToAddressDomain());
+            branch.SetBranchAddress(request.Location.ToAddressDomain());
 
             if (request.IsActive)
                 branch.Activate();
@@ -35,7 +35,7 @@ namespace Mawthooq.Application.Branches.UseCases.UpdateBranch
 
             _branchRepository.Update(branch);
 
-            return new UpdateBranchResponse(branch.BranchID, branch.Name, branch.Location.ToAddressDto(), branch.IsActive);
+            return new UpdateBranchResponse(branch.BranchID, branch.Name, branch.Address?.ToAddressDto(), branch.IsActive);
         }
     }
 }

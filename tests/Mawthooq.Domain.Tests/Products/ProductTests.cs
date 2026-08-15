@@ -1022,7 +1022,6 @@ namespace Mawthooq.Domain.Tests.Products
                 categoryId,
                 manufacturerId,
                 localAgentId,
-                Status.Active,
                 packaging,
                 firstReservedBarcode,
                 image,
@@ -1062,7 +1061,7 @@ namespace Mawthooq.Domain.Tests.Products
         private static CategoryId CreateCategoryID() => CategoryId.New();
         private static ManufacturerId CreateManufacturerID() => ManufacturerId.New();
         private static LocalAgentId CreateLocalAgentID() => LocalAgentId.New();
-        private static SKU CreateSKU() => new SKU("PROD-0001");
+        private static SKU CreateSKU() => SKU.Create("PROD-0001");
 
         private static Image CreateImage()
             => Image.Create("products/1/default.png", "default.png", "image/png");

@@ -7,8 +7,5 @@ using Mawthooq.Domain.Users.Enums;
 
 namespace Mawthooq.Application.Users.UseCases.CreateUser
 {
-    public record class CreateUserResponse (int UserId , NationalIdDto NationalId, string FullName, PhoneDto PhoneNumber, DateOnly DateOfBirth, byte Age, Role Role)
-    {
-
-    }
+    public record class CreateUserResponse (int UserId , NationalIdDto NationalId, string FullName, DateOnly DateOfBirth, byte Age, Role Role);
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs.Mappers;
 using Mawthooq.Domain.Inventories;
+using Mawthooq.Domain.Inventories.ValueObjects;
 using Mawthooq.Domain.Sales;
 using Mawthooq.Domain.Sales.Entity;
 
@@ -29,7 +30,7 @@ namespace Mawthooq.Application.Sales.UseCases.ConfirmSale
 
             foreach (SaleLine line in sale.Lines)
             {
-                Inventory? inventoryLine = _inventoryRepository.GetInventoryByProductAndBranch(sale.BranchId, line.ProductId);
+                Inventory? inventoryLine = _inventoryRepository.GetByInventoryKey(new InventoryKey(sale.BranchId, line.ProductId));
                 if (inventoryLine == null)
                     throw new InvalidOperationException($"Inventory line not found for product {line.ProductId} in branch {sale.BranchId}");
 

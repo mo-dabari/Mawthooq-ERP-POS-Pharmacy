@@ -6,7 +6,7 @@ using Mawthooq.Application.Common.DTOs;
 
 namespace Mawthooq.Application.Branches.UseCases.CreateBranch
 {
-    public record class CreateBranchRequest (string Name, AddressDto Location)
+    public record class CreateBranchRequest (string Name, AddressDto Address)
     {
 
     }

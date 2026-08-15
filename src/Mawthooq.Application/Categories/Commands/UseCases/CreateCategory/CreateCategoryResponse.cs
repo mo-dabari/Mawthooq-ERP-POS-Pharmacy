@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Mawthooq.Application.Categories.Commands.DTOs;
+using Mawthooq.Domain.Categories.Enums;
+
+namespace Mawthooq.Application.Categories.Commands.UseCases.CreateCategory
+{
+    public record class CreateCategoryResponse(
+        CategoryIdDto CategoryId,
+        ProductCategory Name,
+        string Description,
+        bool Status);
+}

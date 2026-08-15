@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Discounts.Enums;
-using Mawthooq.Domain.ValueObjects.Money;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Domain.Discounts
 {

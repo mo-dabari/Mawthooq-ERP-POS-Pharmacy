@@ -10,7 +10,7 @@ namespace Mawthooq.Domain.Products.ValueObjects
     {
         public string Value { get; }
 
-        public SKU(string value)
+        private SKU(string value)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
             value = value.Trim().ToUpperInvariant();
@@ -23,6 +23,8 @@ namespace Mawthooq.Domain.Products.ValueObjects
 
             Value = value;
         }
+
+        public static SKU Create(string Value) => new SKU(Value);
 
         public override string ToString() => Value;
     }

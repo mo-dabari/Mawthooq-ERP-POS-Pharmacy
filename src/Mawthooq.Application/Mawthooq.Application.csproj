@@ -2,6 +2,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mawthooq.Domain\Mawthooq.Domain.csproj" />
+
+    <!-- <Compile Remove="Categories\**" /> -->
+  <Compile Remove="Users\**" />
+  <Compile Remove="Customers\**" />
+  <Compile Remove="Discounts\**" />
+  <Compile Remove="Inventories\**" />
+  <Compile Remove="Medicines\**" />
+  <Compile Remove="Payments\**" />
+  <Compile Remove="Returns\**" />
+  <Compile Remove="Sales\**" />
+  <Compile Remove="SupplierReturns\**" />
+  <Compile Remove="Suppliers\**" />
+  <Compile Remove="Branches\**" />
   </ItemGroup>
 
   <PropertyGroup>

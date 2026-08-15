@@ -46,7 +46,7 @@ namespace Mawthooq.Infrastructure.Repositories
             if (int.TryParse(result.ToString(), out int newCategoryID))
             {
                 Category newCategory = Category.Create(category.Name, category.Description);
-                newCategory.SetCategoryId(newCategoryID);
+                // newCategory.SetCategoryId(newCategoryID);
                 return newCategory;
             }
             throw new InvalidOperationException("Failed to insert category.");
@@ -70,6 +70,11 @@ namespace Mawthooq.Infrastructure.Repositories
             connection.Open();
 
             command.ExecuteNonQuery();
+        }
+
+        public bool ExistsAndActive(int categoryId)
+        {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<Category> GetAllActive()

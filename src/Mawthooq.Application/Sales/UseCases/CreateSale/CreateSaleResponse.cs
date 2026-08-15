@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.Sales.DTOs;
 using Mawthooq.Domain.Sales.Enums;
-using Mawthooq.Domain.ValueObjects.Money.Enums;
+using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Application.Sales.UseCases.CreateSale
 {

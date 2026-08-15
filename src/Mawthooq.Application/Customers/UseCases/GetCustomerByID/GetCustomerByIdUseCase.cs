@@ -27,7 +27,6 @@ namespace Mawthooq.Application.Customers.UseCases.GetCustomerByID
             return new GetCustomerByIdResponse(
                 customer.CustomerId,
                 customer.FullName,
-                customer.Phone.ToDto(),
                 customer.IsActive,
                 customer.CreatedAt);
         }

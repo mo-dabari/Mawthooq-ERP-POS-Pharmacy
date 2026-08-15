@@ -23,52 +23,63 @@ namespace Mawthooq.Infrastructure.Repositories
             _connectionFactory = connectionFactory;
         }
 
+        // public Branch Add(Branch branch, Address address)
+        // {
+        //     ArgumentNullException.ThrowIfNull(branch, nameof(branch));
+        //     ArgumentNullException.ThrowIfNull(address, nameof(address));
+
+        //     using SqlConnection connection = (SqlConnection)_connectionFactory.CreateConnection();
+
+        //     string query = @"Insert
+        //                     Into
+        //                         Branch
+        //                             (Name, AddressId)
+        //                     Values
+        //                         (@Name, @AddressId)
+        //                         Select Cast(SCOPE_IDENTITY() as Int)";
+        //     SqlTransaction? transaction = null;
+        //     try
+        //     {
+        //         connection.Open();
+        //         transaction = connection.BeginTransaction();
+
+
+        //         int newAddressId = AddressHelper.InsertAddress(address, connection, transaction);
+
+        //         if (newAddressId != 0)
+        //         {
+        //             using SqlCommand command = new(query, connection, transaction);
+
+        //             command.Parameters.AddWithValue("@Name", branch.Name).DbType = DbType.String;
+        //             command.Parameters.AddWithValue("@AddressId", newAddressId).DbType = DbType.Int32;
+
+        //             object result = command.ExecuteScalar();
+        //             if (int.TryParse(result.ToString(), out int newBranchId))
+        //             {
+        //                 transaction.Commit();
+        //                 return new Branch(newBranchId, branch.Name, newAddressId);
+        //             }
+        //             throw new InvalidOperationException("Failed to insert Branch.");
+        //         }
+        //         throw new InvalidOperationException("Failed to insert Address.");
+        //     }
+        //     catch
+        //     {
+        //         transaction?.Rollback();
+        //         throw;
+        //     }
+        // }
+
+        public Branch? Add(Branch entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public Branch Add(Branch branch, Address address)
         {
-            ArgumentNullException.ThrowIfNull(branch, nameof(branch));
-            ArgumentNullException.ThrowIfNull(address, nameof(address));
-
-            using SqlConnection connection = (SqlConnection)_connectionFactory.CreateConnection();
-
-            string query = @"Insert
-                            Into
-                                Branch
-                                    (Name, AddressId)
-                            Values
-                                (@Name, @AddressId)
-                                Select Cast(SCOPE_IDENTITY() as Int)";
-            SqlTransaction? transaction = null;
-            try
-            {
-                connection.Open();
-                transaction = connection.BeginTransaction();
-
-
-                int newAddressId = AddressHelper.InsertAddress(address, connection, transaction);
-
-                if (newAddressId != 0)
-                {
-                    using SqlCommand command = new(query, connection, transaction);
-
-                    command.Parameters.AddWithValue("@Name", branch.Name).DbType = DbType.String;
-                    command.Parameters.AddWithValue("@AddressId", newAddressId).DbType = DbType.Int32;
-
-                    object result = command.ExecuteScalar();
-                    if (int.TryParse(result.ToString(), out int newBranchId))
-                    {
-                        transaction.Commit();
-                        return new Branch(newBranchId, branch.Name, newAddressId);
-                    }
-                    throw new InvalidOperationException("Failed to insert Branch.");
-                }
-                throw new InvalidOperationException("Failed to insert Address.");
-            }
-            catch
-            {
-                transaction?.Rollback();
-                throw;
-            }
+            throw new NotImplementedException();
         }
+
         public void Delete(int branchId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(branchId, nameof(branchId));
@@ -140,41 +151,46 @@ namespace Mawthooq.Infrastructure.Repositories
 
         public void Update(Branch entity)
         {
-            ArgumentNullException.ThrowIfNull(entity, nameof(entity));
-
-            using var connection = (SqlConnection)_connectionFactory.CreateConnection();
-
-            string query = @"Update
-                                Branch
-                            Set
-                                Name = @Name,
-                                IsActive = @IsActive
-                            Where
-                                BranchId = @BranchId";
-
-            connection.Open();
-            using SqlTransaction transaction = connection.BeginTransaction();
-
-            try
-            {
-                AddressHelper.UpdateAddress(entity.AddressId, entity.Address, connection, transaction);
-
-                using SqlCommand command = new(query, connection, transaction);
-
-                command.Parameters.AddWithValue("@Name", entity.Name).DbType = DbType.String;
-                command.Parameters.AddWithValue("@IsActive", entity.IsActive).DbType = DbType.Boolean;
-                command.Parameters.AddWithValue("@BranchId", entity.BranchID).DbType = DbType.Int32;
-
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+            throw new NotImplementedException();
         }
+
+        // public void Update(Branch entity)
+        // {
+        //     ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+
+        //     using var connection = (SqlConnection)_connectionFactory.CreateConnection();
+
+        //     string query = @"Update
+        //                         Branch
+        //                     Set
+        //                         Name = @Name,
+        //                         IsActive = @IsActive
+        //                     Where
+        //                         BranchId = @BranchId";
+
+        //     connection.Open();
+        //     using SqlTransaction transaction = connection.BeginTransaction();
+
+        //     try
+        //     {
+        //         AddressHelper.UpdateAddress(entity.AddressId, entity.Address, connection, transaction);
+
+        //         using SqlCommand command = new(query, connection, transaction);
+
+        //         command.Parameters.AddWithValue("@Name", entity.Name).DbType = DbType.String;
+        //         command.Parameters.AddWithValue("@IsActive", entity.IsActive).DbType = DbType.Boolean;
+        //         command.Parameters.AddWithValue("@BranchId", entity.BranchID).DbType = DbType.Int32;
+
+        //         command.ExecuteNonQuery();
+
+        //         transaction.Commit();
+        //     }
+        //     catch
+        //     {
+        //         transaction.Rollback();
+        //         throw;
+        //     }
+        // }
 
     }
 }

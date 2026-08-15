@@ -7,7 +7,10 @@ using Mawthooq.Domain.Users.Enums;
 
 namespace Mawthooq.Application.Users.UseCases.UpdateUser
 {
-    public record class UpdateUserRequest(int UserId, PhoneDto PhoneNumber, Role Role)
-    {
-    }
+    public record class UpdateUserRequest(
+        int UserId,
+        PhoneDto PhoneNumber,
+        Role Role,
+        byte[] rowVersion
+        );
 }

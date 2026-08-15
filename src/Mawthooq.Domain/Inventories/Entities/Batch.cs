@@ -2,26 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Domain.ValueObjects.Money;
+using Mawthooq.Domain.Inventories.Enums;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Domain.Inventories.Entities
 {
     public class Batch
     {
-        public int BatchId { get; private set; }
+        public int BatchId { get; }
         public int Quantity { get; private set; }
-        public Money PurchaseCost { get; private set; }
-        public DateTime ReceivedDate { get; private set; }
-        public DateOnly ExpiryDate { get; private set; }
 
-        public Batch(int batchId, int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate)
-        : this(quantity, purchaseCost, receivedDate, expiryDate)
+        public Money PurchaseCost { get; }
+        public DateTime ReceivedDate { get; }
+        public DateOnly ExpiryDate { get; }
+        public BatchSource Source { get; }
+
+        public bool IsExpired => ExpiryDate <= DateOnly.FromDateTime(DateTime.UtcNow);
+
+
+        public Batch(int batchId, int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate, BatchSource source)
+        : this(quantity, purchaseCost, receivedDate, expiryDate, source)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchId, nameof(batchId));
             BatchId = batchId;
         }
 
-        private Batch(int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate)
+        private Batch(int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate, BatchSource source)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity, nameof(quantity));
             ArgumentNullException.ThrowIfNull(purchaseCost, nameof(purchaseCost));
@@ -33,14 +39,18 @@ namespace Mawthooq.Domain.Inventories.Entities
             if (expiryDate <= DateOnly.FromDateTime(DateTime.UtcNow))
                 throw new ArgumentOutOfRangeException(nameof(expiryDate), "The Batch is already expired!.");
 
+            if (!Enum.IsDefined(typeof(BatchSource), source))
+                throw new InvalidOperationException("Invalid batch source.");
+
             Quantity = quantity;
             PurchaseCost = purchaseCost;
             ReceivedDate = receivedDate;
             ExpiryDate = expiryDate;
+            Source = source;
         }
-        internal static Batch Create(int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate)
+        internal static Batch Create(int quantity, Money purchaseCost, DateTime receivedDate, DateOnly expiryDate, BatchSource source)
         {
-            return new Batch(quantity, purchaseCost, receivedDate, expiryDate);
+            return new Batch(quantity, purchaseCost, receivedDate, expiryDate, source);
         }
 
         internal void IncreaseQuantity(int quantity)
@@ -56,13 +66,21 @@ namespace Mawthooq.Domain.Inventories.Entities
                 throw new InvalidOperationException("Insufficient batch quantity");
             Quantity -= quantity;
         }
-
-        public void SetBatchId(int batchId)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchId, nameof(batchId));
-            if (BatchId != 0)
-                throw new InvalidOperationException("Batch ID is already set and cannot be changed.");
-            BatchId = batchId;
-        }
     }
 }
+ // Batch
+        // public void SetOutOfStock()
+        // {
+        //     if (Status.Equals(ProductStatus.OutOfStock))
+        //         return;
+        //     Status = ProductStatus.OutOfStock;
+        // }
+
+        // Batch
+        // public bool IsNearExpiry(DateOnly expiryDate)
+        // {
+        //     if (!RequiresExpiryTracking)
+        //         throw new InvalidOperationException("This product does not require expiry tracking.");
+
+        //     return (expiryDate.Day - DateOnly.FromDateTime(DateTime.UtcNow).Day) <= NearExpiryThresholdInDays;
+        // }

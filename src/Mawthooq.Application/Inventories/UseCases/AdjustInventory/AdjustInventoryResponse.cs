@@ -8,13 +8,8 @@ using Mawthooq.Domain.Inventories.Enums;
 namespace Mawthooq.Application.Inventories.UseCases.AdjustInventory
 {
     public record class AdjustInventoryResponse(
-        int AdjustmentId,
         InventoryKeyDto InventoryKey,
         int NewQuantity,
-        int QuantityDifference,
-         AdjustmentReason Reason
-    )
-    {
-
-    }
+        int QuantityDifference
+    );
 }

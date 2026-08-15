@@ -6,7 +6,7 @@ using Mawthooq.Application.Common.DTOs;
 
 namespace Mawthooq.Application.Customers.UseCases.CreateCustomer
 {
-    public record class CreateCustomerResponse(int CustomerId, string FullName, PhoneDto PhoneNumber, bool IsActive)
+    public record class CreateCustomerResponse(int CustomerId, string FullName, bool IsActive)
     {
 
     }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Domain.ValueObjects;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Domain.Customers
 {
@@ -11,39 +11,34 @@ namespace Mawthooq.Domain.Customers
         public int CustomerId { get; }
         public string FirstName { get; }
         public string LastName { get; }
-        public Phone Phone { get; private set; }
         private List<Phone> _contactNumbers = new();
         public bool IsActive { get; private set; }
         public IReadOnlyList<Phone> contactNumbers => _contactNumbers.AsReadOnly();
         public string FullName => $"{FirstName} {LastName}";
-        public DateTime CreatedAt { get; }
-        public Customer(int customerId, string firstName, string lastName, Phone phone)
-        : this(firstName, lastName, phone)
+        public DateTime CreatedAt { get; private set; }
+        public Customer(int customerId, string firstName, string lastName)
+        : this(firstName, lastName)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(customerId, nameof(customerId));
 
             CustomerId = customerId;
         }
 
-        private Customer(string firstName, string lastName, Phone phone)
+        private Customer(string firstName, string lastName)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(firstName, nameof(firstName));
             ArgumentException.ThrowIfNullOrWhiteSpace(lastName, nameof(lastName));
 
-            ArgumentNullException.ThrowIfNull(phone, nameof(phone));
 
             FirstName = firstName;
             LastName = lastName;
-            Phone = phone;
             IsActive = true;
             CreatedAt = DateTime.UtcNow;
-
-            _contactNumbers.Add(phone);
         }
 
-        public static Customer Create(string firstName, string lastName, Phone phone)
+        public static Customer Create(string firstName, string lastName)
         {
-            return new Customer(firstName, lastName, phone);
+            return new Customer(firstName, lastName);
         }
         public void AddPhone(Phone phone)
         {
@@ -54,28 +49,37 @@ namespace Mawthooq.Domain.Customers
             if (_contactNumbers.Count < 3 && existing is null)
                 _contactNumbers.Add(phone);
         }
-        public void ChangePhone(Phone phone)
-        {
-            ArgumentNullException.ThrowIfNull(phone, nameof(phone));
 
-            if (!Phone.Equals(phone))
+        public void SetPhones(List<Phone> phones)
+        {
+            ArgumentNullException.ThrowIfNull(phones, nameof(phones));
+
+            if (phones.Count > 3)
+                throw new InvalidOperationException("A user cannot have more than 3 contact numbers.");
+
+            _contactNumbers = phones;
+        }
+
+        public void ChangePhone(Phone oldphone, Phone newphone)
+        {
+            ArgumentNullException.ThrowIfNull(oldphone, nameof(oldphone));
+            ArgumentNullException.ThrowIfNull(newphone, nameof(newphone));
+
+            for (int i = 0; i < _contactNumbers.Count; i++)
             {
-                Phone = phone;
-                if (_contactNumbers.Count > 0)
-                    _contactNumbers[0] = phone;
-                else
-                    _contactNumbers.Add(phone);
+                if (_contactNumbers[i].Equals(oldphone))
+                {
+                    _contactNumbers[i] = newphone;
+                    return;
+                }
             }
         }
-        public void ClearContactNumbers(Phone phone)
+
+        public void RemovePhone(Phone phone)
         {
             ArgumentNullException.ThrowIfNull(phone, nameof(phone));
 
-            _contactNumbers.Clear();
-
-            Phone = phone;
-
-            _contactNumbers.Add(Phone);
+            _contactNumbers.Remove(phone);
         }
         public void Activate()
         {
@@ -88,6 +92,19 @@ namespace Mawthooq.Domain.Customers
             if (!IsActive)
                 return;
             IsActive = false;
+        }
+
+        public void SetCreatedAt(DateTime createdAt)
+        {
+            //check if default value
+            if (createdAt == default)
+                throw new ArgumentException("CreatedAt cannot be the default value.", nameof(createdAt));
+
+            //check if createdAt is in the past
+            if (createdAt > DateTime.UtcNow)
+                throw new ArgumentException("CreatedAt cannot be in the future.", nameof(createdAt));
+
+            CreatedAt = createdAt;
         }
     }
 }

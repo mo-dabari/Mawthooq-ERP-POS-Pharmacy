@@ -24,7 +24,7 @@ namespace Mawthooq.Application.Branches.UseCases.GetBranchByID
             if (branch is null)
                 throw new InvalidOperationException($"Branch with ID {branchId} not found.");
 
-            return new GetBranchByIDResponse(branch.BranchID, branch.Name, branch.Location.ToAddressDto(), branch.IsActive);
+            return new GetBranchByIDResponse(branch.BranchID, branch.Name, branch.Address?.ToAddressDto(), branch.IsActive);
         }
     }
 }

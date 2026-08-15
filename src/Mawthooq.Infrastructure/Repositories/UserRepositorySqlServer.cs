@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Mawthooq.Domain.Users;
 using Mawthooq.Domain.Users.Enums;
 using Mawthooq.Domain.ValueObjects;
-using Mawthooq.Domain.ValueObjects.Enums;
 using Mawthooq.Domain.ValueObjects.NationalID;
 using Mawthooq.Infrastructure.Data;
 using Mawthooq.Infrastructure.Data.Helpers;

@@ -81,7 +81,7 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects
                 result.Should().Be(value.ToUpperInvariant());
             }
         }
-        private static SKU CreateSKU(string value) => new SKU(value);
+        private static SKU CreateSKU(string value) => SKU.Create(value);
 
     }
 }

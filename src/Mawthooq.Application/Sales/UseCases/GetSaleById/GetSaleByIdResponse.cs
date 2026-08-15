@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Sales.DTOs;
-using Mawthooq.Domain.ValueObjects.Money.Enums;
+using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Application.Sales.UseCases.GetSaleById
 {

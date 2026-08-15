@@ -10,7 +10,6 @@ using Mawthooq.Domain.Inventories.Entities;
 using Mawthooq.Domain.SupplierReturns;
 using Mawthooq.Domain.SupplierReturns.Enums;
 using Mawthooq.Domain.Suppliers;
-using Mawthooq.Domain.ValueObjects.Money;
 
 namespace Mawthooq.Application.SupplierReturns.UseCases.UpdateSupplierReturnStatus
 {
@@ -46,11 +45,11 @@ namespace Mawthooq.Application.SupplierReturns.UseCases.UpdateSupplierReturnStat
                 if (supplier == null)
                     throw new InvalidOperationException($"Supplier with ID {supplierReturn.SupplierId} not found.");
 
-                Inventory? inventory = _inventoryRepository.GetById(supplierReturn.InventoryKey);
+                Inventory? inventory = _inventoryRepository.GetByInventoryKey(supplierReturn.InventoryKey);
                 if (inventory == null)
                     throw new InvalidOperationException($"Inventory with key {supplierReturn.InventoryKey} not found.");
 
-                Batch? batch = inventory.BatchValues.FirstOrDefault(b => b.BatchId == supplierReturn.BatchId);
+                Batch? batch = inventory.Batches.FirstOrDefault(b => b.BatchId == supplierReturn.BatchId);
                 if (batch == null)
                     throw new InvalidOperationException($"Batch with ID {supplierReturn.BatchId} not found in inventory with key {supplierReturn.InventoryKey}.");
 
@@ -61,7 +60,7 @@ namespace Mawthooq.Application.SupplierReturns.UseCases.UpdateSupplierReturnStat
 
                 supplier.DeductBalance(totalReturnAmount.ToDomain());
 
-                inventory.ReturnStockToBatch(supplierReturn.BatchId, supplierReturn.Quantity);
+                // inventory.ReturnStockToBatch(supplierReturn.BatchId, supplierReturn.Quantity);
 
                 _supplierReturnRepository.Update(supplierReturn);
                 _supplierRepository.Update(supplier);

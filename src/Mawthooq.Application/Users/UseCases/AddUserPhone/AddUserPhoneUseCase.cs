@@ -27,7 +27,7 @@ namespace Mawthooq.Application.Users.UseCases.AddUserPhone
 
                 user.AddPhone(request.Phone.ToDomain());
 
-                _userRepository.Update(user);
+                _userRepository.Update(user, request.rowVersion);
         }
     }
 }

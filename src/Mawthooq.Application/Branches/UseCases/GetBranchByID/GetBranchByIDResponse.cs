@@ -6,7 +6,7 @@ using Mawthooq.Application.Common.DTOs;
 
 namespace Mawthooq.Application.Branches.UseCases.GetBranchByID
 {
-    public record class GetBranchByIDResponse(int BranchId, string Name, AddressDto Location, bool IsActive)
+    public record class GetBranchByIDResponse(int BranchId, string Name, AddressDto? Location, bool IsActive)
     {
 
     }

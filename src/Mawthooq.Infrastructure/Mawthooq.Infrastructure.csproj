@@ -2,10 +2,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mawthooq.Domain\Mawthooq.Domain.csproj" />
+    <ProjectReference Include="..\Mawthooq.Application\Mawthooq.Application.csproj" />
+
+      <Compile Remove="Mappers\**" />
+      <Compile Remove="Repositories\**" />
+      <Compile Remove="Data\**" />
+      <Compile Remove="AdoNet\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.9" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -19,13 +19,13 @@ namespace Mawthooq.Application.Users.UseCases.GetUserByID
         public GetUserByIdResponse Execute(int userId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(userId, nameof(userId));
-            
+
             User? user = _userRepository.GetById(userId);
 
             if (user is null)
                 throw new KeyNotFoundException($"User with ID {userId} was not found.");
 
-            return new GetUserByIdResponse(user.UserId, user.NationalId.ToDto(), user.FullName, user.Phone.ToDto(), user.DateOfBirth, user.Age, user.Role);
+            return new GetUserByIdResponse(user.UserId, user.NationalId.ToDto(), user.FullName, user.DateOfBirth, user.Age, user.Role);
         }
     }
 }

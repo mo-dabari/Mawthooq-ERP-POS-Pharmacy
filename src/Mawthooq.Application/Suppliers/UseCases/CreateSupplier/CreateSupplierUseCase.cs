@@ -31,7 +31,10 @@ namespace Mawthooq.Application.Suppliers.UseCases.CreateSupplier
                 request.CreditLimit.ToDomain()
                 );
 
-            Supplier SaveSupplier = _supplierRepository.Add(newSupplier);
+            Supplier? SaveSupplier = _supplierRepository.Add(newSupplier);
+
+            if (SaveSupplier is null)
+                throw new InvalidOperationException("Failed to create supplier");
 
             return new CreateSupplierResponse(
                 SaveSupplier.SupplierId,

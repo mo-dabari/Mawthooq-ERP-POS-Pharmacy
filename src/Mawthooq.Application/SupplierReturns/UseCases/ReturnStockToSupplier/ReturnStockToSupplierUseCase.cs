@@ -35,12 +35,15 @@ namespace Mawthooq.Application.SupplierReturns.UseCases.ReturnStockToSupplier
             if (supplier is null)
                 throw new InvalidOperationException($"Supplier with ID {request.SupplierId} does not exist.");
 
-                Batch? batch = inventory.BatchValues.FirstOrDefault(b => b.BatchId == request.BatchId);
+                Batch? batch = inventory.Batches.FirstOrDefault(b => b.BatchId == request.BatchId);
             if (batch is null)
                 throw new InvalidOperationException($"Batch with ID {request.BatchId} does not exist in inventory with key {request.InventoryKey}.");
 
             SupplierReturn supplierReturn = SupplierReturn.Create(request.SupplierId, request.InventoryKey.ToDomain(), request.BatchId, request.Quantity, request.Reason);
-            SupplierReturn savedSupplierReturn = _supplierReturnRepository.Add(supplierReturn);
+            SupplierReturn? savedSupplierReturn = _supplierReturnRepository.Add(supplierReturn);
+
+            if (savedSupplierReturn is null)
+                throw new InvalidOperationException("Failed to create supplier return");
 
             return new ReturnStockToSupplierResponse(
                 savedSupplierReturn.SupplierReturnId,

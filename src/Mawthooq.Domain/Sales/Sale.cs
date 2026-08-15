@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Sales.Entity;
 using Mawthooq.Domain.Sales.Enums;
-using Mawthooq.Domain.ValueObjects.Money;
-using Mawthooq.Domain.ValueObjects.Money.Enums;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
+using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Domain.Sales
 {
@@ -14,6 +14,7 @@ namespace Mawthooq.Domain.Sales
     {
         public int SaleId { get; }
         public int BranchId { get; }
+        public int? CustomerId { get; }
         public Currency Currency { get; }
         public DateTime SaleDate { get; }
         public SaleStatus Status { get; private set; }
@@ -32,14 +33,14 @@ namespace Mawthooq.Domain.Sales
         (sum, line) => sum + line.GrossProfit);
 
 
-        public Sale(int saleId, int branchId, Currency currency)
+        public Sale(int saleId, int branchId, Currency currency, int? customerId = null)
         : this(branchId, currency)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(saleId, nameof(saleId));
             SaleId = saleId;
         }
 
-        private Sale(int branchId, Currency currency)
+        private Sale(int branchId, Currency currency, int? customerId = null)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(branchId, nameof(branchId));
 
@@ -50,12 +51,13 @@ namespace Mawthooq.Domain.Sales
             Currency = currency;
             SaleDate = DateTime.UtcNow;
             Status = SaleStatus.Open;
+            CustomerId = customerId;
             DiscountAmount = Money.Zero(currency);
         }
 
-        public static Sale Create(int branchId, Currency currency)
+        public static Sale Create(int branchId, Currency currency, int? customerId = null)
         {
-            return new Sale(branchId, currency);
+            return new Sale(branchId, currency, customerId);
         }
 
         public void AddLine(int productId, int quantity, Money sellingPrice, Money purchaseCost)

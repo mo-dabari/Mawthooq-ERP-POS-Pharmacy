@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Payments.Entity;
 using Mawthooq.Domain.Payments.Enums;
-using Mawthooq.Domain.ValueObjects.Money;
-using Mawthooq.Domain.ValueObjects.Money.Enums;
+using Mawthooq.Domain.SharedKernel.Enums;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Domain.Payments
 {

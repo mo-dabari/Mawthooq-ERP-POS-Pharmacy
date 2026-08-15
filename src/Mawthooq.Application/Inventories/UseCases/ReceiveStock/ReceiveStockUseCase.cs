@@ -6,6 +6,8 @@ using Mawthooq.Application.Common.DTOs.Mappers;
 using Mawthooq.Domain.Branches;
 using Mawthooq.Domain.Inventories;
 using Mawthooq.Domain.Inventories.Entities;
+using Mawthooq.Domain.Inventories.Enums;
+using Mawthooq.Domain.Inventories.ValueObjects;
 using Mawthooq.Domain.Products;
 
 namespace Mawthooq.Application.Inventories.UseCases.ReceiveStock
@@ -36,23 +38,27 @@ namespace Mawthooq.Application.Inventories.UseCases.ReceiveStock
             if (branch is null)
                 throw new InvalidOperationException($"Branch with ID {request.BranchId} does not exist.");
 
-            Inventory? inventory = _inventoryRepository.GetInventoryByProductAndBranch(request.ProductId, request.BranchId);
+            Inventory? inventory = _inventoryRepository.GetByInventoryKey(new InventoryKey(request.ProductId, request.BranchId));
 
             if (inventory is null)
             {
-                Inventory newinventory = new(request.ProductId, request.BranchId, request.SellingPrice.ToDomain());
-                newinventory.ReceiveStock(request.Quantity, request.PurchaseCost.ToDomain(), request.ReceivedDate, request.ExpiryDate);
+                Inventory newinventory = Inventory.Create(request.ProductId, request.BranchId, request.SellingPrice.ToDomain());
+                newinventory.ReceiveStock(request.Quantity, request.PurchaseCost.ToDomain(), request.ReceivedDate, request.ExpiryDate, BatchSource.Purchase);
                 inventory = _inventoryRepository.Add(newinventory);
             }
             else
             {
-                inventory.ReceiveStock(request.Quantity, request.PurchaseCost.ToDomain(), request.ReceivedDate, request.ExpiryDate);
+                inventory.ReceiveStock(request.Quantity, request.PurchaseCost.ToDomain(), request.ReceivedDate, request.ExpiryDate, BatchSource.InventoryAdjustment);
                 inventory = _inventoryRepository.UpdateAndReturn(inventory);
             }
 
-            Batch lastBatch = inventory.BatchValues.Last();
+            if (inventory is null)
+                throw new InvalidOperationException("Failed to receive stock.");
+
+            Batch? lastBatch = inventory.Batches.Last();
+
             return new ReceiveStockResponse(
-                new DTOs.InventoryKeyDto(inventory.InventoryId.ProductId, inventory.InventoryId.BranchId),
+                new DTOs.InventoryKeyDto(inventory.ProductId, inventory.BranchId),
                 lastBatch.BatchId,
                 lastBatch.Quantity,
                 inventory.SellingPrice.ToDto(),

@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Domain.Common.Interfaces;
+using Mawthooq.Domain.Categories.ValueObjects;
+using Mawthooq.Domain.SharedKernel.Abstractions;
 
 namespace Mawthooq.Domain.Categories
 {
-    public interface ICategoryRepository : IBaseRepository<Category, int>
+    public interface ICategoryRepository : IBaseRepository<Category, CategoryId>
     {
-        IEnumerable<Category> GetAllActive();
-        Category? GetByName(string name);
-        Category Add(Category category);
+        bool ExistsAndActive(CategoryId categoryId);
+        Category? GetByName(string categoryName);
     }
 }

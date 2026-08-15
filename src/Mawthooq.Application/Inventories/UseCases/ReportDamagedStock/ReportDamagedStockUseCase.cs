@@ -15,26 +15,26 @@ namespace Mawthooq.Application.Inventories.UseCases.ReportDamagedStock
             InventoryRepository = inventoryRepository;
         }
 
-        public ReportDamagedResponse Execute(ReportDamagedRequest request)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
-            Inventory? inventory = InventoryRepository.GetById(request.InventoryKey.ToDomain());
+        // public ReportDamagedResponse Execute(ReportDamagedRequest request)
+        // {
+        //     ArgumentNullException.ThrowIfNull(request, nameof(request));
+        //     Inventory? inventory = InventoryRepository.GetById(request.InventoryKey.ToDomain());
 
-            if (inventory is null)
-                throw new InvalidOperationException("Inventory not found.");
+        //     if (inventory is null)
+        //         throw new InvalidOperationException("Inventory not found.");
 
-            var damagedBatch = inventory.ReportDamagedStock(request.BatchId, request.Quantity, request.Reason);
+        //     var damagedBatch = inventory.ReportDamagedStock(request.BatchId, request.Quantity, request.Reason);
 
 
-            Inventory updatedInventory = InventoryRepository.UpdateAndReturn(inventory);
+        //     Inventory updatedInventory = InventoryRepository.UpdateAndReturn(inventory);
 
-            return new ReportDamagedResponse(
-                updatedInventory.DamagedBatchValues.Last().DamagedBatchId,
-                damagedBatch.Quantity,
-                damagedBatch.Reason.ToString(),
-                damagedBatch.DamagedAt
-            );
-        }
+        //     return new ReportDamagedResponse(
+        //         updatedInventory.DamagedBatches.Last().DamagedBatchId,
+        //         damagedBatch.Quantity,
+        //         damagedBatch.Reason.ToString(),
+        //         damagedBatch.DamagedAt
+        //     );
+        // }
 
     }
 }
