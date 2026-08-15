@@ -7,6 +7,8 @@ namespace Mawthooq.Application.Products.Queries.UseCases.ScanProductBarcode
 {
     public interface IScanProductBarcodeQueryRepository
     {
-        
+        Task<ScanProductBarcodeDto?> ScanProductBarcodeAsync(
+            ScanProductBarcodeQuery query,
+            CancellationToken cancellationToken = default);
     }
 }

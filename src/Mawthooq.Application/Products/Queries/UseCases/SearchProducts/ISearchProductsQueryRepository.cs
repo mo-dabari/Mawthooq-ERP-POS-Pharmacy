@@ -7,6 +7,8 @@ namespace Mawthooq.Application.Products.Queries.UseCases.SearchProducts
 {
     public interface ISearchProductsQueryRepository
     {
-        
+        Task<IReadOnlyList<ProductSearchResultDto>> SearchProductsAsync(
+            SearchProductsQuery query,
+            CancellationToken cancellationToken = default);
     }
 }

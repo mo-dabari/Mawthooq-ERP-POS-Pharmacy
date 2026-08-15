@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace Mawthooq.Application.Products.Queries.UseCases.ScanProductBarcode
 {
-    public class ScanProductBarcodeQuery
-    {
-        
-    }
+    public sealed record ScanProductBarcodeQuery(string Barcode);
+
 }

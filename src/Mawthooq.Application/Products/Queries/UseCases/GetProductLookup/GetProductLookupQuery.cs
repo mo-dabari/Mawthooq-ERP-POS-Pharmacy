@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace Mawthooq.Application.Products.Queries.UseCases.GetProductLookup
 {
-    public class GetProductLookupQuery
-    {
-        
-    }
+    public sealed record GetProductLookupQuery(string? SearchText = null, int MaxResults = 20);
+
 }
