@@ -5,8 +5,5 @@ using System.Threading.Tasks;
 
 namespace Mawthooq.Application.Common.DTOs
 {
-    public record class EmailDto (string Value)
-    {
-
-    }
+    public record class EmailDto (string Value);
 }

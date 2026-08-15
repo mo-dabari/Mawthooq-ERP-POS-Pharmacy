@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Domain.ValueObjects;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Application.Common.DTOs.Mappers
 {
@@ -19,7 +19,7 @@ namespace Mawthooq.Application.Common.DTOs.Mappers
         {
             ArgumentNullException.ThrowIfNull(addressDto, nameof(addressDto));
 
-            return new Domain.ValueObjects.Address(addressDto.BuildingNumber, addressDto.Street, addressDto.City, addressDto.Governorate, addressDto.Country);
+            return new Address(addressDto.BuildingNumber, addressDto.Street, addressDto.City, addressDto.Governorate, addressDto.Country);
         }
     }
 }

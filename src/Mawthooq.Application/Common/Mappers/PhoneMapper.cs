@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Domain.ValueObjects;
+using Mawthooq.Domain.SharedKernel.ValueObjects;
 
 namespace Mawthooq.Application.Common.DTOs.Mappers
 {
