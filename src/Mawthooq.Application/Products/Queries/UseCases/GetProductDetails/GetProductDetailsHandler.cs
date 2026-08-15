@@ -1,32 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Mawthooq.Application.Products.Queries.UseCases.GetProductDetails;
 using Microsoft.VisualBasic;
 
-namespace Mawthooq.Application.Products.Queries.UseCases.GetProductById
+namespace Mawthooq.Application.Products.Queries.UseCases.GetProductDetails
 {
-    public class GetProductByIdHandler
+    public class GetProductDetailsHandler
     {
         private readonly IGetProductDetailsQueryRepository
         _getProductDetailsQueryRepository;
 
-        public GetProductByIdHandler(IGetProductDetailsQueryRepository getProductDetailsQueryRepository)
+        public GetProductDetailsHandler(IGetProductDetailsQueryRepository getProductDetailsQueryRepository)
         {
             ArgumentNullException.ThrowIfNull(getProductDetailsQueryRepository, nameof(getProductDetailsQueryRepository));
 
             _getProductDetailsQueryRepository = getProductDetailsQueryRepository;
         }
 
-        public Task<GetProductDetailsDto?> HanHandleAsyncdle(GetProductDetailsQuery query, CancellationToken cancellationToken)
+        public Task<GetProductDetailsDto?> HandleAsync(GetProductDetailsQuery query, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(query, nameof(query));
 
-            return _getProductDetailsQueryRepository.GetProductDetailsAsync(
-                        query,
-                        cancellationToken
-                        ) ?? throw new InvalidOperationException($"Not Found Product");
+            return _getProductDetailsQueryRepository.GetProductDetailsAsync(query, cancellationToken);
         }
     }
 }

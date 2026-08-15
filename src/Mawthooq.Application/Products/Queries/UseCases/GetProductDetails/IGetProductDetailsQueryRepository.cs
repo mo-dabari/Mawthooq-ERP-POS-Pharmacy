@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Mawthooq.Application.Products.Queries.UseCases.GetProductById;
 using Mawthooq.Application.Products.Queries.UseCases.GetProducts;
 
 namespace Mawthooq.Application.Products.Queries.UseCases.GetProductDetails
