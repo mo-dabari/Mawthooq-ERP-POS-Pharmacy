@@ -23,7 +23,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ActivateProduct
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var product = await _productRepository.GetByIdAsync(request.ProductId.ToDomain());
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain());
 
             if (product is null)
                 throw new InvalidOperationException($"Product with ID {request.ProductId.Value} not found.");
