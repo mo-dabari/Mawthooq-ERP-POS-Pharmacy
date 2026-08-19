@@ -73,7 +73,7 @@ namespace Mawthooq.Application.Products.Commands.Mappers
             return product;
         }
 
-        public static CreateProductResponse ToResponseCreate(this Product product)
+        public static CreateProductResponse ToResponseCreate(this Product product, byte[] rowVersion)
         {
             ArgumentNullException.ThrowIfNull(product, nameof(product));
 
@@ -88,9 +88,8 @@ namespace Mawthooq.Application.Products.Commands.Mappers
                 product.CanBeReturnedIfOpened,
                 product.NearExpiryThresholdInDays,
                 product.Image.ToDto(),
-                product.PackagingVersions.Select(pv => pv.ToDto()).ToList());
+                product.PackagingVersions.Select(pv => pv.ToDto()).ToList(),
+                rowVersion);
         }
-
-
     }
 }

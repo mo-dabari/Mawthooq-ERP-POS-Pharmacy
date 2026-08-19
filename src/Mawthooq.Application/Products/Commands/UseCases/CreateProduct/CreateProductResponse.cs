@@ -26,7 +26,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
         int NearExpiryThresholdInDays,
         ImageDto Image,
 
-        IReadOnlyList<PackagingVersionDto> PackagingVersions);
+        IReadOnlyList<PackagingVersionDto> PackagingVersions,
+        byte[] RowVersion);
 
     public record PackagingVersionDto(
         PackagingVersionIdDto PackagingVersionId,
