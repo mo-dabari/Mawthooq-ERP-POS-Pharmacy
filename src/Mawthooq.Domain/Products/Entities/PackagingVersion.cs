@@ -25,13 +25,13 @@ namespace Mawthooq.Domain.Products.Entities
             Status = status;
         }
 
-        private PackagingVersion(PackagingVersionId packagingVersionId, int version, Status status, List<ProductUnitDetails> units)
+        private PackagingVersion(PackagingVersionId packagingVersionId, int version, Status status, IReadOnlyList<ProductUnitDetails> units)
         : this(packagingVersionId, version, status)
         {
-            _units = units;
+            _units = units.ToList();
         }
 
-        internal static PackagingVersion Rehydrate(PackagingVersionId packagingVersionId, int version, Status status, List<ProductUnitDetails> units)
+        internal static PackagingVersion Rehydrate(PackagingVersionId packagingVersionId, int version, Status status, IReadOnlyList<ProductUnitDetails> units)
         {
             return new PackagingVersion(packagingVersionId, version, status, units);
         }
