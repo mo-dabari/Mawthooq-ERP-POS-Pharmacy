@@ -3,11 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Mawthooq.Domain\Mawthooq.Domain.csproj" />
     <ProjectReference Include="..\Mawthooq.Application\Mawthooq.Application.csproj" />
-
-      <Compile Remove="Mappers\**" />
-      <Compile Remove="Repositories\**" />
-      <Compile Remove="Data\**" />
-      <Compile Remove="AdoNet\**" />
   </ItemGroup>
 
   <ItemGroup>
