@@ -24,7 +24,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.RemoveCompanyBarcodeTo
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var product = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _)= await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)
                 throw new InvalidOperationException($"Product with ID {request.ProductIdDto.Value} not found.");

@@ -40,7 +40,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
             var info = request.ProductInformationDto;
 
-            Category? category = await _categoryRepository.GetByIdAsync(
+            var (category, _) = await _categoryRepository.GetByIdAsync(
                 info.CategoryIdDto.ToDomain(),
                 cancellationToken);
 
@@ -54,13 +54,12 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
             var product = await request.ToDomainAsync(category.CategoryId, sKU, _barcodeGenerator);
 
-            var savedProduct = await _productRepository.AddAsync(product,cancellationToken);
+            var (savedProduct, rowVersion) = await _productRepository.AddAsync(product, cancellationToken);
 
-            if (savedProduct is null)
-                throw new InvalidOperationException("Failed to create product");
+            if (savedProduct is null || rowVersion is null)
+                throw new InvalidOperationException("Failed to create product.");
 
-            return savedProduct.ToResponseCreate();
-
+            return savedProduct.ToResponseCreate(rowVersion);
         }
     }
 }

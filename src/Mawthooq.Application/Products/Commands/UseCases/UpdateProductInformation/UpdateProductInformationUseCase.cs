@@ -28,11 +28,11 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var product = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
             if (product is null)
                 throw new InvalidOperationException($"Product with id {request.ProductId.Value} not found.");
 
-            var category = await _categoryRepository.GetByIdAsync(request.CategoryId.ToDomain(), cancellationToken);
+            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryId.ToDomain(), cancellationToken);
             if (category is null)
                 throw new InvalidOperationException($"Category with id {request.CategoryId} not found.");
 

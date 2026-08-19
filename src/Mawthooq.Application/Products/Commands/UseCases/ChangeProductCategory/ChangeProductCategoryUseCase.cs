@@ -28,7 +28,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ChangeProductCategory
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var product = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
                 throw new InvalidOperationException($"Product with ID {request.ProductId.Value} not found.");

@@ -35,15 +35,15 @@ namespace Mawthooq.Domain.Products.ValueObjects
             _barcodes.Add(internalBarcode);
         }
 
-        private ProductUnitDetails(UnitOfMeasure unit, int conversionRate, UnitRank rank, List<Barcode> barcodes)
+        private ProductUnitDetails(UnitOfMeasure unit, int conversionRate, UnitRank rank, IReadOnlyList<Barcode> barcodes)
         {
             Unit = unit;
             ConversionRate = conversionRate;
             Rank = rank;
-            _barcodes = barcodes;
+            _barcodes = barcodes.ToList();
         }
 
-        internal static ProductUnitDetails Reconstruct(UnitOfMeasure unit, int conversionRate, UnitRank rank, List<Barcode> barcodes)
+        internal static ProductUnitDetails Reconstruct(UnitOfMeasure unit, int conversionRate, UnitRank rank, IReadOnlyList<Barcode> barcodes)
         {
             return new ProductUnitDetails(unit, conversionRate, rank, barcodes);
         }
