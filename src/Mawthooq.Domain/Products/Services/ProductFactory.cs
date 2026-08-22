@@ -38,7 +38,7 @@ namespace Mawthooq.Domain.Products.Services
             CancellationToken cancellationToken = default)
         {
             int unitsCount = packaging.GetUnitDefinitions().Count();
-            long startBarcodeSequence = await _barcodeGenerator.GetNextBarcodeSequence(unitsCount, cancellationToken);
+            long startBarcodeSequence = await _barcodeGenerator.GetNextBarcodeSequenceAsync(unitsCount, cancellationToken);
 
             return Product.Create(
                         productId,
@@ -53,6 +53,13 @@ namespace Mawthooq.Domain.Products.Services
                         requiresExpiryTracking,
                         canBeReturnedIfOpened,
                         nearExpiryThresholdInDays);
+        }
+
+        public async Task AddPackagingVersionAsync(Product product, ProductPackaging packaging, CancellationToken cancellationToken)
+        {
+            int unitsCount = packaging.GetUnitDefinitions().Count();  
+            long firstReservedBarcode = await _barcodeGenerator.GetNextBarcodeSequenceAsync(unitsCount, cancellationToken);
+            product.CreatePackagingVersion(packaging, firstReservedBarcode);
         }
     }
 }
