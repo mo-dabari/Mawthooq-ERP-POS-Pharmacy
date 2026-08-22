@@ -15,12 +15,12 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
             _categoryRepository = categoryRepository;
         }
 
-        public UpdateCategoryResponse Execute(UpdateCategoryRequest request)
+        public async Task<UpdateCategoryResponse> ExecuteAsync(UpdateCategoryRequest request, CancellationToken cancellationToken = default)
         {
 
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            Category? category = _categoryRepository.GetById(request.CategoryId.ToDomain());
+            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryId.ToDomain(), cancellationToken);
 
             if (category is null)
                 throw new InvalidOperationException($"Category with ID {request.CategoryId} not found.");
@@ -28,7 +28,7 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
             category.Rename(request.Name);
             category.ChangeDescription(request.Description);
 
-            _categoryRepository.Update(category, request.rowVersion);
+            await _categoryRepository.UpdateAsync(category, request.rowVersion,cancellationToken);
 
             return new UpdateCategoryResponse(category.CategoryId.ToDto(), category.Name.ToString(), category.Description);
         }
