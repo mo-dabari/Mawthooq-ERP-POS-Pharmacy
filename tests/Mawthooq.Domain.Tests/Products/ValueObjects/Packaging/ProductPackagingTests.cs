@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Mawthooq.Domain.Products.Entities;
 using Mawthooq.Domain.Products.Enums;
 using Mawthooq.Domain.Products.ValueObjects.Packaging;
 using Xunit;
