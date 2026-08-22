@@ -15,7 +15,7 @@ namespace Mawthooq.Domain.Products.ValueObjects.Barcodes
         private InternalLinearBarcode(string value) : base(value, BarcodeType.Internal)
         {
             if (!InternalLinearRegex().IsMatch(Value))
-                throw new ArgumentException("Invalid Barcode Must Be Between 4 To 9 Digits Only");
+                throw new ArgumentException("Internal barcode must contain between 4 and 9 digits.");
         }
 
         public static InternalLinearBarcode New(string value)
