@@ -18,10 +18,10 @@ namespace Mawthooq.Application.Categories.UseCases.GetCategoryByID
             _categoryRepository = categoryRepository;
         }
 
-        public GetCategoryByIdResponse Execute(CategoryIdDto categoryId)
+        public async Task<GetCategoryByIdResponse> ExecuteAsync(CategoryIdDto categoryId, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(categoryId, nameof(categoryId));
-            Category? category = _categoryRepository.GetById(categoryId.ToDomain());
+            var (category, _) = await _categoryRepository.GetByIdAsync(categoryId.ToDomain(), cancellationToken);
 
             if (category is null)
                 throw new InvalidOperationException($"Category with id {categoryId} not found");

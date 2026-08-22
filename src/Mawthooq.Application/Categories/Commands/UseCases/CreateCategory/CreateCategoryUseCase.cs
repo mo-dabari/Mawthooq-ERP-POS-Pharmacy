@@ -16,11 +16,11 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.CreateCategory
             _categoryRepository = categoryRepository;
         }
 
-        public CreateCategoryResponse Execute(CreateCategoryRequest request)
+        public async Task<CreateCategoryResponse> ExecuteAsync(CreateCategoryRequest request, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
             var category = Category.Create(CategoryId.New(), request.Name, request.Description);
-            Category? saveCategory = _categoryRepository.Add(category);
+            var (saveCategory,_) = await _categoryRepository.AddAsync(category,cancellationToken);
 
             if (saveCategory is null)
                 throw new InvalidOperationException("Failed to create category");

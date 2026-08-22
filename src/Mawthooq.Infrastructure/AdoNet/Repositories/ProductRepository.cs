@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Categories.ValueObjects;
@@ -15,6 +16,7 @@ using Mawthooq.Domain.Products.ValueObjects.Barcodes;
 using Mawthooq.Domain.SharedKernel.Enums;
 using Mawthooq.Domain.SharedKernel.ValueObjects;
 using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
+using Microsoft.Data.SqlClient;
 
 namespace Mawthooq.Infrastructure.AdoNet.Repositories
 {
@@ -304,7 +306,7 @@ namespace Mawthooq.Infrastructure.AdoNet.Repositories
                     switch (domainEvent)
                     {
                         case PackagingVersionStatusEvent e:
-                            await UpdatePackagingVersionStatusAsync(e, expectedRowVersion, connection, transaction, cancellationToken);
+                            await UpdatePackagingVersionStatusAsync(e, connection, transaction, cancellationToken);
                             break;
 
                         case PackagingVersionAddedEvent e:
@@ -403,7 +405,6 @@ namespace Mawthooq.Infrastructure.AdoNet.Repositories
 
         private static async Task UpdatePackagingVersionStatusAsync(
             PackagingVersionStatusEvent domainEvent,
-            byte[] expectedRowVersion,
             SqlConnection connection,
             SqlTransaction transaction,
             CancellationToken cancellationToken)
@@ -411,14 +412,12 @@ namespace Mawthooq.Infrastructure.AdoNet.Repositories
             const string sql = """
                 UPDATE dbo.PackagingVersions
                 SET Status = @Status
-                WHERE PackagingVersionId = @PackagingVersionId
-                AND RowVersion = @RowVersion;
+                WHERE PackagingVersionId = @PackagingVersionId;
                 """;
 
             await using SqlCommand command = new(sql, connection, transaction);
             command.Parameters.Add("@Status", SqlDbType.TinyInt).Value = (byte)domainEvent.newStatus;
             command.Parameters.Add("@PackagingVersionId", SqlDbType.UniqueIdentifier).Value = domainEvent.PackagingVersionId.Value;
-            command.Parameters.Add("@RowVersion", SqlDbType.Timestamp).Value = expectedRowVersion;
 
             int affectedRows = await command.ExecuteNonQueryAsync(cancellationToken);
 
