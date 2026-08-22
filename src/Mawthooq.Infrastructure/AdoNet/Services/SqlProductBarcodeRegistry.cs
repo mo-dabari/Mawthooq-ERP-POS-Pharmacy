@@ -3,58 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using System.Threading.Tasks;
-using Mawthooq.Domain.Common.Interfaces;
 using Microsoft.Data.SqlClient;
 using Mawthooq.Domain.Products;
-using Mawthooq.Infrastructure.ADO.Persistence.Connections;
+using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
 
 namespace Mawthooq.Infrastructure.Services
 {
     public class SqlInternalBarcodeSequenceGenerator : IInternalBarcodeSequenceGenerator
     {
-        private readonly SqlConnectionFactory _sqlConnectionFactory;
+        private readonly IDbConnectionProvider _connectionProvider;
 
-        public SqlInternalBarcodeSequenceGenerator(SqlConnectionFactory sqlConnectionFactory)
+        public SqlInternalBarcodeSequenceGenerator(IDbConnectionProvider connectionProvider)
         {
-            _sqlConnectionFactory = sqlConnectionFactory
-            ?? throw new ArgumentNullException(nameof(sqlConnectionFactory));
+            _connectionProvider = connectionProvider
+            ?? throw new ArgumentNullException(nameof(connectionProvider));
         }
-        public long GetNextBarcodeSequence(int count)
+        public async Task<long> GetNextBarcodeSequenceAsync(int count, CancellationToken cancellationToken = default)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count, nameof(count));
 
-            // // سنستدعي الـ Sequence باستخدام SQL عادي لجلب الرقم الحالي وتحريك العداد بالـ count المطلوب
-            // // نستخدم sp_sequence_get_range وهي ميزة في SQL Server لحجز نطاق أرقام دفعة واحدة بكفاءة عالية
-            // var results = new List<long>();
-
-            // تجهيز البارامترز لـ الميزة الرسمية في SQL Server لحجز نطاق
             var sequenceName = "dbo.ProductBarcodeSequence";
 
-            // كود افتراضي مبسط لجلب النطاق عبر الاستعلام:
-            // بدلاً من التعقيد، نتحرك بجملة تكرارية سريعة أو عبر الـ Procedure الرسمي:
-            using var command = (SqlConnection)_sqlConnectionFactory.Database.GetDbConnection().CreateCommand();
-            _sqlConnectionFactory.command.CommandText = $@"
-            DECLARE @FirstValue SQL_VARIANT;
-            EXEC sp_sequence_get_range
-                @sequence_name = N'{sequenceName}',
-                @range_size = {count},
-                @range_first_value = @FirstValue OUTPUT;
-            SELECT CAST(@FirstValue AS BIGINT);";
+            string sql = """
+                DECLARE @FirstValue SQL_VARIANT;
 
-            if (command.Connection.State != ConnectionState.Open)
-                command.Connection.OpenAsync();
+                EXEC sp_sequence_get_range
+                    @sequence_name = @SequenceName,
+                    @range_size = @RangeSize,
+                    @range_first_value = @FirstValue OUTPUT;
 
-            var firstValue = (long)command.ExecuteScalar();
+                SELECT CAST(@FirstValue AS BIGINT);
+                """;
 
-            // // بناء قائمة الأرقام المحجوزة بناءً على أول رقم أعطته لنا الداتابيز
-            // for (int i = 0; i < count; i++)
-            // {
-            //     results.Add(firstValue + i);
-            // }
+            SqlConnection connection = await _connectionProvider.GetConnectionAsync(cancellationToken);
 
-            // return results;
+            await using SqlCommand command = new(sql, connection);
 
-            return firstValue;
+            command.Parameters.Add("@SequenceName", SqlDbType.NVarChar, 776).Value = sequenceName;
+
+            command.Parameters.Add("@RangeSize", SqlDbType.BigInt).Value = count;
+
+            var result = await command.ExecuteScalarAsync(cancellationToken);
+
+            if (result is null or DBNull || !long.TryParse(result.ToString(), out long barcode))
+                throw new InvalidOperationException($"Failed to retrieve barcode sequence from sequence '{sequenceName}'. Result was null or invalid.");
+
+            return barcode;
         }
     }
 }
