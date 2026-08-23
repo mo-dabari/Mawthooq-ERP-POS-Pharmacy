@@ -16,7 +16,7 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProductDetails
     string LocalAgent,
     bool CanBeReturnedIfOpened,
     Status Status,
-    string? ImageUrl,
+    string? ImageStorageKey,
     IReadOnlyList<PackagingVersionDto> PackagingVersions);
 
     public record class PackagingVersionDto(

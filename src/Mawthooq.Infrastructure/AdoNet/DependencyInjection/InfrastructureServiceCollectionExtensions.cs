@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Infrastructure.ADO.Persistence.Connections;
 using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
-using Mawthooq.Infrastructure.AdoNet.Persistence.Transactions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
