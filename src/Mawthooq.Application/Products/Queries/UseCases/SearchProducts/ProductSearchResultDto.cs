@@ -10,7 +10,7 @@ namespace Mawthooq.Application.Products.Queries.UseCases.SearchProducts
         Guid ProductId,
         string TradeName,
         string Sku,
-        string? MatchedBarcode,
+        string MatchedBarcode,
         string CategoryName,
         Status Status);
 }
