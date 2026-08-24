@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.DTOs;
-using Mawthooq.Domain.Categories.Enums;
 using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
@@ -12,5 +11,5 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
         CategoryIdDto CategoryId,
         string Name,
         string Description,
-        byte[] rowVersion);
+        byte[] RowVersion);
 }

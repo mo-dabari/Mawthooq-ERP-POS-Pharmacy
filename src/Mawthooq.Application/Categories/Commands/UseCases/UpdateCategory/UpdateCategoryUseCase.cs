@@ -30,7 +30,7 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
             category.Rename(request.Name);
             category.ChangeDescription(request.Description);
 
-            byte[] newRowVersion = await _categoryRepository.UpdateAsync(category, request.rowVersion, cancellationToken);
+            byte[] newRowVersion = await _categoryRepository.UpdateAsync(category, request.RowVersion, cancellationToken);
 
             return new UpdateCategoryResponse(
                 category.CategoryId.ToDto(),

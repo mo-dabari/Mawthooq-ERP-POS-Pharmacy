@@ -10,5 +10,5 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
         CategoryIdDto CategoryId,
         string Name,
         string Description,
-        byte[] newRowVersion);
+        byte[] NewRowVersion);
 }
