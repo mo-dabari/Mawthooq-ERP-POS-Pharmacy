@@ -10,7 +10,7 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
 {
     public record class UpdateCategoryRequest (
         CategoryIdDto CategoryId,
-        ProductCategory Name,
+        string Name,
         string Description,
         byte[] rowVersion);
 }

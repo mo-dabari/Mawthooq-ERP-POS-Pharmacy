@@ -12,6 +12,8 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
         private readonly ICategoryRepository _categoryRepository;
         public UpdateCategoryUseCase(ICategoryRepository categoryRepository)
         {
+            ArgumentNullException.ThrowIfNull(categoryRepository, nameof(categoryRepository));
+
             _categoryRepository = categoryRepository;
         }
 
@@ -28,9 +30,13 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
             category.Rename(request.Name);
             category.ChangeDescription(request.Description);
 
-            await _categoryRepository.UpdateAsync(category, request.rowVersion,cancellationToken);
+            byte[] newRowVersion = await _categoryRepository.UpdateAsync(category, request.rowVersion, cancellationToken);
 
-            return new UpdateCategoryResponse(category.CategoryId.ToDto(), category.Name.ToString(), category.Description);
+            return new UpdateCategoryResponse(
+                category.CategoryId.ToDto(),
+                category.Name,
+                category.Description,
+                newRowVersion);
         }
     }
 }

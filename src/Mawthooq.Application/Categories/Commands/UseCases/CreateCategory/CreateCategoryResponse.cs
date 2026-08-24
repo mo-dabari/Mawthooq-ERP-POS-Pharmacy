@@ -9,7 +9,8 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.CreateCategory
 {
     public record class CreateCategoryResponse(
         CategoryIdDto CategoryId,
-        ProductCategory Name,
+        string Name,
         string Description,
-        bool Status);
+        bool Status,
+        byte[] RowVersion);
 }
