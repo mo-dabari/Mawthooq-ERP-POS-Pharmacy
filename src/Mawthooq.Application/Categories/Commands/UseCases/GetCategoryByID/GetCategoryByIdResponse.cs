@@ -9,7 +9,7 @@ namespace Mawthooq.Application.Categories.UseCases.GetCategoryByID
 {
     public record class GetCategoryByIdResponse(
         CategoryIdDto CategoryId,
-        ProductCategory Name,
+        string Name,
         string Description,
         bool Status);
 }

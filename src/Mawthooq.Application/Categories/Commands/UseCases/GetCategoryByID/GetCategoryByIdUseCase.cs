@@ -15,6 +15,8 @@ namespace Mawthooq.Application.Categories.UseCases.GetCategoryByID
         private readonly ICategoryRepository _categoryRepository;
         public GetCategoryByIdUseCase(ICategoryRepository categoryRepository)
         {
+            ArgumentNullException.ThrowIfNull(categoryRepository, nameof(categoryRepository));
+
             _categoryRepository = categoryRepository;
         }
 
@@ -26,7 +28,11 @@ namespace Mawthooq.Application.Categories.UseCases.GetCategoryByID
             if (category is null)
                 throw new InvalidOperationException($"Category with id {categoryId} not found");
 
-            return new GetCategoryByIdResponse(category.CategoryId.ToDto(), category.Name, category.Description, category.Status);
+            return new GetCategoryByIdResponse(
+                category.CategoryId.ToDto(),
+                category.Name,
+                category.Description,
+                category.Status);
         }
     }
 }
