@@ -23,7 +23,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ActivateProduct
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain());
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
                 throw new InvalidOperationException($"Product with ID {request.ProductId.Value} not found.");
@@ -35,7 +35,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ActivateProduct
             return new ActivateProductResponse(
                 product.ProductId.ToDto(),
                 product.TradeName,
-                product.Status.ToString(),
+                product.Status,
                 newRowVersion);
         }
     }
