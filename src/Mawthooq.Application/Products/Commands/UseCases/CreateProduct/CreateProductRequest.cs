@@ -7,11 +7,7 @@ using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.LocalAgents.DTOs;
 using Mawthooq.Application.Manufacturers.DTOs;
 using Mawthooq.Application.Products.Commands.DTOs;
-using Mawthooq.Domain.LocalAgents.ValueObjects;
-using Mawthooq.Domain.Manufacturers.ValueObjects;
 using Mawthooq.Domain.Products.Enums;
-using Mawthooq.Domain.Products.ValueObjects;
-using Mawthooq.Domain.Products.ValueObjects.Packaging;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 {
@@ -21,7 +17,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
         PackagingInformation PackagingDto,
 
-        List<UserUnitBarcodeDto?> UserBarcodes
+        List<UserUnitBarcodeDto>? UserBarcodes
         );
     public sealed record  UserUnitBarcodeDto(UnitOfMeasure Unit, BarcodeDto BarcodeDto);
 
