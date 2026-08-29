@@ -33,7 +33,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.DiscontinueProduct
             return new DiscontinueProductResponse(
                 product.ProductId.ToDto(),
                 product.TradeName,
-                product.Status.ToString(),
+                product.Status,
                 newRowVersion);
         }
     }

@@ -84,16 +84,13 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                     info.NearExpiryThresholdInDays,
                     cancellationToken);
 
-            if (request.UserBarcodes.Count > 0)
+            if (request.UserBarcodes is not null && request.UserBarcodes.Count > 0)
             {
                 var firstVersionId =
                     product.PackagingVersions.Single().PackagingVersionId;
 
                 foreach (var userBarcode in request.UserBarcodes)
                 {
-                    if (userBarcode is null)
-                        continue;
-
                     product.AddCompanyBarcodeToVersion(
                         firstVersionId,
                         userBarcode.Unit,
