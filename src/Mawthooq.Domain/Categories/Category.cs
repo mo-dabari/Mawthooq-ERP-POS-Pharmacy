@@ -4,8 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Mawthooq.Domain.Categories.Enums;
 using Mawthooq.Domain.Categories.ValueObjects;
+using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Domain.Categories
 {
@@ -14,7 +14,7 @@ namespace Mawthooq.Domain.Categories
         public CategoryId CategoryId { get; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public bool Status { get; private set; }
+        public Status Status { get; private set; }
         private Category(CategoryId categoryId, string name, string description)
         {
             ValidateArguments(categoryId, name, description);
@@ -22,7 +22,7 @@ namespace Mawthooq.Domain.Categories
             CategoryId = categoryId;
             Name = name;
             Description = description.Trim();
-            Status = true;
+            Status = Status.Active;
         }
 
         public static Category Create(CategoryId categoryId, string name, string description)
@@ -55,18 +55,18 @@ namespace Mawthooq.Domain.Categories
 
         public void Activate()
         {
-            if (Status == true)
+            if (Status == Status.Active)
                 return;
 
-            Status = true;
+            Status = Status.Active;
         }
 
         public void Deactivate()
         {
-            if (Status == false)
+            if (Status == Status.Inactive)
                 return;
 
-            Status = false;
+            Status = Status.Inactive;
         }
 
         public void ChangeStatus(bool isActive)
