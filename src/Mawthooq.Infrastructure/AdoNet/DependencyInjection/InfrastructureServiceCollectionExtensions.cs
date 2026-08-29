@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Infrastructure.ADO.Persistence.Connections;
-using Mawthooq.Infrastructure.AdoNet.Persistence.Abstractions;
 using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
-using Mawthooq.Infrastructure.AdoNet.Persistence.Transactions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mawthooq.Infrastructure.AdoNet.DependencyInjection
 {
@@ -16,8 +16,7 @@ namespace Mawthooq.Infrastructure.AdoNet.DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
         {
-            services.AddSingleton<IDbConnectionFactory, SqlConnectionFactory>();
-            services.AddScoped<ITransactionManager, SqlTransactionManager>();
+            services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
 
             return services;
         }

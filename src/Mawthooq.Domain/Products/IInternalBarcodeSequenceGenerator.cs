@@ -7,6 +7,6 @@ namespace Mawthooq.Domain.Products
 {
     public interface IInternalBarcodeSequenceGenerator
     {
-        long GetNextBarcodeSequence(int count);
+        Task<long> GetNextBarcodeSequenceAsync(int count, CancellationToken cancellationToken = default);
     }
 }

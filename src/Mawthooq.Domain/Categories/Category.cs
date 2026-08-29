@@ -2,39 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Mawthooq.Domain.Categories.Enums;
 using Mawthooq.Domain.Categories.ValueObjects;
+using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Domain.Categories
 {
     public class Category
     {
         public CategoryId CategoryId { get; }
-        public ProductCategory Name { get; private set; }
+        public string Name { get; private set; }
         public string Description { get; private set; }
-        public bool Status { get; private set; }
-        private Category(CategoryId categoryId, ProductCategory name, string description)
+        public Status Status { get; private set; }
+        private Category(CategoryId categoryId, string name, string description)
         {
             ValidateArguments(categoryId, name, description);
 
             CategoryId = categoryId;
             Name = name;
             Description = description.Trim();
-            Status = true;
+            Status = Status.Active;
         }
 
-        public static Category Create(CategoryId categoryId, ProductCategory name, string description)
+        public static Category Create(CategoryId categoryId, string name, string description)
         {
             return new Category(categoryId, name, description);
         }
 
-        public void Rename(ProductCategory name)
+        public void Rename(string name)
         {
-            if (!Enum.IsDefined(typeof(ProductCategory), name))
-                throw new InvalidEnumArgumentException(nameof(name), (int)name, typeof(ProductCategory));
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 
-            if (Name == name)
+            name = name.Trim();
+
+            if (string.Equals(Name, name, StringComparison.OrdinalIgnoreCase))
                 return;
 
             Name = name;
@@ -53,18 +55,18 @@ namespace Mawthooq.Domain.Categories
 
         public void Activate()
         {
-            if (Status == true)
+            if (Status == Status.Active)
                 return;
 
-            Status = true;
+            Status = Status.Active;
         }
 
         public void Deactivate()
         {
-            if (Status == false)
+            if (Status == Status.Inactive)
                 return;
 
-            Status = false;
+            Status = Status.Inactive;
         }
 
         public void ChangeStatus(bool isActive)
@@ -74,12 +76,11 @@ namespace Mawthooq.Domain.Categories
             else
                 Deactivate();
         }
-        private void ValidateArguments(CategoryId categoryId, ProductCategory name, string description)
+        private void ValidateArguments(CategoryId categoryId, string name, string description)
         {
             ArgumentNullException.ThrowIfNull(categoryId, nameof(categoryId));
 
-            if (!Enum.IsDefined(typeof(ProductCategory), name))
-                throw new InvalidEnumArgumentException(nameof(name), (int)name, typeof(ProductCategory));
+            ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 
             ArgumentException.ThrowIfNullOrWhiteSpace(description, nameof(description));
         }

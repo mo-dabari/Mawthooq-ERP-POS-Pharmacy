@@ -10,5 +10,5 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ChangeProductCategory
     public record class ChangeProductCategoryResponse(
         ProductIdDto ProductId,
         CategoryIdDto NewCategoryId,
-        byte[] RowVersion);
+        byte[] NewRowVersion);
 }

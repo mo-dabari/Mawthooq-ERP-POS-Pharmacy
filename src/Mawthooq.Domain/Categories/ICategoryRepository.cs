@@ -9,7 +9,7 @@ namespace Mawthooq.Domain.Categories
 {
     public interface ICategoryRepository : IBaseRepository<Category, CategoryId>
     {
-        bool ExistsAndActive(CategoryId categoryId);
-        Category? GetByName(string categoryName);
+        Task<bool> ExistsAndActiveAsync(CategoryId categoryId, CancellationToken cancellationToken = default);
+        Task<Category?> GetByNameAsync(string categoryName, CancellationToken cancellationToken = default);
     }
 }

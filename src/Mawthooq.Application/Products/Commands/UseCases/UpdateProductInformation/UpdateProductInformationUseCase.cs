@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
 using Mawthooq.Application.Common.Mappers;
@@ -23,15 +24,15 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
             _categoryRepository = categoryRepository;
         }
 
-        public UpdateProductInformationResponse Execute(UpdateProductInformationRequest request)
+        public async Task<UpdateProductInformationResponse> ExecuteAsync(UpdateProductInformationRequest request, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var product = _productRepository.GetById(request.ProductId.ToDomain());
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
             if (product is null)
                 throw new InvalidOperationException($"Product with id {request.ProductId.Value} not found.");
 
-            var category = _categoryRepository.GetById(request.CategoryId.ToDomain());
+            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryId.ToDomain(), cancellationToken);
             if (category is null)
                 throw new InvalidOperationException($"Category with id {request.CategoryId} not found.");
 
@@ -48,7 +49,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
 
             product.ChangeImage(request.Image.ToDomain());
 
-            var newRowVersion = _productRepository.Update(product, request.RowVersion);
+            var newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
             return new UpdateProductInformationResponse(
                 product.ProductId.ToDto(),

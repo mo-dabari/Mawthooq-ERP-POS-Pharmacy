@@ -4,10 +4,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
-using Mawthooq.Application.Common.Interfaces;
+using Mawthooq.Application.Common.Mappers;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Domain.Categories;
+using Mawthooq.Domain.LocalAgents.ValueObjects;
+using Mawthooq.Domain.Manufacturers.ValueObjects;
 using Mawthooq.Domain.Products;
+using Mawthooq.Domain.Products.Services;
 using Mawthooq.Domain.Products.ValueObjects;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
@@ -16,47 +19,91 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IInternalBarcodeSequenceGenerator _barcodeGenerator;
+        private readonly ProductFactory _productFactory;
 
         public CreateProductUseCase(
             IProductRepository productRepository,
             ICategoryRepository categoryRepository,
-            IInternalBarcodeSequenceGenerator barcodeGenerator)
+            ProductFactory productFactory)
         {
             ArgumentNullException.ThrowIfNull(productRepository, nameof(productRepository));
             ArgumentNullException.ThrowIfNull(categoryRepository, nameof(categoryRepository));
-            ArgumentNullException.ThrowIfNull(barcodeGenerator, nameof(barcodeGenerator));
+            ArgumentNullException.ThrowIfNull(productFactory, nameof(productFactory));
 
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
-            _barcodeGenerator = barcodeGenerator;
+            _productFactory = productFactory;
         }
 
-        public CreateProductResponse Execute(CreateProductRequest request)
+        public async Task<CreateProductResponse> ExecuteAsync(
+            CreateProductRequest request,
+            CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var info = request.ProductInformationDto;
+            var info =
+                request.ProductInformationDto;
 
-            Category? category = _categoryRepository.GetById(request.ProductInformationDto.CategoryIdDto.ToDomain());
+            var (category, _) = await _categoryRepository.GetByIdAsync(
+            info.CategoryIdDto.ToDomain(),
+            cancellationToken);
 
             if (category == null)
-                throw new InvalidOperationException($"Category with {request.ProductInformationDto.CategoryIdDto.Value} not found.");
+                throw new InvalidOperationException($"Category with {info.CategoryIdDto.Value} not found.");
 
-            SKU sKU = request.ProductInformationDto.Sku.ToDomain();
+            SKU sKU = info.Sku.ToDomain();
 
-            if (_productRepository.ExistsBySku(sKU))
+            if (await _productRepository.ExistsBySkuAsync(sKU, cancellationToken))
                 throw new InvalidOperationException($"SKU '{sKU.Value}' already exists.");
 
-            var product = request.ToDomain(category.CategoryId, sKU, _barcodeGenerator);
 
-            Product? savedProduct = _productRepository.Add(product);
+            var packaging =
+                request.ToPackagingDomain();
 
-            if (savedProduct is null)
-                throw new InvalidOperationException("Failed to create product");
+            var manufacturerId =
+                ManufacturerId.From(info.ManufacturerIdDto.Value);
 
-            return savedProduct.ToResponseCreate();
+            var localAgentId =
+                LocalAgentId.From(info.LocalAgentIdDto.Value);
 
+            var image =
+                info.Image.ToDomain();
+
+            var product = await _productFactory
+                .CreateAsync(
+                    ProductId.New(),
+                    info.TradeName,
+                    sKU,
+                    category.CategoryId,
+                    manufacturerId,
+                    localAgentId,
+                    packaging,
+                    image,
+                    info.RequiresExpiryTracking,
+                    info.CanBeReturnedIfOpened,
+                    info.NearExpiryThresholdInDays,
+                    cancellationToken);
+
+            if (request.UserBarcodes is not null && request.UserBarcodes.Count > 0)
+            {
+                var firstVersionId =
+                    product.PackagingVersions.Single().PackagingVersionId;
+
+                foreach (var userBarcode in request.UserBarcodes)
+                {
+                    product.AddCompanyBarcodeToVersion(
+                        firstVersionId,
+                        userBarcode.Unit,
+                        userBarcode.BarcodeDto.ToDomain());
+                }
+            }
+
+            var (savedProduct, rowVersion) = await _productRepository.AddAsync(product, cancellationToken);
+
+            if (savedProduct is null || rowVersion is null)
+                throw new InvalidOperationException("Failed to create product.");
+
+            return savedProduct.ToResponseCreate(rowVersion);
         }
     }
 }
