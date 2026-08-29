@@ -7,8 +7,6 @@ using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.LocalAgents.DTOs;
 using Mawthooq.Application.Manufacturers.DTOs;
 using Mawthooq.Application.Products.Commands.DTOs;
-using Mawthooq.Domain.Categories.Enums;
-using Mawthooq.Domain.Products.Entities;
 using Mawthooq.Domain.Products.Enums;
 using Mawthooq.Domain.SharedKernel.Enums;
 
