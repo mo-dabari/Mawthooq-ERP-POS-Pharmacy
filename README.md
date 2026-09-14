@@ -1,285 +1,97 @@
-# Mawthooq-POS
+# Mawthooq — Offline-First Pharmacy ERP & POS
 
-Advanced Point of Sale (POS) Management System for Pharmacies and Retail. The "Mawthooq" system is a comprehensive technology solution specifically designed to meet the needs of precision-sensitive environments such as pharmacies and supermarkets. The system is based on a robust, offline-first infrastructure with advanced cloud synchronization.
+## Overview
 
-# 🧾 Retail POS System — Clean Architecture Learning Project
+**Mawthooq** is an integrated **ERP/POS** system specifically designed to manage pharmacy operations, built with an **Offline-First** philosophy to ensure efficient operation even during internet outages.
 
-## 📌 Project Purpose
-
-This repository is not just a coding exercise.
-It is a **step-by-step construction of a production-ready Retail POS system** designed to:
-
-- Build deep understanding of **Clean Architecture**
-- Apply **SOLID principles in real-world scenarios**
-- Simulate a **multi-branch retail environment**
-- Produce a system that can later evolve into a **commercial product**
-- Serve as a strong, explainable project in a professional CV
+The primary goal of the system is not merely data recording, but to simulate the actual operational and financial reality of the pharmacy with the highest possible level of accuracy, preventing errors and inconsistencies before they reach the database while maintaining inventory precision and financial integrity across every transaction.
 
 ---
 
-## 🏗️ Development Philosophy
+## Architectural Philosophy
 
-This project is intentionally built with constraints to enforce learning:
+The project is built entirely in accordance with the following principles:
 
-- ❌ No ORM (No Entity Framework)
-- ❌ No Design Patterns (initially)
-- ✅ Pure ADO.NET
-- ✅ Manual separation of responsibilities
-- ✅ Architecture enforced by discipline, not frameworks
-- ✅ Console Application as Presentation Layer (temporary)
-
-The goal is to understand **why architecture exists**, not just use it.
+- **Clean Architecture** — Strict separation between layers (Domain, Application, Infrastructure, API) with a clear dependency direction towards the Domain.
+- **Domain-Driven Design (DDD)** — Business logic is entirely encapsulated within the Domain Layer, and Aggregates serve as the sole consistency boundaries allowed to mutate their own state.
+- **CQRS** — Complete separation between the write path (Commands) and the read path (Queries), each having an independent execution model optimized for its purpose.
+- **Event-Based Persistence** — Aggregates do not generate SQL directly; instead, they record Domain Events describing actual changes that occurred, while the Infrastructure translates them into explicit SQL operations (without Entity Framework Change Tracking or automatic object comparison).
+- **Optimistic Concurrency** via RowVersion to protect business data from conflicting updates.
+- **Explicit over Implicit** — No implicit or magic behavior; every persistence operation and architectural decision is explicit and traceable.
 
 ---
 
-## 🧠 System Scope (Phase 1)
-
-We are building a **Retail POS Core Engine** starting with a Supermarket use case.
-
-Supported Concepts:
-
-- Multi-Branch Management (1 warehouse per branch)
-- Inventory per Branch
-- Sales Transactions
-- Multi-Currency Support (EGP, USD, JOD, ILS)
-- Extensible for future domains (e.g., Pharmacy)
-
----
-
-## 🌳 Git Workflow Strategy (MANDATORY)
-
-We are using a **structured GitFlow model** to simulate real team development.
-
----
-
-## 🔀 Branch Types
-
-### `main`
-
-- Always stable
-- Represents production-ready code
-- No direct commits allowed
-
-### `develop`
-
-- Integration branch
-- All completed features merge here first
-- Acts as the current working version of the system
-
-### `feature/*`
-
-Used for building individual domain parts.
-
-Example:
+## Layered Architecture (Layers)
 
 ```
-feature/domain-branch
-feature/domain-product
-feature/domain-inventory
-feature/application-sale-usecase
+API
+ ↓
+Application   (Use Case Orchestration — CQRS, Transactions, Validation)
+ ↓
+Domain        (Business Rules, Aggregates, Invariants, Domain Events)
+ ↑
+Infrastructure (SQL Execution, Repositories, Unit of Work, External Integrations)
 ```
 
-Rules:
-
-- Created from `develop`
-- Merged back into `develop`
-- Deleted after merge
-
-### `release/*` (Later)
-
-Used when preparing a version to become production-ready.
-
-### `hotfix/*` (Later)
-
-Used only to patch `main` if needed.
+- **Domain** knows nothing about databases, Infrastructure, or HTTP.
+- **Application** orchestrates Use Cases only, without any business rules.
+- **Infrastructure** implements technical details (explicit SQL, Unit of Work, Repositories) and relies on contracts defined by the Application.
+- **API** deals solely with HTTP, Validation, and Authentication/Authorization.
 
 ---
 
-## 🔁 Development Lifecycle (What You MUST Follow)
+## Business Capability Model
 
-### 1️⃣ Start Work
+The system is divided into clearly bounded Bounded Contexts, each owning a single business responsibility and a single source of truth:
 
-```
-git checkout develop
-git pull origin develop
-git checkout -b feature/domain-product
-```
+| Module | Responsibility |
+|---|---|
+| **Product** | The commercial definition of what is sold (brand name, packaging, sales units, barcode) |
+| **Medicine** | The medical identity of the pharmaceutical item (composition, dosage form, therapeutic classification) |
+| **Inventory** | Physical inventory within the branch (batches, quantities, FEFO allocation, pricing) |
+| **Purchase** | Purchasing operations (Purchase Orders and Goods Receipts) |
+| **Sales** | Sales operations and returns (Sales Orders, Sales Returns, Payments) |
+| **Customer / Supplier** | Commercial identity of external transacting parties |
+| **Branch** | The organizational unit within which operations are executed |
+| **Active Ingredient / Manufacturer / Therapeutic Class** | Shared reference catalogs reused across the system |
+| **Financial** | A layer for recording the financial impact of completed operational processes (not a full accounting system) |
 
----
-
-### 2️⃣ Develop the Feature
-
-Commit frequently using **meaningful messages**.
-
-Commit Format:
-
-```
-<type>: <what was done>
-```
-
-Examples:
-
-```
-build: create Product entity with invariants
-refactor: enforce encapsulation in Branch aggregate
-add: initial money value object structure
-fix: prevent invalid quantity mutation
-```
-
-Allowed Types:
-
-- `build` → new structure
-- `add` → new behavior
-- `refactor` → improve without changing behavior
-- `fix` → correct logic
-- `docs` → documentation only
+Each module protects its own rules, and no module's data is directly modified by another; inter-module communication occurs strictly via **Domain Events / Integration Events**.
 
 ---
 
-### 3️⃣ Finish Feature
+## Key Architectural Decisions
 
-```
-git checkout develop
-git merge feature/domain-product
-git branch -d feature/domain-product
-git push origin develop
-```
-
----
-
-### 4️⃣ Never Do This ❌
-
-- Commit directly to `main`
-- Mix multiple features in one branch
-- Create "test" commits like `update`, `change`, `fix stuff`
-- Push broken architecture
+- **Separation of Commercial Identity and Medical Identity**: `Product` answers "What are we selling?", while `Medicine` answers "What is this medicine?" — two distinct entities, each with its own Aggregate.
+- **Inventory as the Single Source of Truth for Physical Stock**: No other module directly modifies quantities; allocation follows the **FEFO** (First Expired, First Out) strategy.
+- **Preserving Historical Truth**: Completed documents (sales invoices, medical records at the time of the event) are never overwritten when reference data changes later; reliance is placed on Snapshots and Identity Preservation.
+- **Financial as a Recording Layer, Not a Full Accounting System**: Receives completed operational events and logs their financial impact only, laying the groundwork for future integration with a full accounting system.
+- **Idempotency** to protect critical operations (completing a sale, receiving goods) from duplication caused by retries or network interruptions.
 
 ---
 
-## 📐 Architecture Roadmap (Execution Order)
+## Tech Stack
 
-We will build layers in this strict order:
-
-```
-Phase 1 → Domain Modeling
-Phase 2 → Application Use Cases
-Phase 3 → Infrastructure (ADO.NET)
-Phase 4 → Console Presentation
-Phase 5 → Hardening for Production
-Phase 6 → Future API Refactor
-```
-
-Each phase must be completed through Feature Branches only.
+- **.NET / C#**
+- **ASP.NET Core**
+- **ADO.NET** (Explicit SQL without ORM Change Tracking)
+- **SQL Server**
+- **xUnit** for testing
+- Development Environment: **VS Code** on **Linux**
 
 ---
 
-## 🧪 What This Repository Represents
+## Knowledge Governance (AI-Governed Knowledge Base)
 
-This is not just code.
+The project maintains a fully documented Knowledge Base governed by high-priority **Constitutions** (Project Identity, AI Governance, Knowledge Model, Architecture Principles, Documentation Standards, Decision Governance, Terminology), ensuring:
 
-It is a **log of architectural decisions**:
-Every branch tells a story.
-Every commit explains intent.
-Every merge reflects a validated concept.
-
----
-
-## ⚙️ Current Status
-
-### 🏢 Domain Layer — Phase 1: Complete ✅
-
-Core aggregates fully implemented with invariants and repository interfaces:
-
-**Business Domains:**
-
-- 🏪 **Branches** — multi-branch store management with factory methods
-- 📦 **Products** — product catalog with categorization support
-- 👥 **Customers** — customer entity with factory methods and validation
-- 🤝 **Suppliers** — supplier aggregate with balance tracking and factory methods
-- 🛒 **Sales** — sales transactions with line item management and discount handling
-- 📤 **Returns** — customer and supplier returns with extended reasons and expiry tracking
-- 💳 **Payments** — multi-currency payment workflows with explicit lifecycle
-- 📊 **Inventory** — stock management with batches, adjustments, and damage tracking
-- 🏷️ **Discounts** — product and sale-level discounts with calculation logic and invariants
-- 🗂️ **Categories** — product categorization system
-
-**Value Objects:**
-
-- 💰 **Money** — multi-currency support (EGP, USD, JOD, ILS) with safe arithmetic
-- 🆔 **NationalId** — country-specific validation for national IDs
-- 📱 **Phone** — country-specific phone number validation
-- Comprehensive enum definitions (DiscountType, AdjustmentReason, PaymentMethod, ReturnReason, etc.)
+- A single source of truth for every architectural decision.
+- A **No Assumptions** policy — any unverified information is explicitly stated as unknown, assuming nothing.
+- Full decision traceability via **ADRs** (Architecture Decision Records).
+- Complete consistency in terminology (**Ubiquitous Language**) across all documentation and code layers.
 
 ---
 
-### 📲 Application Layer — Phase 2: In Progress 🔄
+## Project Status
 
-Use cases, DTOs, and mappers for business workflows:
-
-**Implemented Workflows:**
-
-- ✅ Customer management (create, update, retrieve)
-- ✅ Sales operations (create sales, manage line items)
-- ✅ Payment processing (multi-currency, refunds)
-- ✅ Return workflows (customer and supplier returns with refunds)
-- ✅ Inventory management (stock adjustments, batch tracking, damage logging)
-- ✅ Discount application (product-level and sale-level discount workflows)
-- ✅ Employee management (users, permissions, branch assignment)
-- ✅ Supplier operations (create, update, balance deduction)
-- 🔄 **In Progress:** EmailDto and enhanced supplier workflows
-
-**Mapping Layer:**
-
-- Complete DTOs for all aggregates
-- Type-safe mappers (MoneyMapper, entity mappers, etc.)
-- Bi-directional conversion between domain and application layers
-
----
-
-### 🗄️ Infrastructure Layer — Phase 3: Started 🚀
-
-- ADO.NET implementation (no ORM)
-- Manual connection and query management
-- Repository pattern foundation
-- Ready for database schema implementation
-
----
-
-### Current Git Status
-
-**Branch:** `feature/domain-sale-discount-support`
-
-**In Progress:**
-
-- Refactoring Sale discount handling (moved from ValueObject to aggregate-controlled)
-- Enhancing supplier workflows with Email support
-- Improving supplier return management
-
----
-
-## 🚫 Important Rule
-
-If something feels "easy", we probably did it wrong.
-
-This system must be:
-
-- Explicit
-- Intentional
-- Explainable
-
----
-
-## 📋 Next Phase
-
-**Phase 3 — Infrastructure Implementation:**
-
-- Implement ADO.NET repository contracts
-- Design and create database schema
-- Build persistence layer for all aggregates
-- Integration testing with real database
-
-**Phase 4 — Presentation Layer:**
-
-- Upgrade from Console to a proper UI (likely console-based with TUI framework or API)
-- Implement user workflows end-to-end
-- System testing and validation
+The project is under active, continuous development, built incrementally module by module while strictly adhering to Aggregate boundaries and architectural dependency rules in every new addition.
