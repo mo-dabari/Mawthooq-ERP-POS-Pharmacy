@@ -7,7 +7,7 @@ using Mawthooq.Application.Products.Commands.DTOs;
 namespace Mawthooq.Application.Products.Commands.UseCases.ChangeNearExpiryThreshold
 {
     public record class ChangeNearExpiryThresholdResponse(
-        ProductIdDto ProductId,
+        ProductIdDto ProductIdDto,
         string Name,
         int NearExpiryThresholdInDays,
         byte[] RowVersion);

@@ -8,7 +8,7 @@ using Mawthooq.Domain.SharedKernel.Enums;
 namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
 {
     public record class UpdateCategoryRequest (
-        CategoryIdDto CategoryId,
+        CategoryIdDto CategoryIdDto,
         string Name,
         string Description,
         byte[] RowVersion);

@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.LocalAgents.DTOs;
 using Mawthooq.Application.Manufacturers.DTOs;
-using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.CreateProduct;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Categories.ValueObjects;
 using Mawthooq.Domain.Products;
@@ -139,7 +140,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<CategoryNotFoundException>();
 
             _productRepositoryMock.Verify(pr => pr.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()),
                 Times.Never);
@@ -160,7 +161,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<DuplicateSkuException>();
 
             _barcodeGeneratorMock.Verify(br => br.GetNextBarcodeSequenceAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
             _productRepositoryMock.Verify(pr => pr.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()), Times.Never);

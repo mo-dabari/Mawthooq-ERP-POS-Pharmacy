@@ -8,7 +8,7 @@ using Mawthooq.Domain.SharedKernel.Enums;
 namespace Mawthooq.Application.Categories.UseCases.GetCategoryByID
 {
     public record class GetCategoryByIdResponse(
-        CategoryIdDto CategoryId,
+        CategoryIdDto CategoryIdDto,
         string Name,
         string Description,
         Status Status);

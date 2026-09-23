@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.DTOs;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Domain.Categories;
@@ -20,13 +21,13 @@ namespace Mawthooq.Application.Categories.UseCases.GetCategoryByID
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<GetCategoryByIdResponse> ExecuteAsync(CategoryIdDto categoryId, CancellationToken cancellationToken = default)
+        public async Task<GetCategoryByIdResponse> ExecuteAsync(CategoryIdDto categoryIdDto, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(categoryId, nameof(categoryId));
-            var (category, _) = await _categoryRepository.GetByIdAsync(categoryId.ToDomain(), cancellationToken);
+            ArgumentNullException.ThrowIfNull(categoryIdDto, nameof(categoryIdDto));
+            var (category, _) = await _categoryRepository.GetByIdAsync(categoryIdDto.ToDomain(), cancellationToken);
 
             if (category is null)
-                throw new InvalidOperationException($"Category with id {categoryId} not found");
+                throw new CategoryNotFoundException(categoryIdDto.Value);
 
             return new GetCategoryByIdResponse(
                 category.CategoryId.ToDto(),

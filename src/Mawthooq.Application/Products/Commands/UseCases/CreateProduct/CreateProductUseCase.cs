@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Common.Mappers;
 using Mawthooq.Application.Products.Commands.Mappers;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.LocalAgents.ValueObjects;
 using Mawthooq.Domain.Manufacturers.ValueObjects;
@@ -49,12 +51,12 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             cancellationToken);
 
             if (category == null)
-                throw new InvalidOperationException($"Category with {info.CategoryIdDto.Value} not found.");
+                throw new CategoryNotFoundException(info.CategoryIdDto.Value);
 
             SKU sKU = info.Sku.ToDomain();
 
             if (await _productRepository.ExistsBySkuAsync(sKU, cancellationToken))
-                throw new InvalidOperationException($"SKU '{sKU.Value}' already exists.");
+                throw new DuplicateSkuException(sKU.Value);
 
 
             var packaging =

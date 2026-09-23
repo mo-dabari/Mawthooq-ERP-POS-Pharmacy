@@ -9,9 +9,9 @@ using Mawthooq.Application.Products.Commands.DTOs;
 namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformation
 {
     public record class UpdateProductInformationResponse(
-        ProductIdDto ProductId,
+        ProductIdDto ProductIdDto,
         string Name,
-        CategoryIdDto CategoryId,
+        CategoryIdDto CategoryIdDto,
         ImageDto Image,
         bool CanBeReturnedIfOpened,
         int NearExpiryThresholdInDays,

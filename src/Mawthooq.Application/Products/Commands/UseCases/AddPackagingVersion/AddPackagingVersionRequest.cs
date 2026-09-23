@@ -9,7 +9,7 @@ using Mawthooq.Domain.Products.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.AddPackagingVersion
 {
     public sealed record AddPackagingVersionRequest(
-        ProductIdDto ProductId,
+        ProductIdDto ProductIdDto,
         PackagingTemplate Template,
         PackagingInformation Packaging,
         byte[] ExpectedRowVersion);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Domain.Categories;
 
 namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
@@ -22,10 +23,10 @@ namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
 
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryId.ToDomain(), cancellationToken);
+            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryIdDto.ToDomain(), cancellationToken);
 
             if (category is null)
-                throw new InvalidOperationException($"Category with ID {request.CategoryId} not found.");
+                throw new CategoryNotFoundException(request.CategoryIdDto.Value);
 
             category.Rename(request.Name);
             category.ChangeDescription(request.Description);

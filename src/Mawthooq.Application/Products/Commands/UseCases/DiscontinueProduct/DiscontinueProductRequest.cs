@@ -8,6 +8,6 @@ using Mawthooq.Domain.Products.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.DiscontinueProduct
 {
     public record class DiscontinueProductRequest(
-        ProductIdDto ProductId,
+        ProductIdDto ProductIdDto,
         byte[] RowVersion);
 }

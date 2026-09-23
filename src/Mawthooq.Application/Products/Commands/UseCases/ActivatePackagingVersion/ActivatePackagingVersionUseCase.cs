@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Commands.Mappers;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Products;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.ActivatePackagingVersion
@@ -25,7 +26,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ActivatePackagingVersi
             var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new InvalidOperationException($"Product with ID {request.ProductIdDto.Value} not found.");
+                throw new ProductNotFoundException(request.ProductIdDto.Value);
 
             product.ActivatePackagingVersions(request.PackagingVersionId.ToDomain());
 

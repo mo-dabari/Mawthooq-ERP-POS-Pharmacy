@@ -8,7 +8,7 @@ using Mawthooq.Application.Products.Commands.UseCases.CreateProduct;
 namespace Mawthooq.Application.Products.Commands.UseCases.AddPackagingVersion
 {
     public sealed record AddPackagingVersionResponse(
-        ProductIdDto ProductId,
+        ProductIdDto ProductIdDto,
         PackagingVersionDto PackagingVersion,
         byte[] RowVersion);
 }
