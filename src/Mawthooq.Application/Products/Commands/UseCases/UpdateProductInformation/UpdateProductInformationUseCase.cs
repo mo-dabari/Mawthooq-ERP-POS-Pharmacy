@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Common.Mappers;
 using Mawthooq.Application.Products.Commands.Mappers;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Products;
 
@@ -28,13 +30,13 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
             if (product is null)
-                throw new InvalidOperationException($"Product with id {request.ProductId.Value} not found.");
+                throw new ProductNotFoundException(request.ProductIdDto.Value);
 
-            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryId.ToDomain(), cancellationToken);
+            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryIdDto.ToDomain(), cancellationToken);
             if (category is null)
-                throw new InvalidOperationException($"Category with id {request.CategoryId} not found.");
+                throw new CategoryNotFoundException(request.CategoryIdDto.Value);
 
             product.Rename(request.TradeName);
 

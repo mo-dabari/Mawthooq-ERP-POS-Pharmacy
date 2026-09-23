@@ -10,7 +10,7 @@ using Mawthooq.Domain.SharedKernel.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.DiscontinueProduct
 {
     public record class DiscontinueProductResponse(
-        ProductIdDto ProductId,
+        ProductIdDto ProductIdDto,
         string Name,
         Status NewStatus,
         byte[] RowVersion);

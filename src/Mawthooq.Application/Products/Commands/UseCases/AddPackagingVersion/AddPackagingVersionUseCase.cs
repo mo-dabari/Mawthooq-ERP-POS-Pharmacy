@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Commands.Mappers;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.Entities;
 using Mawthooq.Domain.Products.Services;
@@ -34,12 +35,11 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddPackagingVersion
 
             var (product, _) =
                 await _productRepository.GetByIdAsync(
-                    request.ProductId.ToDomain(),
+                    request.ProductIdDto.ToDomain(),
                     cancellationToken);
 
             if (product is null)
-                throw new InvalidOperationException(
-                    $"Product with id '{request.ProductId.Value}' not found.");
+                throw new ProductNotFoundException(request.ProductIdDto.Value);
 
             ProductPackaging packaging =
                 request.Packaging.ToDomain(request.Template);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Commands.Mappers;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Products;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit
@@ -27,10 +28,10 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit
             var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new InvalidOperationException($"Product with ID {request.ProductIdDto.Value} not found.");
+                throw new ProductNotFoundException(request.ProductIdDto.Value);
 
             if (await _productRepository.ExistsByBarcodeAsync(request.BarcodeDto.ToDomain(), cancellationToken))
-                throw new InvalidOperationException($"cannot adding barcode : {request.BarcodeDto.Value} duplicate");
+                throw new DuplicateBarcodeException(request.BarcodeDto.Value);
 
             product.AddCompanyBarcodeToVersion(
                 request.PackagingVersionIdDto.ToDomain(),
