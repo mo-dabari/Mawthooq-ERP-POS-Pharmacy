@@ -7,7 +7,7 @@ using Mawthooq.Application.Categories.Commands.DTOs;
 namespace Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory
 {
     public record class UpdateCategoryResponse (
-        CategoryIdDto CategoryId,
+        CategoryIdDto CategoryIdDto,
         string Name,
         string Description,
         byte[] NewRowVersion);
