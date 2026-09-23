@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Domain.Categories.ValueObjects;
 using Mawthooq.Domain.LocalAgents.ValueObjects;
 using Mawthooq.Domain.Manufacturers.ValueObjects;
@@ -354,8 +355,7 @@ namespace Mawthooq.Infrastructure.AdoNet.Repositories
             object? result = await command.ExecuteScalarAsync(cancellationToken);
 
             if (result is not byte[] newRowVersion)
-                throw new InvalidOperationException(
-                    $"Product {productId.Value} was modified by another user. Reload and try again.");
+                throw new ConcurrencyConflictException(productId.Value);
 
             return newRowVersion;
         }
@@ -397,8 +397,7 @@ namespace Mawthooq.Infrastructure.AdoNet.Repositories
             object? result = await command.ExecuteScalarAsync(cancellationToken);
 
             if (result is not byte[] newRowVersion)
-                throw new InvalidOperationException(
-                    $"Product {entity.ProductId.Value} was modified by another user. Reload and try again.");
+                throw new ConcurrencyConflictException(entity.ProductId.Value);
 
             return newRowVersion;
         }
