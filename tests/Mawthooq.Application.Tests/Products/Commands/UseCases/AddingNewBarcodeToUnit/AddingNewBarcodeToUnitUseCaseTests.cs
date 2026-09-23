@@ -6,6 +6,7 @@ using FluentAssertions;
 using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Application.Tests.Products.TestHelpersProduct;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.Enums;
@@ -80,7 +81,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.AddingNewBarcode
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<ProductNotFoundException>();
 
             _productRepositoryMock
             .Verify(pr => pr.UpdateAsync(
@@ -107,7 +108,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.AddingNewBarcode
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<DuplicateBarcodeException>();
 
             _productRepositoryMock.Verify(
                 r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),

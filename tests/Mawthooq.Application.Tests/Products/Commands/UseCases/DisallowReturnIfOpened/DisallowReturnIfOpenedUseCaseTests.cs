@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.DisallowReturnIfOpened;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Application.Tests.Products.TestHelpersProduct;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.ValueObjects;
@@ -63,7 +64,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.DisallowReturnIf
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<ProductNotFoundException>();
 
             _productRepositoryMock.Verify(
                 r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>())

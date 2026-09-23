@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformation;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Application.Tests.Products.TestHelpersProduct;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Categories.ValueObjects;
@@ -66,7 +68,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.UpdateProductInf
             var response = await _sut.ExecuteAsync(request);
 
             response.Name.Should().Be("Panadol Ultra");
-            response.CategoryId.Value.Should().Be(newCategory.CategoryId.Value);
+            response.CategoryIdDto.Value.Should().Be(newCategory.CategoryId.Value);
             response.Image.StorageKey.Should().Be(newImage.StorageKey);
             response.CanBeReturnedIfOpened.Should().BeFalse();
             response.NearExpiryThresholdInDays.Should().Be(45);
@@ -88,7 +90,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.UpdateProductInf
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<ProductNotFoundException>();
 
             _categoryRepositoryMock.Verify(
                 r => r.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()),
@@ -117,7 +119,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.UpdateProductInf
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<CategoryNotFoundException>();
 
             _productRepositoryMock.Verify(
                 r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),

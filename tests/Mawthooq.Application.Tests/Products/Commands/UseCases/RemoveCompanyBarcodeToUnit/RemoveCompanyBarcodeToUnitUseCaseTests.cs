@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.RemoveCompanyBarcodeToUnit;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Application.Tests.Products.TestHelpersProduct;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.Enums;
@@ -90,7 +91,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.RemoveCompanyBar
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<BarcodeNotFoundException>();
 
             _productRepositoryMock.Verify(
                 r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),
@@ -113,7 +114,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.RemoveCompanyBar
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<ProductNotFoundException>();
         }
 
         [Fact]

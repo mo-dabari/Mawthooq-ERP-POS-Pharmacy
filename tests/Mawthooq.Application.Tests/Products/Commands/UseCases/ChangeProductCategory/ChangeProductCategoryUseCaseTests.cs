@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.ChangeProductCategory;
+using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Application.Tests.Products.TestHelpersProduct;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Categories.ValueObjects;
@@ -85,7 +87,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeProductCat
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<CategoryNotFoundException>();
 
             _productRepositoryMock
                 .Verify(pr => pr.UpdateAsync(
@@ -106,7 +108,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeProductCat
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<ProductNotFoundException>();
 
             _productRepositoryMock
             .Verify(pr => pr.UpdateAsync(
