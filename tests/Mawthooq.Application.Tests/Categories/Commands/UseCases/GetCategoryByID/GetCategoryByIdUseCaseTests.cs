@@ -33,7 +33,7 @@ namespace Mawthooq.Application.Tests.Categories.Commands.UseCases.GetCategoryByI
 
             var response = await _sut.ExecuteAsync(category.CategoryId.ToDto());
 
-            response.CategoryId.Value.Should().Be(category.CategoryId.Value);
+            response.CategoryIdDto.Value.Should().Be(category.CategoryId.Value);
             response.Name.Should().Be(category.Name);
             response.Description.Should().Be(category.Description);
             response.Status.Should().Be(category.Status);
