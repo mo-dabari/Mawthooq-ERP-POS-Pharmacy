@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace Mawthooq.Domain.SharedKernel.Exceptions
 {
-    public class DomainException
+    public class DomainException : Exception
     {
-        
+        public DomainException(string message) : base(message)
+        {
+        }
     }
 }
