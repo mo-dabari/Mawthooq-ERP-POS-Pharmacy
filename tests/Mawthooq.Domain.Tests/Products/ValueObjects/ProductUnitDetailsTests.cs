@@ -7,6 +7,7 @@ using FluentAssertions;
 using Mawthooq.Domain.Products.Enums;
 using Mawthooq.Domain.Products.ValueObjects;
 using Mawthooq.Domain.Products.ValueObjects.Barcodes;
+using Mawthooq.Domain.SharedKernel.Exceptions;
 
 namespace Mawthooq.Domain.Tests.Products.ValueObjects
 {
@@ -101,7 +102,7 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_AddedingBarcodeTypeInternal()
+            public void Should_ThrowDomainRuleViolationException_When_AddedingBarcodeTypeInternal()
             {
                 var internalLinearBarcode = CreateInternalLinearBarcode();
 
@@ -109,11 +110,11 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects
 
                 Action act = () => sut.AddCompanyBarcode(CreateInternalLinearBarcode());
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_AddedingBarcodeAlreadyExists()
+            public void Should_ThrowDomainRuleViolationException_When_AddedingBarcodeAlreadyExists()
             {
                 var internalLinearBarcode = CreateInternalLinearBarcode();
 
@@ -125,7 +126,7 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects
 
                 Action act = () => sut.AddCompanyBarcode(barcode);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
@@ -141,7 +142,7 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_RemoveingBarcodeIsTypeInternal()
+            public void Should_ThrowDomainRuleViolationException_When_RemoveingBarcodeIsTypeInternal()
             {
                 var internalLinearBarcode = CreateInternalLinearBarcode();
 
@@ -149,11 +150,11 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects
 
                 Action act = () => sut.RemoveCompanyBarcode(internalLinearBarcode);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_RemoveingBarcodeIsNotFound()
+            public void Should_ThrowDomainRuleViolationException_When_RemoveingBarcodeIsNotFound()
             {
                 var internalLinearBarcode = CreateInternalLinearBarcode();
 
@@ -163,7 +164,7 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects
 
                 Action act = () => sut.RemoveCompanyBarcode(notFoundBarcode);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             public static IEnumerable<object[]> GetBarcodeTestData()
