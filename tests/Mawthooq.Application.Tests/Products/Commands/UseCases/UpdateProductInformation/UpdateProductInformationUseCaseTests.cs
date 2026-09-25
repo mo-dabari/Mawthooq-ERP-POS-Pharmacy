@@ -63,6 +63,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.UpdateProductInf
                 newImage,
                 CanBeReturnedIfOpened: false,
                 NearExpiryThresholdInDays: 45,
+                RequiresExpiryTracking: true,
                 requestRowVersion);
 
             var response = await _sut.ExecuteAsync(request);
@@ -143,6 +144,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.UpdateProductInf
                 new ImageDto("products/1/new-image.png", "new-image.png", "image/png"),
                 CanBeReturnedIfOpened: false,
                 NearExpiryThresholdInDays: 45,
+                RequiresExpiryTracking: true,
                 RowVersion: [1, 1, 1]);
         }
     }
