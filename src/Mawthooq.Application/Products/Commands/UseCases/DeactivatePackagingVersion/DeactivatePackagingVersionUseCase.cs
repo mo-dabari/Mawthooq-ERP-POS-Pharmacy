@@ -24,6 +24,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.DeactivatePackagingVer
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
+            DeactivatePackagingVersionValidator.Validate(request);
+
             var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)

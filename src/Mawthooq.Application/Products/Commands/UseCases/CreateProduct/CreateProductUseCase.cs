@@ -43,6 +43,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
+            CreateProductValidator.Validate(request);
+
             var info =
                 request.ProductInformationDto;
 

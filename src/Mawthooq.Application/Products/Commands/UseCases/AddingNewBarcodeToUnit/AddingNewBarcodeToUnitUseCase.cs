@@ -25,6 +25,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
+            AddingNewBarcodeToUnitValidator.Validate(request);
+
             var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)
