@@ -7,6 +7,7 @@ using Mawthooq.Domain.Products.ValueObjects;
 using Mawthooq.Domain.Products.ValueObjects.Barcodes;
 using Mawthooq.Domain.Products.ValueObjects.Packaging;
 using Mawthooq.Domain.SharedKernel.Enums;
+using Mawthooq.Domain.SharedKernel.Exceptions;
 
 namespace Mawthooq.Domain.Products.Entities
 {
@@ -53,8 +54,6 @@ namespace Mawthooq.Domain.Products.Entities
             return packagingVersion;
         }
 
-
-
         private void CreateUnits(IEnumerable<ProductUnitDefinition> sortedDefinitions, long firstReservedBarcode)
         {
             ArgumentNullException.ThrowIfNull(sortedDefinitions, nameof(sortedDefinitions));
@@ -67,10 +66,10 @@ namespace Mawthooq.Domain.Products.Entities
                 var internalBarcode = InternalLinearBarcode.New(currentBarcode.ToString());
 
                 if (_units.Any(u => u.Unit == unitDef.Unit))
-                    throw new InvalidOperationException($"This Unit: {unitDef.Unit} Already Exists");
+                    throw new DomainRuleViolationException($"This Unit: {unitDef.Unit} Already Exists");
 
                 if (_units.Any(u => u.Rank == unitDef.Rank))
-                    throw new InvalidOperationException($"Cannot Add Level. Rank {unitDef.Rank} Already Exists");
+                    throw new DomainRuleViolationException($"Cannot Add Level. Rank {unitDef.Rank} Already Exists");
 
                 var unit = new ProductUnitDetails(
                     unitDef.Unit,
@@ -88,7 +87,7 @@ namespace Mawthooq.Domain.Products.Entities
         {
             var targetUnit = _units.FirstOrDefault(u => u.Unit == unit);
             if (targetUnit is null)
-                throw new InvalidOperationException($"Unit {unit} not found in this packaging version.");
+                throw new DomainRuleViolationException($"Unit {unit} not found in this packaging version.");
 
             int index = _units.IndexOf(targetUnit);
 
@@ -99,7 +98,7 @@ namespace Mawthooq.Domain.Products.Entities
         {
             var targetUnit = _units.FirstOrDefault(u => u.Unit == unit);
             if (targetUnit is null)
-                throw new InvalidOperationException($"Unit {unit} not found in this packaging version.");
+                throw new DomainRuleViolationException($"Unit {unit} not found in this packaging version.");
 
             int index = _units.IndexOf(targetUnit);
 
