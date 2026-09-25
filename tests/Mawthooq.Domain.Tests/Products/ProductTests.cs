@@ -15,6 +15,7 @@ using Mawthooq.Domain.Products.ValueObjects;
 using Mawthooq.Domain.Products.ValueObjects.Barcodes;
 using Mawthooq.Domain.Products.ValueObjects.Packaging;
 using Mawthooq.Domain.SharedKernel.Enums;
+using Mawthooq.Domain.SharedKernel.Exceptions;
 using Mawthooq.Domain.SharedKernel.ValueObjects;
 using Xunit;
 
@@ -230,7 +231,7 @@ namespace Mawthooq.Domain.Tests.Products
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_RequiresExpiryTrackingIsTrue_AndThresholdIsZero()
+            public void Should_ThrowDomainRuleViolationException_When_RequiresExpiryTrackingIsTrue_AndThresholdIsZero()
             {
                 Action act = () => CreateProduct(
                     CreateProductID(),
@@ -246,7 +247,7 @@ namespace Mawthooq.Domain.Tests.Products
                     true,
                     0);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
@@ -413,13 +414,13 @@ namespace Mawthooq.Domain.Tests.Products
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_PackagingVersionIsDublicated()
+            public void Should_ThrowDomainRuleViolationException_When_PackagingVersionIsDublicated()
             {
                 var sut = CreateProductValid();
 
                 Action act = () => sut.CreatePackagingVersion(CreateProductBoxWithStripsPackaging(), 9000);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
         }
         public class AddCompanyBarcodeToVersionBehavior
@@ -484,7 +485,7 @@ namespace Mawthooq.Domain.Tests.Products
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_AddedingBarcodeIsBarcodeRepeatedInProduct()
+            public void Should_ThrowDomainRuleViolationException_When_AddedingBarcodeIsBarcodeRepeatedInProduct()
             {
                 var sut = CreateProductValid();
                 var versionId = sut.PackagingVersions[0].PackagingVersionId;
@@ -492,40 +493,40 @@ namespace Mawthooq.Domain.Tests.Products
 
                 Action act = () => sut.AddCompanyBarcodeToVersion(versionId, UnitOfMeasure.Box, BarcodeEAN13Linear.New("1234567891234"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_BarcodeIsInternalType()
+            public void Should_ThrowDomainRuleViolationException_When_BarcodeIsInternalType()
             {
                 var sut = CreateProductValid();
                 var versionId = sut.PackagingVersions[0].PackagingVersionId;
 
                 Action act = () => sut.AddCompanyBarcodeToVersion(versionId, UnitOfMeasure.Box, InternalLinearBarcode.New("12345"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_AddedingBarcodeIsPackagingVersionIdNotExist()
+            public void Should_ThrowDomainRuleViolationException_When_AddedingBarcodeIsPackagingVersionIdNotExist()
             {
                 var sut = CreateProductValid();
                 var notFoundVersionId = PackagingVersionId.From(new Guid("11111111-1111-1111-1111-111111111111"));
 
                 Action act = () => sut.AddCompanyBarcodeToVersion(notFoundVersionId, UnitOfMeasure.Box, InternalLinearBarcode.New("12345"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_UnitNotFoundInVersion()
+            public void Should_ThrowDomainRuleViolationException_When_UnitNotFoundInVersion()
             {
                 var sut = CreateProductValid();
                 var versionId = sut.PackagingVersions[0].PackagingVersionId;
 
                 Action act = () => sut.AddCompanyBarcodeToVersion(versionId, UnitOfMeasure.Roll, BarcodeEAN13Linear.New("1234567891234"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
         }
         public class RemoveCompanyBarcodeBehavior
@@ -588,47 +589,47 @@ namespace Mawthooq.Domain.Tests.Products
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_PackagingVersionIsNotFound()
+            public void Should_ThrowDomainRuleViolationException_When_PackagingVersionIsNotFound()
             {
                 var sut = CreateProductValid();
                 var notFoundPackagingVersionId = PackagingVersionId.From(new Guid(("11111111-1111-1111-1111-111111111111")));
 
                 Action act = () => sut.RemoveCompanyBarcodeFromVersion(notFoundPackagingVersionId, UnitOfMeasure.Box, InternalLinearBarcode.New("12345"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_UnitOfMeasureIsNotFound()
+            public void Should_ThrowDomainRuleViolationException_When_UnitOfMeasureIsNotFound()
             {
                 var sut = CreateProductValid();
                 var PackagingVersionId = sut.PackagingVersions[0].PackagingVersionId;
 
                 Action act = () => sut.RemoveCompanyBarcodeFromVersion(PackagingVersionId, UnitOfMeasure.Roll, BarcodeEAN13Linear.New("1234567891234"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_BarcodeIsNotFound()
+            public void Should_ThrowDomainRuleViolationException_When_BarcodeIsNotFound()
             {
                 var sut = CreateProductValid();
                 var PackagingVersionId = sut.PackagingVersions[0].PackagingVersionId;
 
                 Action act = () => sut.RemoveCompanyBarcodeFromVersion(PackagingVersionId, UnitOfMeasure.Box, BarcodeEAN13Linear.New("1234567891234"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_BarcodeIsInternalType()
+            public void Should_ThrowDomainRuleViolationException_When_BarcodeIsInternalType()
             {
                 var sut = CreateProductValid();
                 var PackagingVersionId = sut.PackagingVersions[0].PackagingVersionId;
 
                 Action act = () => sut.RemoveCompanyBarcodeFromVersion(PackagingVersionId, UnitOfMeasure.Box, InternalLinearBarcode.New("12345"));
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
         }
         public class PackagingVersionStatusBehavior
@@ -692,25 +693,25 @@ namespace Mawthooq.Domain.Tests.Products
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_ActivateVersionNotFound()
+            public void Should_ThrowDomainRuleViolationException_When_ActivateVersionNotFound()
             {
                 var sut = CreateProductValid();
                 var notFoundPackagingVersionId = PackagingVersionId.From(new Guid("11111111-1111-1111-1111-111111111111"));
 
                 Action act = () => sut.ActivatePackagingVersions(notFoundPackagingVersionId);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_DeactivateVersionNotFound()
+            public void Should_ThrowDomainRuleViolationException_When_DeactivateVersionNotFound()
             {
                 var sut = CreateProductValid();
                 var notFoundPackagingVersionId = PackagingVersionId.From(new Guid("11111111-1111-1111-1111-111111111111"));
 
                 Action act = () => sut.DeactivatePackagingVersions(notFoundPackagingVersionId);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
@@ -938,7 +939,7 @@ namespace Mawthooq.Domain.Tests.Products
             }
 
             [Fact]
-            public void Should_ThrowInvalidOperationException_When_ProductDoesNotRequireExpiryTracking()
+            public void Should_ThrowDomainRuleViolationException_When_ProductDoesNotRequireExpiryTracking()
             {
                 var sut = CreateProduct(
                     CreateProductID(),
@@ -956,7 +957,7 @@ namespace Mawthooq.Domain.Tests.Products
 
                 Action act = () => sut.ChangeNearExpiryThreshold(15);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
         }
         public class ChangeImageBehavior

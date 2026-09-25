@@ -11,6 +11,7 @@ using Mawthooq.Domain.Products.ValueObjects;
 using Mawthooq.Domain.Products.ValueObjects.Barcodes;
 using Mawthooq.Domain.Products.ValueObjects.Packaging;
 using Mawthooq.Domain.SharedKernel.Enums;
+using Mawthooq.Domain.SharedKernel.Exceptions;
 using Xunit;
 
 namespace Mawthooq.Domain.Tests.Products.Entities
@@ -78,7 +79,7 @@ namespace Mawthooq.Domain.Tests.Products.Entities
             }
 
             [Fact]
-            public void Should_Throw_InvalidOperationException_When_DuplicateUnitPassed()
+            public void Should_Throw_DomainRuleViolationException_When_DuplicateUnitPassed()
             {
                 var duplicateUnits = new List<ProductUnitDefinition>
                 {
@@ -88,11 +89,11 @@ namespace Mawthooq.Domain.Tests.Products.Entities
 
                 Action act = () => CreatePackagingVersion(1, duplicateUnits, 10000001);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_Throw_InvalidOperationException_When_DuplicateRankPassed()
+            public void Should_Throw_DomainRuleViolationException_When_DuplicateRankPassed()
             {
                 var duplicateUnits = new List<ProductUnitDefinition>
                 {
@@ -102,7 +103,7 @@ namespace Mawthooq.Domain.Tests.Products.Entities
 
                 Action act = () => CreatePackagingVersion(1, duplicateUnits, 10000001);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
         }
 
@@ -158,7 +159,7 @@ namespace Mawthooq.Domain.Tests.Products.Entities
             }
 
             [Fact]
-            public void Should_Throw_InvalidOperationException_When_AddCompanyBarcodeToUnitDoesNotExist()
+            public void Should_ThrowDomainRuleViolationException_When_AddCompanyBarcodeToUnitDoesNotExist()
             {
                 var notExistUnit = UnitOfMeasure.Roll;
                 var validCompanyBarcode = BarcodeEAN13Linear.New("1234567891234");
@@ -166,11 +167,11 @@ namespace Mawthooq.Domain.Tests.Products.Entities
 
                 Action act = () => sut.AddCompanyBarcodeToUnit(notExistUnit, validCompanyBarcode);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
-            public void Should_Throw_InvalidOperationException_When_RemoveCompanyBarcodeToUnitDoesNotExist()
+            public void Should_ThrowDomainRuleViolationException_When_RemoveCompanyBarcodeToUnitDoesNotExist()
             {
                 var notExistUnit = UnitOfMeasure.Roll;
                 var validCompanyBarcode = BarcodeEAN13Linear.New("1234567891234");
@@ -178,7 +179,7 @@ namespace Mawthooq.Domain.Tests.Products.Entities
 
                 Action act = () => sut.RemoveCompanyBarcodeFromUnit(notExistUnit, validCompanyBarcode);
 
-                act.Should().Throw<InvalidOperationException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
         }
 
