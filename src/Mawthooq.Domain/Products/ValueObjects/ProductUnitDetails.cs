@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Products.Enums;
 using Mawthooq.Domain.Products.ValueObjects.Barcodes;
+using Mawthooq.Domain.SharedKernel.Exceptions;
 
 namespace Mawthooq.Domain.Products.ValueObjects
 {
@@ -53,10 +54,10 @@ namespace Mawthooq.Domain.Products.ValueObjects
             ArgumentNullException.ThrowIfNull(barcode, nameof(barcode));
 
             if (barcode.Type == BarcodeType.Internal)
-                throw new InvalidOperationException("Cannot add internal barcode manually.");
+                throw new DomainRuleViolationException("Cannot add internal barcode manually.");
 
             if (_barcodes.Any(b => b.Value == barcode.Value))
-                throw new InvalidOperationException("Barcode already exists for this unit.");
+                throw new DomainRuleViolationException("Barcode already exists for this unit.");
 
             var updatedBarcodes = new List<Barcode>(_barcodes) { barcode };
             return new ProductUnitDetails(Unit, ConversionRate, Rank, updatedBarcodes);
@@ -67,11 +68,11 @@ namespace Mawthooq.Domain.Products.ValueObjects
             ArgumentNullException.ThrowIfNull(barcode, nameof(barcode));
 
             if (barcode.Type == BarcodeType.Internal)
-                throw new InvalidOperationException("Cannot add internal barcode manually.");
+                throw new DomainRuleViolationException("Cannot add internal barcode manually.");
 
             var existingBarcode = _barcodes.FirstOrDefault(b => b.Value == barcode.Value);
             if (existingBarcode is null)
-                throw new InvalidOperationException($"This barcode: {barcode.Value} does not exist.");
+                throw new DomainRuleViolationException($"This barcode: {barcode.Value} does not exist.");
 
             var updatedBarcodes = new List<Barcode>(_barcodes);
             updatedBarcodes.Remove(existingBarcode);
