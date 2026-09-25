@@ -14,6 +14,7 @@ using Mawthooq.Domain.Products.ValueObjects;
 using Mawthooq.Domain.Products.ValueObjects.Barcodes;
 using Mawthooq.Domain.Products.ValueObjects.Packaging;
 using Mawthooq.Domain.SharedKernel.Enums;
+using Mawthooq.Domain.SharedKernel.Exceptions;
 using Mawthooq.Domain.SharedKernel.Primitives;
 using Mawthooq.Domain.SharedKernel.ValueObjects;
 
@@ -193,7 +194,7 @@ namespace Mawthooq.Domain.Products
                 }
 
                 if (isIdentical)
-                    throw new InvalidOperationException(
+                    throw new DomainRuleViolationException(
                         @$"A packaging version with the exact same unit configuration
                         (Units, Conversion Rates, and Ranks) already exists for this product. Duplicate configurations are not allowed.");
             }
@@ -224,15 +225,15 @@ namespace Mawthooq.Domain.Products
             ArgumentNullException.ThrowIfNull(barcode, nameof(barcode));
 
             if (barcode.Type == BarcodeType.Internal)
-                throw new InvalidOperationException("cannot adding an internal-type barcode");
+                throw new DomainRuleViolationException("cannot adding an internal-type barcode");
 
             var version = _packagingVersions.SingleOrDefault(v => v.PackagingVersionId == versionId);
             if (version is null)
-                throw new InvalidOperationException("Packaging version not found.");
+                throw new DomainRuleViolationException("Packaging version not found.");
 
             var existUnit = version.Units.Any(u => u.Unit == unit);
             if (!existUnit)
-                throw new InvalidOperationException($"UnitOfMeasure: {unit} Not found");
+                throw new DomainRuleViolationException($"UnitOfMeasure: {unit} Not found");
 
             bool isBarcodeRepeatedInProduct = _packagingVersions
                     .SelectMany(v => v.Units)
@@ -240,7 +241,7 @@ namespace Mawthooq.Domain.Products
                     .Any(b => b.Value == barcode.Value);
 
             if (isBarcodeRepeatedInProduct)
-                throw new InvalidOperationException($"The barcode '{barcode.Value}' is already assigned to another unit within this product.");
+                throw new DomainRuleViolationException($"The barcode '{barcode.Value}' is already assigned to another unit within this product.");
 
             version.AddCompanyBarcodeToUnit(unit, barcode);
 
@@ -262,20 +263,20 @@ namespace Mawthooq.Domain.Products
             ArgumentNullException.ThrowIfNull(barcode, nameof(barcode));
 
             if (barcode.Type == BarcodeType.Internal)
-                throw new InvalidOperationException("Cannot Removing Barcode From Type Internal");
+                throw new DomainRuleViolationException("Cannot Removing Barcode From Type Internal");
 
             var version = _packagingVersions.FirstOrDefault(v => v.PackagingVersionId == versionId);
             if (version is null)
-                throw new InvalidOperationException("Packaging version not found.");
+                throw new DomainRuleViolationException("Packaging version not found.");
 
             var existUnit = version.Units.FirstOrDefault(u => u.Unit == unit);
             if (existUnit is null)
-                throw new InvalidOperationException($"UnitOfMeasure: {unit} Not found");
+                throw new DomainRuleViolationException($"UnitOfMeasure: {unit} Not found");
 
             bool isBarcode = existUnit.Barcodes.Any(b => b.Equals(barcode));
 
             if (!isBarcode)
-                throw new InvalidOperationException($"Barcode : {barcode} Not Found");
+                throw new DomainRuleViolationException($"Barcode : {barcode} Not Found");
 
             version.RemoveCompanyBarcodeFromUnit(unit, barcode);
 
@@ -294,7 +295,7 @@ namespace Mawthooq.Domain.Products
             var existPackagingVersions = _packagingVersions.SingleOrDefault(pv => pv.PackagingVersionId == packagingVersionId);
 
             if (existPackagingVersions is null)
-                throw new InvalidOperationException($"The Packaging Version Not Exists");
+                throw new DomainRuleViolationException($"The Packaging Version Not Exists");
 
             if (existPackagingVersions.Status == Status.Active) return;
 
@@ -314,7 +315,7 @@ namespace Mawthooq.Domain.Products
             var existPackagingVersions = _packagingVersions.SingleOrDefault(pv => pv.PackagingVersionId == packagingVersionId);
 
             if (existPackagingVersions is null)
-                throw new InvalidOperationException($"The Packaging Version Not Exists");
+                throw new DomainRuleViolationException($"The Packaging Version Not Exists");
 
             if (existPackagingVersions.Status == Status.Inactive) return;
 
@@ -389,7 +390,7 @@ namespace Mawthooq.Domain.Products
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(thresholdInDays, nameof(thresholdInDays));
 
             if (!RequiresExpiryTracking)
-                throw new InvalidOperationException("Cannot change near expiry threshold for products that do not require expiry tracking.");
+                throw new DomainRuleViolationException("Cannot change near expiry threshold for products that do not require expiry tracking.");
 
             if (NearExpiryThresholdInDays == thresholdInDays)
                 return;
@@ -435,7 +436,7 @@ namespace Mawthooq.Domain.Products
             ArgumentOutOfRangeException.ThrowIfNegative(nearExpiryThresholdInDays, nameof(nearExpiryThresholdInDays));
 
             if (requiresExpiryTracking && nearExpiryThresholdInDays == 0)
-                throw new InvalidOperationException("Near expiry threshold in days must be greater than zero when expiry tracking is required.");
+                throw new DomainRuleViolationException("Near expiry threshold in days must be greater than zero when expiry tracking is required.");
         }
     }
 }
