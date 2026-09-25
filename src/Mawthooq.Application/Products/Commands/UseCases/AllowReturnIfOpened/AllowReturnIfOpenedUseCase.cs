@@ -24,6 +24,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AllowReturnIfOpened
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
+            AllowReturnIfOpenedValidator.Validate(request);
+
             var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)

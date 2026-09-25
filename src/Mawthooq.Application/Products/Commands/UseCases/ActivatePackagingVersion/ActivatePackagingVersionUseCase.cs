@@ -23,6 +23,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ActivatePackagingVersi
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
+            ActivatePackagingVersionValidator.Validate(request);
+
             var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
 
             if (product is null)

@@ -31,7 +31,9 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddPackagingVersion
             AddPackagingVersionRequest request,
             CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(request);
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
+
+             AddPackagingVersionValidator.Validate(request);
 
             var (product, _) =
                 await _productRepository.GetByIdAsync(
