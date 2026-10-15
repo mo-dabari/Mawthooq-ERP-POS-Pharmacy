@@ -15,7 +15,7 @@ namespace Mawthooq.Domain.SharedKernel.ValueObjects
 
             string cleanTaxNumber = taxNumber.Replace("-", "").Replace(" ", "").Trim();
 
-            if (cleanTaxNumber.Length > 9 || cleanTaxNumber.All(Char.IsDigit))
+            if (cleanTaxNumber.Length != 9 || !cleanTaxNumber.All(Char.IsDigit))
                 throw new InvalidProgramException("The tax number must consist of exactly 9 digits.");
 
             Value = cleanTaxNumber;

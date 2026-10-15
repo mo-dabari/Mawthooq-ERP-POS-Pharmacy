@@ -21,10 +21,11 @@ namespace Mawthooq.Domain.SharedKernel.ValueObjects
             { CountryCode.KW, new Regex(@"^\d{12}$", _regexOptions) },
             { CountryCode.OM, new Regex(@"^\d{8}$", _regexOptions) },
             { CountryCode.BH, new Regex(@"^\d{9}$", _regexOptions) },
+            { CountryCode.PS, new Regex(@"^\d{9}$", _regexOptions) },
             { CountryCode.JO, new Regex(@"^\d{10}$", _regexOptions) }
         };
         public CountryCode CountryCode { get; }
-        public string Value { get;}
+        public string Value { get; }
 
         public NationalId(CountryCode countryCode, string value)
         {

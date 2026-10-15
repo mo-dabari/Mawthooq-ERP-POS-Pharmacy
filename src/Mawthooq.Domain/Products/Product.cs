@@ -110,15 +110,15 @@ namespace Mawthooq.Domain.Products
                 image);
 
             product.RaiseDomainEvent(new ProductCreatedEvent(
-                productId,
-                trimmedName,
-                sku,
-                categoryId,
-                manufacturerId,
-                localAgentId,
-                requiresExpiryTracking,
-                canBeReturnedIfOpened,
-                nearExpiryThresholdInDays,
+                product.ProductId,
+                product.TradeName,
+                product.SKU,
+                product.CategoryId,
+                product.ManufacturerId,
+                product.LocalAgentId,
+                product.RequiresExpiryTracking,
+                product.CanBeReturnedIfOpened,
+                product.NearExpiryThresholdInDays,
                 image,
                 DateTime.UtcNow));
 
@@ -164,7 +164,7 @@ namespace Mawthooq.Domain.Products
             product._packagingVersions.AddRange(packagingVersions);
             return product;
         }
-        public void CreatePackagingVersion(ProductPackaging packaging, long firstReservedBarcode)
+        internal void CreatePackagingVersion(ProductPackaging packaging, long firstReservedBarcode)
         {
             ArgumentNullException.ThrowIfNull(packaging, nameof(packaging));
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(firstReservedBarcode, nameof(firstReservedBarcode));
