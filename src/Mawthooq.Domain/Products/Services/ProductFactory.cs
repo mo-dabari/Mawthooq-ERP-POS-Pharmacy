@@ -32,9 +32,9 @@ namespace Mawthooq.Domain.Products.Services
             LocalAgentId localAgentId,
             ProductPackaging packaging,
             Image image,
-            bool requiresExpiryTracking = true,
-            bool canBeReturnedIfOpened = false,
-            int nearExpiryThresholdInDays = 30,
+            bool requiresExpiryTracking,
+            bool canBeReturnedIfOpened,
+            int nearExpiryThresholdInDays,
             CancellationToken cancellationToken = default)
         {
             int unitsCount = packaging.GetUnitDefinitions().Count();
@@ -57,7 +57,7 @@ namespace Mawthooq.Domain.Products.Services
 
         public async Task AddPackagingVersionAsync(Product product, ProductPackaging packaging, CancellationToken cancellationToken)
         {
-            int unitsCount = packaging.GetUnitDefinitions().Count();  
+            int unitsCount = packaging.GetUnitDefinitions().Count();
             long firstReservedBarcode = await _barcodeGenerator.GetNextBarcodeSequenceAsync(unitsCount, cancellationToken);
             product.CreatePackagingVersion(packaging, firstReservedBarcode);
         }
