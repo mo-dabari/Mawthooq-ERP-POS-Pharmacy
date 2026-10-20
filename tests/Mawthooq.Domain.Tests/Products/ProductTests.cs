@@ -33,7 +33,7 @@ namespace Mawthooq.Domain.Tests.Products
                 sut.TradeName.Should().Be("Panadol");
                 sut.Status.Should().Be(Status.Active);
                 sut.RequiresExpiryTracking.Should().BeTrue();
-                sut.NearExpiryThresholdInDays.Should().Be(30);
+                sut.NearExpiryThresholdInDays.Should().Be(Product.MinDays);
                 sut.CanBeReturnedIfOpened.Should().BeTrue();
 
 
@@ -82,7 +82,7 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    30);
+                    Product.MinDays);
 
                 act.Should().Throw<ArgumentNullException>();
             }
@@ -105,7 +105,7 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    30);
+                    Product.MinDays);
 
                 sut.Should().Throw<ArgumentException>();
             }
@@ -125,7 +125,7 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    30);
+                    Product.MinDays);
 
                 act.Should().Throw<ArgumentNullException>();
             }
@@ -145,7 +145,7 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    30);
+                    Product.MinDays);
 
                 act.Should().Throw<ArgumentNullException>();
             }
@@ -165,7 +165,7 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    30);
+                    Product.MinDays);
 
                 act.Should().Throw<ArgumentNullException>();
             }
@@ -185,7 +185,7 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    30);
+                    Product.MinDays);
 
                 act.Should().Throw<ArgumentNullException>();
             }
@@ -205,13 +205,13 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    30);
+                    Product.MinDays);
 
                 act.Should().Throw<ArgumentNullException>();
             }
 
             [Fact]
-            public void Should_ThrowArgumentOutOfRangeException_When_NearExpiryThresholdIsNegative()
+            public void Should_ThrowDomainRuleViolationException_When_NearExpiryThresholdIsNegative()
             {
                 Action act = () => CreateProduct(
                     CreateProductID(),
@@ -227,7 +227,7 @@ namespace Mawthooq.Domain.Tests.Products
                     true,
                     -1);
 
-                act.Should().Throw<ArgumentOutOfRangeException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
             [Fact]
@@ -245,7 +245,7 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     true,
                     true,
-                    0);
+                    Product.NotTracked);
 
                 act.Should().Throw<DomainRuleViolationException>();
             }
@@ -275,7 +275,7 @@ namespace Mawthooq.Domain.Tests.Products
                 var sut = Product.Rehydrate(
                     productId, "Panadol", CreateSKU(), CreateCategoryID(),
                     CreateManufacturerID(), CreateLocalAgentID(), Status.Inactive,
-                    true, true, 30, CreateImage(),
+                    true, true, Product.MinDays, CreateImage(),
                     new List<PackagingVersion> { packagingVersion });
 
                 sut.ProductId.Should().Be(productId);
@@ -289,7 +289,7 @@ namespace Mawthooq.Domain.Tests.Products
                 var sut = Product.Rehydrate(
                     CreateProductID(), "Panadol", CreateSKU(), CreateCategoryID(),
                     CreateManufacturerID(), CreateLocalAgentID(), Status.Inactive,
-                    true, true, 30, CreateImage(),
+                    true, true, Product.MinDays, CreateImage(),
                     new List<PackagingVersion>());
 
                 sut.Status.Should().Be(Status.Inactive);
@@ -728,7 +728,7 @@ namespace Mawthooq.Domain.Tests.Products
                 sut.DomainEvents.Should().BeEmpty();
             }
 
-             [Fact]
+            [Fact]
             public void Should_NotRaiseEvent_When_NewStatusIsDeactivate()
             {
                 var sut = CreateProductValid();
@@ -900,20 +900,22 @@ namespace Mawthooq.Domain.Tests.Products
         }
         public class ChangeNearExpiryThresholdBehavior
         {
-            [Fact]
-            public void Should_UpdateThreshold_And_RaiseEvent_When_Valid()
+            [Theory]
+            [InlineData(91)]
+            [InlineData(364)]
+            public void Should_UpdateThreshold_And_RaiseEvent_When_Valid(int threshold)
             {
                 var sut = CreateProductValid();
 
-                sut.ChangeNearExpiryThreshold(15);
+                sut.ChangeNearExpiryThreshold(threshold);
 
                 sut.RequiresExpiryTracking.Should().BeTrue();
-                sut.NearExpiryThresholdInDays.Should().Be(15);
+                sut.NearExpiryThresholdInDays.Should().Be(threshold);
 
                 var domainEvent = sut.DomainEvents.Should().ContainSingle()
                     .Subject.Should().BeOfType<ProductNearExpiryThresholdChangedEvent>().Subject;
 
-                domainEvent.NearExpiryThresholdInDays.Should().Be(15);
+                domainEvent.NearExpiryThresholdInDays.Should().Be(threshold);
             }
 
             [Fact]
@@ -929,17 +931,21 @@ namespace Mawthooq.Domain.Tests.Products
             [Theory]
             [InlineData(-1)]
             [InlineData(0)]
-            public void Should_ThrowArgumentOutOfRangeException_When_ThresholdIsInvalid(int nearExpiryThresholdInDays)
+            [InlineData(89)]
+            [InlineData(366)]
+            public void Should_ThrowDomainRuleViolationException_When_TrackingIsRequired_And_ThresholdIsOutOfRange(int nearExpiryThresholdInDays)
             {
                 var sut = CreateProductValid();
 
                 Action act = () => sut.ChangeNearExpiryThreshold(nearExpiryThresholdInDays);
 
-                act.Should().Throw<ArgumentOutOfRangeException>();
+                act.Should().Throw<DomainRuleViolationException>();
             }
 
-            [Fact]
-            public void Should_ThrowDomainRuleViolationException_When_ProductDoesNotRequireExpiryTracking()
+            [Theory]
+            [InlineData(0)]
+            [InlineData(120)]
+            public void Should_StoreZeroThreshold_When_TrackingIsNotRequired_RegardlessOfTheGivenValue(int given)
             {
                 var sut = CreateProduct(
                     CreateProductID(),
@@ -953,13 +959,49 @@ namespace Mawthooq.Domain.Tests.Products
                     CreateImage(),
                     false,
                     true,
-                    0);
+                    given);
 
-                Action act = () => sut.ChangeNearExpiryThreshold(15);
+                sut.RequiresExpiryTracking.Should().BeFalse();
+                sut.NearExpiryThresholdInDays.Should().Be(Product.NotTracked);
 
-                act.Should().Throw<DomainRuleViolationException>();
+                var domainEvent = sut.DomainEvents.OfType<ProductCreatedEvent>().Single();
+
+                domainEvent.NearExpiryThresholdInDays.Should().Be(0);
             }
         }
+
+        public class GetExpiryStatusBehavior
+        {
+            [Theory]
+            [InlineData(-1, ExpiryStatus.Expired)]
+            [InlineData(0, ExpiryStatus.Expired)]
+            [InlineData(1, ExpiryStatus.NearExpiry)]
+            [InlineData(90, ExpiryStatus.NearExpiry)]
+            [InlineData(91, ExpiryStatus.Valid)]
+            [InlineData(500, ExpiryStatus.Valid)]
+            public void Should_ClassifyByExpiryDate_When_TrackingIsRequired(int daysFromToday, ExpiryStatus expected)
+            {
+                DateOnly today = new(2026, 10, 10);
+
+                var sut = CreateProductValid();
+
+                sut.GetExpiryStatus(today.AddDays(daysFromToday), today).Should().Be(expected);
+            }
+
+            [Fact]
+            public void Should_ReturnNotTracked_When_TrackingIsNotRequired()
+            {
+                DateOnly today = new(2026, 10, 10);
+
+                var sut = CreateProduct(
+                    CreateProductID(), "Hammer", CreateSKU(), CreateCategoryID(),
+                    CreateManufacturerID(), CreateLocalAgentID(),
+                    CreateProductBoxWithStripsPackaging(), 10000, CreateImage(), false, true, 0);
+
+                sut.GetExpiryStatus(today.AddDays(-30), today).Should().Be(ExpiryStatus.NotTracked);
+            }
+        }
+
         public class ChangeImageBehavior
         {
             [Fact]
@@ -1028,8 +1070,7 @@ namespace Mawthooq.Domain.Tests.Products
                 image,
                 requiresExpiryTracking,
                 canBeReturnedIfOpened,
-                nearExpiryThresholdInDays
-                );
+                nearExpiryThresholdInDays);
         }
 
         /// <summary>
@@ -1056,7 +1097,7 @@ namespace Mawthooq.Domain.Tests.Products
                 CreateImage(),
                 true,
                 true,
-                30);
+                Product.MinDays);
         }
         private static ProductId CreateProductID() => ProductId.New();
         private static CategoryId CreateCategoryID() => CategoryId.New();
