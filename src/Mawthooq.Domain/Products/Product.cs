@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Domain.Categories.ValueObjects;
@@ -22,6 +21,10 @@ namespace Mawthooq.Domain.Products
 {
     public class Product : AggregateRoot
     {
+        public const int MinDays = 90;
+        public const int MaxDays = 365;
+        public const int NotTracked = 0;
+
         private readonly List<PackagingVersion> _packagingVersions = new();
         public IReadOnlyList<PackagingVersion> PackagingVersions => _packagingVersions.AsReadOnly();
 
@@ -60,7 +63,7 @@ namespace Mawthooq.Domain.Products
             Status = status;
             ManufacturerId = manufacturerId;
             LocalAgentId = localAgentId;
-            NearExpiryThresholdInDays = requiresExpiryTracking ? nearExpiryThresholdInDays : 0;
+            NearExpiryThresholdInDays = requiresExpiryTracking ? nearExpiryThresholdInDays : NotTracked;
             Image = image;
         }
 
@@ -77,9 +80,9 @@ namespace Mawthooq.Domain.Products
             ProductPackaging packaging,
             long firstReservedBarcode,
             Image image,
-            bool requiresExpiryTracking = true,
-            bool canBeReturnedIfOpened = false,
-            int nearExpiryThresholdInDays = 30
+            bool requiresExpiryTracking,
+            bool canBeReturnedIfOpened,
+            int nearExpiryThresholdInDays
             )
         {
 
@@ -119,7 +122,7 @@ namespace Mawthooq.Domain.Products
                 product.RequiresExpiryTracking,
                 product.CanBeReturnedIfOpened,
                 product.NearExpiryThresholdInDays,
-                image,
+                product.Image,
                 DateTime.UtcNow));
 
             product.CreatePackagingVersion(packaging, firstReservedBarcode);
@@ -385,12 +388,17 @@ namespace Mawthooq.Domain.Products
 
             RaiseDomainEvent(new ProductStatusChangedEvent(ProductId, Status, DateTime.UtcNow));
         }
+        internal static void EnsureInRange(int days)
+        {
+            if (days < MinDays || days > MaxDays)
+                throw new DomainRuleViolationException($" {nameof(NearExpiryThresholdInDays)} must be between {MinDays} and {MaxDays} days.");
+        }
         public void ChangeNearExpiryThreshold(int thresholdInDays)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(thresholdInDays, nameof(thresholdInDays));
-
             if (!RequiresExpiryTracking)
                 throw new DomainRuleViolationException("Cannot change near expiry threshold for products that do not require expiry tracking.");
+
+            EnsureInRange(thresholdInDays);
 
             if (NearExpiryThresholdInDays == thresholdInDays)
                 return;
@@ -398,7 +406,6 @@ namespace Mawthooq.Domain.Products
             NearExpiryThresholdInDays = thresholdInDays;
 
             RaiseDomainEvent(new ProductNearExpiryThresholdChangedEvent(ProductId, NearExpiryThresholdInDays, DateTime.UtcNow));
-
         }
         public void ChangeImage(Image image)
         {
@@ -411,6 +418,21 @@ namespace Mawthooq.Domain.Products
 
             RaiseDomainEvent(new ProductImageChangedEvent(ProductId, Image, DateTime.UtcNow));
         }
+
+        public ExpiryStatus GetExpiryStatus(DateOnly expiryDate, DateOnly today)
+        {
+            if (!RequiresExpiryTracking)
+                return ExpiryStatus.NotTracked;
+
+            if (expiryDate <= today)
+                return ExpiryStatus.Expired;
+
+            if (expiryDate <= today.AddDays(NearExpiryThresholdInDays))
+                return ExpiryStatus.NearExpiry;
+
+            return ExpiryStatus.Valid;
+        }
+
         private static void ValidateArguments(
             ProductId productId,
             string name,
@@ -433,10 +455,8 @@ namespace Mawthooq.Domain.Products
 
             ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 
-            ArgumentOutOfRangeException.ThrowIfNegative(nearExpiryThresholdInDays, nameof(nearExpiryThresholdInDays));
-
-            if (requiresExpiryTracking && nearExpiryThresholdInDays == 0)
-                throw new DomainRuleViolationException("Near expiry threshold in days must be greater than zero when expiry tracking is required.");
+            if (requiresExpiryTracking)
+                EnsureInRange(nearExpiryThresholdInDays);
         }
     }
 }
