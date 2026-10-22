@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Application.Common.Validation;
 using Mawthooq.Application.Products.Commands.Validation;
+using Mawthooq.Domain.Products;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 {
@@ -99,8 +100,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                 {
                     RangeValidator.ValidateRange(
                         request.ProductInformationDto.NearExpiryThresholdInDays,
-                         30,
-                         90,
+                         Product.MinDays,
+                         Product.MaxDays,
                         nameof(request.ProductInformationDto.NearExpiryThresholdInDays),
                          errors);
                 }

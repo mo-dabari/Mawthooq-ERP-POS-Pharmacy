@@ -49,8 +49,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                 request.ProductInformationDto;
 
             var (category, _) = await _categoryRepository.GetByIdAsync(
-            info.CategoryIdDto.ToDomain(),
-            cancellationToken);
+                info.CategoryIdDto.ToDomain(),
+                cancellationToken);
 
             if (category == null)
                 throw new CategoryNotFoundException(info.CategoryIdDto.Value);
@@ -60,6 +60,19 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             if (await _productRepository.ExistsBySkuAsync(sKU, cancellationToken))
                 throw new DuplicateSkuException(sKU.Value);
 
+            if (request.UserBarcodes is not null && request.UserBarcodes.Count > 0)
+            {
+
+                foreach (var userBarcode in request.UserBarcodes)
+                {
+                    var barcodeDomain = userBarcode.BarcodeDto.ToDomain();
+
+                    if (await _productRepository.ExistsByBarcodeAsync(barcodeDomain, cancellationToken))
+                    {
+                        throw new DuplicateBarcodeException(userBarcode.BarcodeDto.Value);
+                    }
+                }
+            }
 
             var packaging =
                 request.ToPackagingDomain();
@@ -72,6 +85,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
             var image =
                 info.Image.ToDomain();
+
 
             var product = await _productFactory
                 .CreateAsync(
@@ -90,8 +104,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
             if (request.UserBarcodes is not null && request.UserBarcodes.Count > 0)
             {
-                var firstVersionId =
-                    product.PackagingVersions.Single().PackagingVersionId;
+                var firstVersionId = product.PackagingVersions.Single().PackagingVersionId;
 
                 foreach (var userBarcode in request.UserBarcodes)
                 {
