@@ -68,7 +68,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.RemoveCompanyBar
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_BarcodeNotFound()
+        public async Task Should_ThrowBarcodeNotFoundException_When_BarcodeNotFound()
         {
             var product = ProductTestFactory.CreateValidProduct();
             var versionId = product.PackagingVersions[0].PackagingVersionId;
@@ -99,7 +99,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.RemoveCompanyBar
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_ProductNotFound()
+        public async Task Should_ThrowProductNotFoundException_When_ProductNotFound()
         {
             _productRepositoryMock
                 .Setup(r => r.GetByIdAsync(It.IsAny<ProductId>(), It.IsAny<CancellationToken>()))

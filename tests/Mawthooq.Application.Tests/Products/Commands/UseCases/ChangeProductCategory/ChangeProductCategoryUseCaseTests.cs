@@ -71,12 +71,12 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeProductCat
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_NewCategoryNotFoundOrInactive()
+        public async Task Should_ThrowCategoryNotFoundException_When_NewCategoryNotFoundOrInactive()
         {
             var productValid = ProductTestFactory.CreateValidProduct();
 
             _productRepositoryMock
-                .Setup(pr => pr.GetByIdAsync(productValid.ProductId, It.IsAny<CancellationToken>()))
+                .Setup(pr => pr.GetByIdAsync(It.IsAny<ProductId>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((productValid, null));
 
             _categoryRepositoryMock
@@ -98,7 +98,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeProductCat
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_ProductNotFound()
+        public async Task Should_ThrowProductNotFoundException_When_ProductNotFound()
         {
             _productRepositoryMock
                 .Setup(pr => pr.GetByIdAsync(It.IsAny<ProductId>(), It.IsAny<CancellationToken>()))

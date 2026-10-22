@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Mawthooq.Application.Categories.Commands.Mappers;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Categories.UseCases.GetCategoryByID;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Categories.ValueObjects;
@@ -40,7 +41,7 @@ namespace Mawthooq.Application.Tests.Categories.Commands.UseCases.GetCategoryByI
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_CategoryNotFound()
+        public async Task Should_ThrowCategoryNotFoundException_When_CategoryNotFound()
         {
             _categoryRepositoryMock
                 .Setup(r => r.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
@@ -48,7 +49,7 @@ namespace Mawthooq.Application.Tests.Categories.Commands.UseCases.GetCategoryByI
 
             Func<Task> act = () => _sut.ExecuteAsync(CategoryId.New().ToDto());
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<CategoryNotFoundException>();
         }
 
         [Fact]

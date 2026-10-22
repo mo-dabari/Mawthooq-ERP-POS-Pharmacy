@@ -73,7 +73,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.AddPackagingVers
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_ProductNotFound()
+        public async Task Should_ThrowProductNotFoundException_When_ProductNotFound()
         {
             var product = ProductTestFactory.CreateValidProduct();
 
