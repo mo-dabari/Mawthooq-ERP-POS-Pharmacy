@@ -22,6 +22,12 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit
 
             EnumValidator.ValidateAndCollect(request.UnitName, nameof(request.UnitName), errors);
 
+            if (RequiredValidator.ValidateAndCollect(request.BarcodeDto, nameof(request.BarcodeDto), errors))
+            {
+                StringValidator.ValidateAndCollect(request.BarcodeDto.Value, nameof(request.BarcodeDto.Value), errors);
+                EnumValidator.ValidateAndCollect(request.BarcodeDto.Type, nameof(request.BarcodeDto.Type), errors);
+            }
+
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 
             if (errors.Count > 0)
