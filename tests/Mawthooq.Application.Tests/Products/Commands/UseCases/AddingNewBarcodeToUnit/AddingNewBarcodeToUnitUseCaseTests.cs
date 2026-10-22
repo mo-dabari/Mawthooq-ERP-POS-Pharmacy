@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit;
@@ -68,8 +69,27 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.AddingNewBarcode
                 Times.Once);
         }
 
+
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_ProductNotFound()
+        public async Task Should_ThrowValidationException_When_BarcodeIsNull()
+        {
+            var request = CreateRequestWithBarcodeIsNull();
+
+            Func<Task> act = () => _sut.ExecuteAsync(request);
+
+            await act.Should().ThrowAsync<ValidationException>();
+
+            _productRepositoryMock
+            .Verify(pr => pr.UpdateAsync(
+                It.IsAny<Product>(),
+                It.IsAny<Byte[]>(),
+                It.IsAny<CancellationToken>())
+                , Times.Never);
+        }
+
+
+        [Fact]
+        public async Task Should_ThrowProductNotFoundException_When_ProductNotFound()
         {
             var product = ProductTestFactory.CreateValidProduct();
 
@@ -92,7 +112,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.AddingNewBarcode
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_BarcodeAlreadyExists()
+        public async Task Should_ThrowDuplicateBarcodeException_When_BarcodeAlreadyExists()
         {
             var product = ProductTestFactory.CreateValidProduct();
 
@@ -130,6 +150,18 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.AddingNewBarcode
                 product.PackagingVersions[0].PackagingVersionId.ToDto(),
                 UnitOfMeasure.Bottle,
                 BarcodeEAN13Linear.New("1234567891234").ToDto(),
+                [1, 1, 1]);
+        }
+
+        private static AddingNewBarcodeToUnitRequest CreateRequestWithBarcodeIsNull()
+        {
+            var product = ProductTestFactory.CreateValidProduct();
+
+            return new AddingNewBarcodeToUnitRequest(
+                product.ProductId.ToDto(),
+                product.PackagingVersions[0].PackagingVersionId.ToDto(),
+                UnitOfMeasure.Bottle,
+                null!,
                 [1, 1, 1]);
         }
     }

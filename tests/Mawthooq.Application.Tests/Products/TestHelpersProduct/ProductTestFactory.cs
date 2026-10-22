@@ -31,8 +31,23 @@ namespace Mawthooq.Application.Tests.Products.TestHelpersProduct
                 Image.Create("products/1/default.png", "default.png", "image/png"),
                 requiresExpiryTracking: true,
                 canBeReturnedIfOpened: true,
-                nearExpiryThresholdInDays: 30);
+                nearExpiryThresholdInDays: Product.MinDays);
 
+            product.ClearDomainEvents();
+            return product;
+        }
+
+        public static Product CreateProductWithoutExpiryTracking()
+        {
+            var product = Product.Create(
+                ProductId.New(), "Digital Thermometer", SKU.Create("THERMO-0001"),
+                CategoryId.New(), ManufacturerId.New(), LocalAgentId.New(),
+                SingleUnitPackaging.Create(UnitOfMeasure.Piece), 1000,
+                Image.Create("products/1/default.png", "default.png", "image/png"),
+                requiresExpiryTracking: false,
+                canBeReturnedIfOpened: false,
+                nearExpiryThresholdInDays: 0);
+                
             product.ClearDomainEvents();
             return product;
         }
