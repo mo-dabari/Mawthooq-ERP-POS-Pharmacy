@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
 using Mawthooq.Application.Categories.Exceptions;
+using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Application.Common.Mappers;
+using Mawthooq.Application.Common.Validation;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Categories;
@@ -40,6 +42,16 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
             if (category is null)
                 throw new CategoryNotFoundException(request.CategoryIdDto.Value);
 
+            if (product.RequiresExpiryTracking)
+            {
+                List<string> errors = new();
+                RangeValidator.ValidateRange(request.NearExpiryThresholdInDays,
+                    Product.MinDays, Product.MaxDays, nameof(request.NearExpiryThresholdInDays), errors);
+                if (errors.Count > 0) throw new ValidationException(errors);
+
+                product.ChangeNearExpiryThreshold(request.NearExpiryThresholdInDays);
+            }
+
             product.Rename(request.TradeName);
 
             product.ChangeCategory(category.CategoryId);
@@ -48,8 +60,6 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
                 product.AllowReturnIfOpened();
             else
                 product.DisallowReturnIfOpened();
-
-            product.ChangeNearExpiryThreshold(request.NearExpiryThresholdInDays);
 
             product.ChangeImage(request.Image.ToDomain());
 
