@@ -19,7 +19,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
         List<UserUnitBarcodeDto>? UserBarcodes
         );
-    public sealed record  UserUnitBarcodeDto(UnitOfMeasure Unit, BarcodeDto BarcodeDto);
+    public sealed record UserUnitBarcodeDto(UnitOfMeasure Unit, BarcodeDto BarcodeDto);
 
     public record class PackagingInformation(
         int? TotalUnitsPerBox,
@@ -39,9 +39,9 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             LocalAgentIdDto LocalAgentIdDto,
             PackagingTemplate Template,
             ImageDto Image,
-            bool RequiresExpiryTracking = true,
-            bool CanBeReturnedIfOpened = false,
-            int NearExpiryThresholdInDays = 30);
+            bool RequiresExpiryTracking,
+            bool CanBeReturnedIfOpened,
+            int NearExpiryThresholdInDays);
 
 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.ChangeNearExpiryThreshold;
 using Mawthooq.Application.Products.Exceptions;
@@ -40,11 +41,11 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeNearExpiry
                 .ReturnsAsync(newRowVersion);
 
             var request = new ChangeNearExpiryThresholdRequest(
-                product.ProductId.ToDto(), 45, requestRowVersion);
+                product.ProductId.ToDto(), Product.MinDays, requestRowVersion);
 
             var response = await _sut.ExecuteAsync(request);
 
-            response.NearExpiryThresholdInDays.Should().Be(45);
+            response.NearExpiryThresholdInDays.Should().Be(Product.MinDays);
             response.Name.Should().Be(product.TradeName);
             response.RowVersion.Should().BeEquivalentTo(newRowVersion);
 
@@ -54,18 +55,39 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeNearExpiry
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_ProductNotFound()
+        public async Task Should_ThrowProductNotFoundException_When_ProductNotFound()
         {
             _productRepositoryMock
                 .Setup(r => r.GetByIdAsync(It.IsAny<ProductId>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((null, null));
 
             var request = new ChangeNearExpiryThresholdRequest(
-                ProductId.New().ToDto(), 45, [1, 1, 1]);
+                ProductId.New().ToDto(), Product.MinDays, [1, 1, 1]);
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
             await act.Should().ThrowAsync<ProductNotFoundException>();
+
+            _productRepositoryMock.Verify(
+                r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+
+        [Theory]
+        [InlineData(Product.MinDays - 1)]
+        [InlineData(Product.MaxDays + 1)]
+        public async Task Should_ThrowValidationException_When_ChangeNearExpiryThresholdInvalid(int threshold)
+        {
+            var request = new ChangeNearExpiryThresholdRequest(
+                ProductId.New().ToDto(), threshold, [1, 1, 1]);
+
+            Func<Task> act = () => _sut.ExecuteAsync(request);
+
+            await act.Should().ThrowAsync<ValidationException>();
+
+            _productRepositoryMock.Verify(
+                r => r.GetByIdAsync(It.IsAny<ProductId>(), It.IsAny<CancellationToken>()),
+                Times.Never);
 
             _productRepositoryMock.Verify(
                 r => r.UpdateAsync(It.IsAny<Product>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),

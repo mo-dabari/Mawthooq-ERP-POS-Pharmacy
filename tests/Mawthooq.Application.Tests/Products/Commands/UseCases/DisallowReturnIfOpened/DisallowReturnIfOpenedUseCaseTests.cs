@@ -54,7 +54,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.DisallowReturnIf
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_ProductNotFound()
+        public async Task Should_ThrowProductNotFoundException_When_ProductNotFound()
         {
             _productRepositoryMock
                 .Setup(r => r.GetByIdAsync(It.IsAny<ProductId>(), It.IsAny<CancellationToken>()))

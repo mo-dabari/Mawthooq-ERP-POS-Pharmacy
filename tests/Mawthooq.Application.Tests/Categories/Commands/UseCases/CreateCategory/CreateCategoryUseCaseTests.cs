@@ -30,7 +30,7 @@ namespace Mawthooq.Application.Tests.Categories.Commands.UseCases.CreateCategory
             _categoryRepositoryMock
                 .Setup(r => r.AddAsync(It.IsAny<Category>(), It.IsAny<CancellationToken>()))
                 .Callback<Category, CancellationToken>((c, _) => capturedCategory = c)
-                .ReturnsAsync((Category? c, byte[]? _) => (c, expectedRowVersion));
+                .ReturnsAsync((Category? c, CancellationToken _) => (c, expectedRowVersion));
 
             var request = new CreateCategoryRequest("Pharmaceuticals", "General category");
 

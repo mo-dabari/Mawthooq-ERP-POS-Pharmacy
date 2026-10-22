@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Mawthooq.Application.Categories.Commands.Mappers;
 using Mawthooq.Application.Categories.Commands.UseCases.UpdateCategory;
+using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Categories.ValueObjects;
 using Moq;
@@ -55,7 +56,7 @@ namespace Mawthooq.Application.Tests.Categories.Commands.UseCases.UpdateCategory
         }
 
         [Fact]
-        public async Task Should_ThrowInvalidOperationException_When_CategoryNotFound()
+        public async Task Should_ThrowCategoryNotFoundException_When_CategoryNotFound()
         {
             _categoryRepositoryMock
                 .Setup(r => r.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
@@ -69,7 +70,7 @@ namespace Mawthooq.Application.Tests.Categories.Commands.UseCases.UpdateCategory
 
             Func<Task> act = () => _sut.ExecuteAsync(request);
 
-            await act.Should().ThrowAsync<InvalidOperationException>();
+            await act.Should().ThrowAsync<CategoryNotFoundException>();
 
             _categoryRepositoryMock.Verify(
                 r => r.UpdateAsync(It.IsAny<Category>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),

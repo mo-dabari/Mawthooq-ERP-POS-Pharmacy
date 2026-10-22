@@ -9,15 +9,17 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProductDetails
 {
     public record class GetProductDetailsDto(
     Guid ProductId,
-    string DisplayName,
+    string TradeName,
     string SKU,
-    string Category,
-    string Manufacturer,
-    string LocalAgent,
+    string CategoryName,
+    string ManufacturerName,
+    string LocalAgentName,
     bool CanBeReturnedIfOpened,
+    int NearExpiryThresholdInDays,
     Status Status,
     string? ImageStorageKey,
-    IReadOnlyList<PackagingVersionDto> PackagingVersions);
+    IReadOnlyList<PackagingVersionDto> PackagingVersions,
+    byte[] RowVersion);
 
     public record class PackagingVersionDto(
         Guid PackagingVersionId,

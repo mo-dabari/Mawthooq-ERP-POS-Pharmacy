@@ -17,6 +17,5 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
         ImageDto Image,
         bool CanBeReturnedIfOpened,
         int NearExpiryThresholdInDays,
-        bool RequiresExpiryTracking,
         byte[] RowVersion);
 }

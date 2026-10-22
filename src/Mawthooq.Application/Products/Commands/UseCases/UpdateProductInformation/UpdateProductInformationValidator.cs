@@ -11,14 +11,6 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
     {
         public static void Validate(UpdateProductInformationRequest request)
         {
-            //     ProductIdDto ProductIdDto,
-            // string TradeName,
-            // CategoryIdDto CategoryIdDto,
-            // ImageDto Image,
-            // bool CanBeReturnedIfOpened,
-            // int NearExpiryThresholdInDays,
-            // byte[] RowVersion);
-
             List<string> errors = new();
 
             if (RequiredValidator.ValidateAndCollect(request.ProductIdDto, nameof(request.ProductIdDto), errors))
@@ -49,16 +41,6 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
                 nameof(request.Image.MimeType),
                 errors);
             }
-
-            if (request.RequiresExpiryTracking)
-                {
-                    RangeValidator.ValidateRange(
-                        request.NearExpiryThresholdInDays,
-                         30,
-                         90,
-                        nameof(request.NearExpiryThresholdInDays),
-                         errors);
-                }
 
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 

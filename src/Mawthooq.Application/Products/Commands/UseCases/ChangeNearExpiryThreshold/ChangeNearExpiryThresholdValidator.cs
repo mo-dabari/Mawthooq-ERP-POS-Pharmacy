@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Application.Common.Validation;
+using Mawthooq.Domain.Products;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.ChangeNearExpiryThreshold
 {
@@ -14,9 +15,17 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ChangeNearExpiryThresh
             List<string> errors = new();
 
             if (RequiredValidator.ValidateAndCollect(request.ProductIdDto, nameof(request.ProductIdDto), errors))
-                GuidValidator.ValidateAndCollect(request.ProductIdDto.Value, nameof(request.ProductIdDto), errors);
+                GuidValidator.ValidateAndCollect(
+                    request.ProductIdDto.Value,
+                    nameof(request.ProductIdDto)
+                    , errors);
 
-            NumberValidator.ValidateNonNegative(request.NewNearExpiryThresholdInDays, nameof(request.NewNearExpiryThresholdInDays), errors);
+            RangeValidator.ValidateRange(
+                request.NewNearExpiryThresholdInDays,
+                Product.MinDays,
+                Product.MaxDays,
+                nameof(request.NewNearExpiryThresholdInDays)
+                , errors);
 
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 
