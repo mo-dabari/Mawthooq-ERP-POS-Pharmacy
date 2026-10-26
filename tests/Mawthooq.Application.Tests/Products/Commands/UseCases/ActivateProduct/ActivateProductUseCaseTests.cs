@@ -46,7 +46,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ActivateProduct
 
             var response = await _sut.ExecuteAsync(request);
 
-            response.NewStatus.Should().Be(Status.Active);
+            response.Status.Should().Be(Status.Active);
             response.RowVersion.Should().BeEquivalentTo(newRowVersion);
 
             _productRepositoryMock.Verify(pr => pr.UpdateAsync(productValid, requestRowVersion, It.IsAny<CancellationToken>()),

@@ -68,8 +68,8 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.UpdateProductInf
 
             var response = await _sut.ExecuteAsync(request);
 
-            response.Name.Should().Be("Panadol Ultra");
-            response.CategoryIdDto.Value.Should().Be(newCategory.CategoryId.Value);
+            response.TradeName.Should().Be("Panadol Ultra");
+            response.CategoryId.Value.Should().Be(newCategory.CategoryId.Value);
             response.Image.StorageKey.Should().Be(newImage.StorageKey);
             response.CanBeReturnedIfOpened.Should().BeFalse();
             response.NearExpiryThresholdInDays.Should().Be(Product.MinDays);
@@ -188,7 +188,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.UpdateProductInf
 
             var response = await _sut.ExecuteAsync(request);
 
-            response.Name.Should().Be("Digital Thermometer Pro");
+            response.TradeName.Should().Be("Digital Thermometer Pro");
             response.NearExpiryThresholdInDays.Should().Be(0);
             product.DomainEvents.OfType<ProductNearExpiryThresholdChangedEvent>().Should().BeEmpty();
         }
