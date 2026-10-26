@@ -8,10 +8,10 @@ using Mawthooq.Domain.Products.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.RemoveCompanyBarcodeToUnit
 {
     public record class RemoveCompanyBarcodeToUnitRequest(
-        ProductIdDto ProductIdDto,
-        PackagingVersionIdDto PackagingVersionIdDto,
-        UnitOfMeasure UnitName,
-        BarcodeDto BarcodeDto,
+        ProductIdDto ProductId,
+        PackagingVersionIdDto PackagingVersionId,
+        UnitOfMeasure Unit,
+        BarcodeDto Barcode,
         byte[] RowVersion);
 
 }

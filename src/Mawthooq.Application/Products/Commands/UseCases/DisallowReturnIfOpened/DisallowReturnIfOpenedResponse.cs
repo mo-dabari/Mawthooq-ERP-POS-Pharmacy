@@ -8,7 +8,8 @@ using Mawthooq.Domain.Products.ValueObjects;
 namespace Mawthooq.Application.Products.Commands.UseCases.DisallowReturnIfOpened
 {
     public record class DisallowReturnIfOpenedResponse(
-        ProductIdDto ProductIdDto,
+        ProductIdDto ProductId,
+        string TradeName,
         bool CanBeReturnedIfOpened,
         byte[] RowVersion);
 }

@@ -16,99 +16,99 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             List<string> errors = new();
 
             if (RequiredValidator.ValidateAndCollect(
-                request.ProductInformationDto,
-                nameof(request.ProductInformationDto),
+                request.ProductInformation,
+                nameof(request.ProductInformation),
                 errors))
             {
                 StringValidator.ValidateAndCollect(
-                    request.ProductInformationDto.TradeName,
-                    nameof(request.ProductInformationDto.TradeName),
+                    request.ProductInformation.TradeName,
+                    nameof(request.ProductInformation.TradeName),
                     50,
                     errors);
 
                 if (RequiredValidator.ValidateAndCollect(
-                    request.ProductInformationDto.Sku,
-                    nameof(request.ProductInformationDto.Sku),
+                    request.ProductInformation.Sku,
+                    nameof(request.ProductInformation.Sku),
                     errors))
                 {
                     RequiredValidator.ValidateAndCollect(
-                        request.ProductInformationDto.Sku.Value,
-                        nameof(request.ProductInformationDto.Sku),
+                        request.ProductInformation.Sku.Value,
+                        nameof(request.ProductInformation.Sku),
                         errors);
                 }
 
                 if (RequiredValidator.ValidateAndCollect(
-                    request.ProductInformationDto.CategoryIdDto,
-                    nameof(request.ProductInformationDto.CategoryIdDto),
+                    request.ProductInformation.CategoryId,
+                    nameof(request.ProductInformation.CategoryId),
                     errors))
                 {
                     GuidValidator.ValidateAndCollect(
-                        request.ProductInformationDto.CategoryIdDto.Value,
-                        nameof(request.ProductInformationDto.CategoryIdDto),
+                        request.ProductInformation.CategoryId.Value,
+                        nameof(request.ProductInformation.CategoryId),
                         errors);
                 }
 
                 if (RequiredValidator.ValidateAndCollect(
-                    request.ProductInformationDto.ManufacturerIdDto,
-                    nameof(request.ProductInformationDto.ManufacturerIdDto),
+                    request.ProductInformation.ManufacturerId,
+                    nameof(request.ProductInformation.ManufacturerId),
                     errors))
                 {
                     GuidValidator.ValidateAndCollect(
-                        request.ProductInformationDto.ManufacturerIdDto.Value,
-                        nameof(request.ProductInformationDto.ManufacturerIdDto),
+                        request.ProductInformation.ManufacturerId.Value,
+                        nameof(request.ProductInformation.ManufacturerId),
                         errors);
                 }
 
                 if (RequiredValidator.ValidateAndCollect(
-                    request.ProductInformationDto.LocalAgentIdDto,
-                    nameof(request.ProductInformationDto.LocalAgentIdDto),
+                    request.ProductInformation.LocalAgentId,
+                    nameof(request.ProductInformation.LocalAgentId),
                     errors))
                 {
                     GuidValidator.ValidateAndCollect(
-                        request.ProductInformationDto.LocalAgentIdDto.Value,
-                        nameof(request.ProductInformationDto.LocalAgentIdDto),
+                        request.ProductInformation.LocalAgentId.Value,
+                        nameof(request.ProductInformation.LocalAgentId),
                         errors);
                 }
 
                 EnumValidator.ValidateAndCollect(
-                    request.ProductInformationDto.Template,
-                    nameof(request.ProductInformationDto.Template),
+                    request.ProductInformation.Template,
+                    nameof(request.ProductInformation.Template),
                     errors);
 
                 if (RequiredValidator.ValidateAndCollect(
-                request.ProductInformationDto.Image,
-                nameof(request.ProductInformationDto.Image),
+                request.ProductInformation.Image,
+                nameof(request.ProductInformation.Image),
                 errors))
                 {
                     RequiredValidator.ValidateAndCollect(
-                    request.ProductInformationDto.Image.StorageKey,
-                    nameof(request.ProductInformationDto.Image.StorageKey),
+                    request.ProductInformation.Image.StorageKey,
+                    nameof(request.ProductInformation.Image.StorageKey),
                     errors);
 
                     RequiredValidator.ValidateAndCollect(
-                    request.ProductInformationDto.Image.FileName,
-                    nameof(request.ProductInformationDto.Image.FileName),
+                    request.ProductInformation.Image.FileName,
+                    nameof(request.ProductInformation.Image.FileName),
                     errors);
 
                     RequiredValidator.ValidateAndCollect(
-                    request.ProductInformationDto.Image.MimeType,
-                    nameof(request.ProductInformationDto.Image.MimeType),
+                    request.ProductInformation.Image.MimeType,
+                    nameof(request.ProductInformation.Image.MimeType),
                     errors);
                 }
 
-                if (request.ProductInformationDto.RequiresExpiryTracking)
+                if (request.ProductInformation.RequiresExpiryTracking)
                 {
                     RangeValidator.ValidateRange(
-                        request.ProductInformationDto.NearExpiryThresholdInDays,
+                        request.ProductInformation.NearExpiryThresholdInDays,
                          Product.MinDays,
                          Product.MaxDays,
-                        nameof(request.ProductInformationDto.NearExpiryThresholdInDays),
+                        nameof(request.ProductInformation.NearExpiryThresholdInDays),
                          errors);
                 }
 
                 PackagingInformationValidator.ValidateAndCollect(
-                    request.ProductInformationDto.Template,
-                    request.PackagingDto,
+                    request.ProductInformation.Template,
+                    request.Packaging,
                     errors);
 
                 if (request.UserBarcodes is not null)
@@ -121,13 +121,13 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                             errors);
 
                         RequiredValidator.ValidateAndCollect(
-                            userBarcode.BarcodeDto,
-                            nameof(userBarcode.BarcodeDto),
+                            userBarcode.Barcode,
+                            nameof(userBarcode.Barcode),
                             errors);
                     }
 
                     var duplicateBarcodes = request.UserBarcodes?
-                    .GroupBy(b => b.BarcodeDto?.Value)
+                    .GroupBy(b => b.Barcode?.Value)
                     .Where(g => g.Key is not null && g.Count() > 1)
                     .Select(g => g.Key!);
 

@@ -32,23 +32,23 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ChangeProductCategory
 
             ChangeProductCategoryValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
-            var newCategoryExists = await _categoryRepository.ExistsAndActiveAsync(request.NewCategoryId.ToDomain(), cancellationToken);
+            var newCategoryExists = await _categoryRepository.ExistsAndActiveAsync(request.CategoryId.ToDomain(), cancellationToken);
 
             if (!newCategoryExists)
-                throw new CategoryNotFoundException(request.NewCategoryId.Value);
+                throw new CategoryNotFoundException(request.CategoryId.Value);
 
-            product.ChangeCategory(request.NewCategoryId.ToDomain());
-            var newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
+            product.ChangeCategory(request.CategoryId.ToDomain());
+            var RowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
             return new ChangeProductCategoryResponse(
                 product.ProductId.ToDto(),
                 product.CategoryId.ToDto(),
-                newRowVersion);
+                RowVersion);
         }
     }
 }

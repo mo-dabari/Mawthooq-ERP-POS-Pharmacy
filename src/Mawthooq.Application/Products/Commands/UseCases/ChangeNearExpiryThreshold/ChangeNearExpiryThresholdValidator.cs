@@ -14,17 +14,17 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ChangeNearExpiryThresh
         {
             List<string> errors = new();
 
-            if (RequiredValidator.ValidateAndCollect(request.ProductIdDto, nameof(request.ProductIdDto), errors))
+            if (RequiredValidator.ValidateAndCollect(request.ProductId, nameof(request.ProductId), errors))
                 GuidValidator.ValidateAndCollect(
-                    request.ProductIdDto.Value,
-                    nameof(request.ProductIdDto)
+                    request.ProductId.Value,
+                    nameof(request.ProductId)
                     , errors);
 
             RangeValidator.ValidateRange(
-                request.NewNearExpiryThresholdInDays,
+                request.NearExpiryThresholdInDays,
                 Product.MinDays,
                 Product.MaxDays,
-                nameof(request.NewNearExpiryThresholdInDays)
+                nameof(request.NearExpiryThresholdInDays)
                 , errors);
 
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);

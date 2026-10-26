@@ -27,28 +27,31 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit
 
             AddingNewBarcodeToUnitValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
-            if (await _productRepository.ExistsByBarcodeAsync(request.BarcodeDto.ToDomain(), cancellationToken))
-                throw new DuplicateBarcodeException(request.BarcodeDto.Value);
+            if (await _productRepository.ExistsByBarcodeAsync(request.Barcode.ToDomain(), cancellationToken))
+                throw new DuplicateBarcodeException(request.Barcode.Value);
 
             product.AddCompanyBarcodeToVersion(
-                request.PackagingVersionIdDto.ToDomain(),
-                request.UnitName,
-                request.BarcodeDto.ToDomain());
+                request.PackagingVersionId.ToDomain(),
+                request.Unit,
+                request.Barcode.ToDomain());
 
             byte[] newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
-            var unit = product.PackagingVersions
-                .Single(pv => pv.PackagingVersionId.Value == request.PackagingVersionIdDto.Value)
-                .Units.Single(u => u.Unit == request.UnitName);
+            var packagingVersion = product.PackagingVersions
+                .Single(pv => pv.PackagingVersionId.Value == request.PackagingVersionId.Value);
+
+            var unit = packagingVersion
+                .Units.Single(u => u.Unit == request.Unit);
 
             return new AddingNewBarcodeToUnitResponse(
                 product.ProductId.ToDto(),
-                request.UnitName,
+                packagingVersion.PackagingVersionId.ToDto(),
+                unit.Unit,
                 unit.Barcodes
                 .Select(ub => ub.ToDto())
                 .ToList(),

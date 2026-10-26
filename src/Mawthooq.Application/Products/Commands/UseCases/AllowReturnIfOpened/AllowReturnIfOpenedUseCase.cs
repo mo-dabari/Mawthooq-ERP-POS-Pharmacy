@@ -26,10 +26,10 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AllowReturnIfOpened
 
             AllowReturnIfOpenedValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
             product.AllowReturnIfOpened();
 

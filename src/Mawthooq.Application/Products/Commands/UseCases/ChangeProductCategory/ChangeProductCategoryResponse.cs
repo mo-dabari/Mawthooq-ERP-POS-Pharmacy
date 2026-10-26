@@ -8,7 +8,7 @@ using Mawthooq.Application.Products.Commands.DTOs;
 namespace Mawthooq.Application.Products.Commands.UseCases.ChangeProductCategory
 {
     public record class ChangeProductCategoryResponse(
-        ProductIdDto ProductIdDto,
-        CategoryIdDto NewCategoryId,
-        byte[] NewRowVersion);
+        ProductIdDto ProductId,
+        CategoryIdDto CategoryId,
+        byte[] RowVersion);
 }

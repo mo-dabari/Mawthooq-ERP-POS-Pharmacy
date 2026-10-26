@@ -37,11 +37,11 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddPackagingVersion
 
             var (product, _) =
                 await _productRepository.GetByIdAsync(
-                    request.ProductIdDto.ToDomain(),
+                    request.ProductId.ToDomain(),
                     cancellationToken);
 
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
             ProductPackaging packaging =
                 request.Packaging.ToDomain(request.Template);
@@ -51,7 +51,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddPackagingVersion
             byte[] newRowVersion =
                 await _productRepository.UpdateAsync(
                     product,
-                    request.ExpectedRowVersion,
+                    request.RowVersion,
                     cancellationToken);
 
             PackagingVersion packagingVersion =

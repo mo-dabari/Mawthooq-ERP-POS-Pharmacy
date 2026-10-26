@@ -9,10 +9,10 @@ using Mawthooq.Domain.Products.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.AddingNewBarcodeToUnit
 {
     public record class AddingNewBarcodeToUnitRequest(
-        ProductIdDto ProductIdDto,
-        PackagingVersionIdDto PackagingVersionIdDto,
-        UnitOfMeasure UnitName,
-        BarcodeDto BarcodeDto,
+        ProductIdDto ProductId,
+        PackagingVersionIdDto PackagingVersionId,
+        UnitOfMeasure Unit,
+        BarcodeDto Barcode,
         byte[] RowVersion);
 
 }

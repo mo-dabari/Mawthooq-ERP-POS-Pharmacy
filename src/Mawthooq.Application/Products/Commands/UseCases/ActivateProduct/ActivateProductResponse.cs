@@ -8,8 +8,8 @@ using Mawthooq.Domain.SharedKernel.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.ActivateProduct
 {
     public record class ActivateProductResponse(
-        ProductIdDto ProductIdDto,
-        string Name,
-        Status NewStatus,
+        ProductIdDto ProductId,
+        string TradeName,
+        Status Status,
         byte[] RowVersion);
 }

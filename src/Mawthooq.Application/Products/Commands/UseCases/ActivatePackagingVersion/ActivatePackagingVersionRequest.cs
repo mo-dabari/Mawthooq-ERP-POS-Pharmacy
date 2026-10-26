@@ -8,7 +8,7 @@ using Mawthooq.Domain.Products.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.ActivatePackagingVersion
 {
     public record class ActivatePackagingVersionRequest(
-        ProductIdDto ProductIdDto,
+        ProductIdDto ProductId,
         PackagingVersionIdDto PackagingVersionId,
         byte[] RowVersion);
 }

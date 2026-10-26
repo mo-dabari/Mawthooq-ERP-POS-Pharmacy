@@ -26,12 +26,12 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ChangeNearExpiryThresh
 
             ChangeNearExpiryThresholdValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
-            product.ChangeNearExpiryThreshold(request.NewNearExpiryThresholdInDays);
+            product.ChangeNearExpiryThreshold(request.NearExpiryThresholdInDays);
             var newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
             return new ChangeNearExpiryThresholdResponse(
