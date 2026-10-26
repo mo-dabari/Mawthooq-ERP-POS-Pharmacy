@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Queries.Common.Pagination;
-using Mawthooq.Application.Products.Queries.UseCases.GetProducs;
 
 namespace Mawthooq.Application.Products.Queries.UseCases.GetProducts
 {
@@ -23,6 +22,8 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProducts
             CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(query, nameof(query));
+
+            GetProductsQueryValidator.Validate(query);
 
             return _getProductsQueryRepository.GetProductsAsync(query, cancellationToken);
         }

@@ -21,8 +21,7 @@ namespace Mawthooq.Application.Products.Queries.UseCases.ScanProductBarcode
         {
             ArgumentNullException.ThrowIfNull(query, nameof(query));
 
-            if (string.IsNullOrWhiteSpace(query.Barcode))
-                throw new ArgumentException("Barcode must not be empty.", nameof(query));
+            ScanProductBarcodeQueryValidator.Validate(query);
 
             return _scanProductBarcodeQueryRepository.ScanProductBarcodeAsync(query, cancellationToken);
         }

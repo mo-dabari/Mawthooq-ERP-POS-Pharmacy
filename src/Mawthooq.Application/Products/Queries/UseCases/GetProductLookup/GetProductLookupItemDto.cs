@@ -7,7 +7,7 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProductLookup
 {
     public sealed record GetProductLookupItemDto(
          Guid ProductId,
-         string DisplayName,
+         string TradeName,
          string Sku,
          string InternalBarcode);
 }

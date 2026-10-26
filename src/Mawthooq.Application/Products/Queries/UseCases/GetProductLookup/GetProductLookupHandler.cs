@@ -21,6 +21,8 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProductLookup
         {
             ArgumentNullException.ThrowIfNull(query, nameof(query));
 
+            GetProductLookupQueryValidator.Validate(query);
+
             return _getProductLookupQueryRepository.GetProductLookupAsync(query, cancellationToken);
         }
     }

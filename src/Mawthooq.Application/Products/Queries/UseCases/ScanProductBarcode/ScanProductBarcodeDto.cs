@@ -11,7 +11,7 @@ namespace Mawthooq.Application.Products.Queries.UseCases.ScanProductBarcode
         string TradeName,
         string Sku,
         Guid PackagingVersionId,
-        string UnitName,
+        string Unit,
         int ConversionRate,
         string MatchedBarcode,
         Status Status);

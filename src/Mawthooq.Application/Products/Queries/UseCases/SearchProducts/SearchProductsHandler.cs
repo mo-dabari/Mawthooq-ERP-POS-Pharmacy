@@ -22,8 +22,7 @@ namespace Mawthooq.Application.Products.Queries.UseCases.SearchProducts
         {
             ArgumentNullException.ThrowIfNull(query, nameof(query));
 
-            if (string.IsNullOrWhiteSpace(query.SearchText))
-                throw new ArgumentException("Search text must not be empty.", nameof(query));
+            SearchProductsQueryValidator.Validate(query);
 
             return _searchProductsQueryRepository.SearchProductsAsync(query, cancellationToken);
         }
