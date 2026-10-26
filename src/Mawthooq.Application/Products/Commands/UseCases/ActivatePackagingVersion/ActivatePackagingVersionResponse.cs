@@ -9,7 +9,7 @@ using Mawthooq.Domain.SharedKernel.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.ActivatePackagingVersion
 {
     public record class ActivatePackagingVersionResponse(
-        ProductIdDto ProductIdDto,
+        ProductIdDto ProductId,
         PackagingVersionIdDto PackagingVersionId,
         Status Status,
         byte[] RowVersion);

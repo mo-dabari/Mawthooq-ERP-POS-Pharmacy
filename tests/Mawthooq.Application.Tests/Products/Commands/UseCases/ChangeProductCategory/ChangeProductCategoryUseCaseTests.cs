@@ -59,8 +59,8 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeProductCat
             var response = await _sut.ExecuteAsync(request);
 
             productValid.CategoryId.Should().Be(newCategoryId);
-            response.NewCategoryId.Should().Be(newCategoryId.ToDto());
-            response.NewRowVersion.Should().BeEquivalentTo(newRowVersion);
+            response.CategoryId.Should().Be(newCategoryId.ToDto());
+            response.RowVersion.Should().BeEquivalentTo(newRowVersion);
 
             _productRepositoryMock
                 .Verify(pr => pr.UpdateAsync(

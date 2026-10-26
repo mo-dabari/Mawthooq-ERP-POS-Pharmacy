@@ -117,8 +117,8 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
                 .Barcodes;
 
             var expectedUserBarcodeValue = request.UserBarcodes?
-                .Single(b => b.BarcodeDto.Type == BarcodeType.EAN13)
-                .BarcodeDto.Value;
+                .Single(b => b.Barcode.Type == BarcodeType.EAN13)
+                .Barcode.Value;
 
             barcodes.Should().HaveCount(2);
             barcodes.Should().Contain(b => b.Type == BarcodeType.Internal);
@@ -293,7 +293,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
 
             var request = CreateValidRequest(categoryId);
 
-            return new CreateProductRequest(request.ProductInformationDto, request.PackagingDto, userUnitBarcodes);
+            return new CreateProductRequest(request.ProductInformation, request.Packaging, userUnitBarcodes);
         }
     }
 }

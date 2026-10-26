@@ -27,28 +27,36 @@ namespace Mawthooq.Application.Products.Commands.UseCases.RemoveCompanyBarcodeTo
 
             RemoveCompanyBarcodeToUnitValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
-            if (!await _productRepository.ExistsByBarcodeAsync(request.BarcodeDto.ToDomain(), cancellationToken))
-                throw new BarcodeNotFoundException(request.BarcodeDto.Value);
+            var barcode = request.Barcode.ToDomain();
+            var existsInProduct = product.PackagingVersions
+                .SelectMany(v => v.Units)
+                .SelectMany(u => u.Barcodes)
+                .Any(b => b.Value == barcode.Value);
+            if (!existsInProduct)
+                throw new BarcodeNotFoundException(request.Barcode.Value);
 
             product.RemoveCompanyBarcodeFromVersion(
-                request.PackagingVersionIdDto.ToDomain(),
-                request.UnitName,
-                request.BarcodeDto.ToDomain());
+                request.PackagingVersionId.ToDomain(),
+                request.Unit,
+                request.Barcode.ToDomain());
 
             byte[] newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
-            var unit = product.PackagingVersions
-                .Single(pv => pv.PackagingVersionId.Value == request.PackagingVersionIdDto.Value)
-                .Units.Single(u => u.Unit == request.UnitName);
+            var PackagingVersion = product.PackagingVersions
+                .Single(pv => pv.PackagingVersionId.Value == request.PackagingVersionId.Value);
+
+            var unit = PackagingVersion
+                .Units.Single(u => u.Unit == request.Unit);
 
             return new RemoveCompanyBarcodeToUnitResponse(
                 product.ProductId.ToDto(),
-                request.UnitName,
+                PackagingVersion.PackagingVersionId.ToDto(),
+                request.Unit,
                 unit.Barcodes
                 .Select(ub => ub.ToDto())
                 .ToList(),

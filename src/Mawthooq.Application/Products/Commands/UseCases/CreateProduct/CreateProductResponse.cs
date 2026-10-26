@@ -7,8 +7,6 @@ using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.LocalAgents.DTOs;
 using Mawthooq.Application.Manufacturers.DTOs;
 using Mawthooq.Application.Products.Commands.DTOs;
-using Mawthooq.Domain.Products.Enums;
-using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 {
@@ -26,16 +24,4 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
         IReadOnlyList<PackagingVersionDto> PackagingVersions,
         byte[] RowVersion);
-
-    public record PackagingVersionDto(
-        PackagingVersionIdDto PackagingVersionId,
-        int Version,
-        Status Status,
-        IReadOnlyList<ProductUnitDetailsDto> Units);
-
-    public record class ProductUnitDetailsDto(
-    UnitOfMeasure Unit,
-    int ConversionRate,
-    UnitRank Rank,
-    IReadOnlyList<BarcodeDto> Barcodes);
 }

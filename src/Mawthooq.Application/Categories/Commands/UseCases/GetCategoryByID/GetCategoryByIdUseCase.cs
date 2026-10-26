@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.DTOs;
 using Mawthooq.Application.Categories.Commands.Mappers;
 using Mawthooq.Application.Categories.Exceptions;
-using Mawthooq.Application.Products.Commands.DTOs;
+using Mawthooq.Application.Categories.UseCases.GetCategoryByID;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Domain.Categories;
 
-namespace Mawthooq.Application.Categories.UseCases.GetCategoryByID
+namespace Mawthooq.Application.Categories.Commands.UseCases.GetCategoryByID
 {
     public class GetCategoryByIdUseCase
     {

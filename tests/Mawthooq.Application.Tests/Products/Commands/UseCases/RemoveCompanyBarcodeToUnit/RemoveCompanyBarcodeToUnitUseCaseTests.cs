@@ -60,7 +60,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.RemoveCompanyBar
             var response = await _sut.ExecuteAsync(request);
 
             response.Barcodes.Should().NotContain(b => b.Value == barcode.Value);
-            response.NewRowVersion.Should().BeEquivalentTo(newRowVersion);
+            response.RowVersion.Should().BeEquivalentTo(newRowVersion);
 
             _productRepositoryMock.Verify(
                 r => r.UpdateAsync(product, requestRowVersion, It.IsAny<CancellationToken>()),
@@ -77,10 +77,6 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.RemoveCompanyBar
             _productRepositoryMock
                 .Setup(r => r.GetByIdAsync(product.ProductId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((product, (byte[]?)null));
-
-            _productRepositoryMock
-                .Setup(r => r.ExistsByBarcodeAsync(It.IsAny<Barcode>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
 
             var request = new RemoveCompanyBarcodeToUnitRequest(
                 product.ProductId.ToDto(),

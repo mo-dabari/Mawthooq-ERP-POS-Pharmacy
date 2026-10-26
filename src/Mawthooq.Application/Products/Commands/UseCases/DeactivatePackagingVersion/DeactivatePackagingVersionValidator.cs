@@ -13,11 +13,11 @@ namespace Mawthooq.Application.Products.Commands.UseCases.DeactivatePackagingVer
         {
             List<string> errors = new();
 
-            if (RequiredValidator.ValidateAndCollect(request.ProductIdDto, nameof(request.ProductIdDto), errors))
-                GuidValidator.ValidateAndCollect(request.ProductIdDto.Value, nameof(request.ProductIdDto), errors);
+            if (RequiredValidator.ValidateAndCollect(request.ProductId, nameof(request.ProductId), errors))
+                GuidValidator.ValidateAndCollect(request.ProductId.Value, nameof(request.ProductId), errors);
 
-            if (RequiredValidator.ValidateAndCollect(request.packagingVersionId, nameof(request.packagingVersionId), errors))
-                GuidValidator.ValidateAndCollect(request.packagingVersionId.Value, nameof(request.packagingVersionId), errors);
+            if (RequiredValidator.ValidateAndCollect(request.PackagingVersionId, nameof(request.PackagingVersionId), errors))
+                GuidValidator.ValidateAndCollect(request.PackagingVersionId.Value, nameof(request.PackagingVersionId), errors);
 
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 

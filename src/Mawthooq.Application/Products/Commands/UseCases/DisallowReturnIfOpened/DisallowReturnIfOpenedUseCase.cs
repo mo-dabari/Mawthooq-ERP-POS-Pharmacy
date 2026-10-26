@@ -25,17 +25,18 @@ namespace Mawthooq.Application.Products.Commands.UseCases.DisallowReturnIfOpened
 
             DisallowReturnIfOpenedValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
             product.DisallowReturnIfOpened();
-            var newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
+            var RowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
             return new DisallowReturnIfOpenedResponse(
                 product.ProductId.ToDto(),
+                product.TradeName,
                 product.CanBeReturnedIfOpened,
-                newRowVersion);
+                RowVersion);
         }
     }
 }

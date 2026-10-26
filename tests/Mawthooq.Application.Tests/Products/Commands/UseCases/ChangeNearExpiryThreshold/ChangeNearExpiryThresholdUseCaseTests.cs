@@ -46,7 +46,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.ChangeNearExpiry
             var response = await _sut.ExecuteAsync(request);
 
             response.NearExpiryThresholdInDays.Should().Be(Product.MinDays);
-            response.Name.Should().Be(product.TradeName);
+            response.TradeName.Should().Be(product.TradeName);
             response.RowVersion.Should().BeEquivalentTo(newRowVersion);
 
             _productRepositoryMock.Verify(

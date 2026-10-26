@@ -13,13 +13,13 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
         {
             List<string> errors = new();
 
-            if (RequiredValidator.ValidateAndCollect(request.ProductIdDto, nameof(request.ProductIdDto), errors))
-                GuidValidator.ValidateAndCollect(request.ProductIdDto.Value, nameof(request.ProductIdDto.Value), errors);
+            if (RequiredValidator.ValidateAndCollect(request.ProductId, nameof(request.ProductId), errors))
+                GuidValidator.ValidateAndCollect(request.ProductId.Value, nameof(request.ProductId.Value), errors);
 
             StringValidator.ValidateAndCollect(request.TradeName, nameof(request.TradeName), 50, errors);
 
-            if (RequiredValidator.ValidateAndCollect(request.CategoryIdDto, nameof(request.CategoryIdDto), errors))
-                GuidValidator.ValidateAndCollect(request.CategoryIdDto.Value, nameof(request.CategoryIdDto.Value), errors);
+            if (RequiredValidator.ValidateAndCollect(request.CategoryId, nameof(request.CategoryId), errors))
+                GuidValidator.ValidateAndCollect(request.CategoryId.Value, nameof(request.CategoryId.Value), errors);
 
             if (RequiredValidator.ValidateAndCollect(
             request.Image,

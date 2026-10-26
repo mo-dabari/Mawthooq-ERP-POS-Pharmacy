@@ -44,8 +44,8 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.DiscontinueProdu
 
             var response = await _sut.ExecuteAsync(request);
 
-            response.NewStatus.Should().Be(Status.Inactive);
-            response.Name.Should().Be(product.TradeName);
+            response.Status.Should().Be(Status.Inactive);
+            response.TradeName.Should().Be(product.TradeName);
             response.RowVersion.Should().BeEquivalentTo(newRowVersion);
 
             _productRepositoryMock

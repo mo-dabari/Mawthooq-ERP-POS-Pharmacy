@@ -7,7 +7,7 @@ namespace Mawthooq.Application.Products.Queries.Common.Pagination
 {
     public sealed record PagedResult<T>
     (
-        IReadOnlyList<T> items,
+        IReadOnlyList<T> Items,
 
         int TotalCount,
 

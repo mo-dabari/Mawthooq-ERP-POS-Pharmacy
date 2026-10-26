@@ -7,6 +7,6 @@ using Mawthooq.Application.Products.Commands.DTOs;
 namespace Mawthooq.Application.Products.Commands.UseCases.ActivateProduct
 {
     public record class ActivateProductRequest(
-        ProductIdDto ProductIdDto,
+        ProductIdDto ProductId,
         byte[] RowVersion);
 }

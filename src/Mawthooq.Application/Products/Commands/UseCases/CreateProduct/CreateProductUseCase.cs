@@ -46,14 +46,14 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             CreateProductValidator.Validate(request);
 
             var info =
-                request.ProductInformationDto;
+                request.ProductInformation;
 
             var (category, _) = await _categoryRepository.GetByIdAsync(
-                info.CategoryIdDto.ToDomain(),
+                info.CategoryId.ToDomain(),
                 cancellationToken);
 
             if (category == null)
-                throw new CategoryNotFoundException(info.CategoryIdDto.Value);
+                throw new CategoryNotFoundException(info.CategoryId.Value);
 
             SKU sKU = info.Sku.ToDomain();
 
@@ -65,11 +65,11 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
                 foreach (var userBarcode in request.UserBarcodes)
                 {
-                    var barcodeDomain = userBarcode.BarcodeDto.ToDomain();
+                    var barcodeDomain = userBarcode.Barcode.ToDomain();
 
                     if (await _productRepository.ExistsByBarcodeAsync(barcodeDomain, cancellationToken))
                     {
-                        throw new DuplicateBarcodeException(userBarcode.BarcodeDto.Value);
+                        throw new DuplicateBarcodeException(userBarcode.Barcode.Value);
                     }
                 }
             }
@@ -78,10 +78,10 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                 request.ToPackagingDomain();
 
             var manufacturerId =
-                ManufacturerId.From(info.ManufacturerIdDto.Value);
+                ManufacturerId.From(info.ManufacturerId.Value);
 
             var localAgentId =
-                LocalAgentId.From(info.LocalAgentIdDto.Value);
+                LocalAgentId.From(info.LocalAgentId.Value);
 
             var image =
                 info.Image.ToDomain();
@@ -111,7 +111,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                     product.AddCompanyBarcodeToVersion(
                         firstVersionId,
                         userBarcode.Unit,
-                        userBarcode.BarcodeDto.ToDomain());
+                        userBarcode.Barcode.ToDomain());
                 }
             }
 

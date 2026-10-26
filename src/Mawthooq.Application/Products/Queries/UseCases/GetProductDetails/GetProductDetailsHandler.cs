@@ -23,6 +23,8 @@ namespace Mawthooq.Application.Products.Queries.UseCases.GetProductDetails
         {
             ArgumentNullException.ThrowIfNull(query, nameof(query));
 
+            GetProductDetailsQueryValidator.Validate(query);
+
             return _getProductDetailsQueryRepository.GetProductDetailsAsync(query, cancellationToken);
         }
     }

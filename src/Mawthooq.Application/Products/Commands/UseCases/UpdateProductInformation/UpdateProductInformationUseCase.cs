@@ -34,13 +34,13 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
 
             UpdateProductInformationValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
-            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryIdDto.ToDomain(), cancellationToken);
+            var (category, _) = await _categoryRepository.GetByIdAsync(request.CategoryId.ToDomain(), cancellationToken);
             if (category is null)
-                throw new CategoryNotFoundException(request.CategoryIdDto.Value);
+                throw new CategoryNotFoundException(request.CategoryId.Value);
 
             if (product.RequiresExpiryTracking)
             {

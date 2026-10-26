@@ -13,11 +13,11 @@ namespace Mawthooq.Application.Products.Commands.UseCases.ChangeProductCategory
         {
             List<string> errors = new();
 
-            if (RequiredValidator.ValidateAndCollect(request.ProductIdDto, nameof(request.ProductIdDto), errors))
-                GuidValidator.ValidateAndCollect(request.ProductIdDto.Value, nameof(request.ProductIdDto), errors);
+            if (RequiredValidator.ValidateAndCollect(request.ProductId, nameof(request.ProductId), errors))
+                GuidValidator.ValidateAndCollect(request.ProductId.Value, nameof(request.ProductId), errors);
 
-            if (RequiredValidator.ValidateAndCollect(request.NewCategoryId, nameof(request.NewCategoryId), errors))
-                GuidValidator.ValidateAndCollect(request.NewCategoryId.Value, nameof(request.NewCategoryId), errors);
+            if (RequiredValidator.ValidateAndCollect(request.CategoryId, nameof(request.CategoryId), errors))
+                GuidValidator.ValidateAndCollect(request.CategoryId.Value, nameof(request.CategoryId), errors);
 
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 

@@ -7,13 +7,13 @@ using Mawthooq.Application.Categories.Commands.Mappers;
 using Mawthooq.Application.Common.Mappers;
 using Mawthooq.Application.LocalAgents.Mappers;
 using Mawthooq.Application.Manufacturers.Mappers;
-using Mawthooq.Application.Products.Commands.UseCases.CreateProduct;
+using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.ValueObjects.Packaging;
 
 
 
-namespace Mawthooq.Application.Products.Commands.Mappers
+namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 {
     public static class CreateProductMapper
     {
@@ -22,9 +22,9 @@ namespace Mawthooq.Application.Products.Commands.Mappers
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            var info = request.ProductInformationDto;
+            var info = request.ProductInformation;
 
-            return request.PackagingDto.ToDomain(info.Template);
+            return request.Packaging.ToDomain(info.Template);
         }
 
         public static CreateProductResponse ToResponseCreate(

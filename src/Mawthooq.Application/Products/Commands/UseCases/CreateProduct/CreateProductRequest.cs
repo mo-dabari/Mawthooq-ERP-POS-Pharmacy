@@ -13,13 +13,13 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 {
     public record class CreateProductRequest(
 
-        BasicInformation ProductInformationDto,
+        BasicInformation ProductInformation,
 
-        PackagingInformation PackagingDto,
+        PackagingInformation Packaging,
 
         List<UserUnitBarcodeDto>? UserBarcodes
         );
-    public sealed record UserUnitBarcodeDto(UnitOfMeasure Unit, BarcodeDto BarcodeDto);
+    public sealed record UserUnitBarcodeDto(UnitOfMeasure Unit, BarcodeDto Barcode);
 
     public record class PackagingInformation(
         int? TotalUnitsPerBox,
@@ -34,9 +34,9 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
     public sealed record BasicInformation(
             string TradeName,
             SkuDto Sku,
-            CategoryIdDto CategoryIdDto,
-            ManufacturerIdDto ManufacturerIdDto,
-            LocalAgentIdDto LocalAgentIdDto,
+            CategoryIdDto CategoryId,
+            ManufacturerIdDto ManufacturerId,
+            LocalAgentIdDto LocalAgentId,
             PackagingTemplate Template,
             ImageDto Image,
             bool RequiresExpiryTracking,

@@ -9,8 +9,8 @@ using Mawthooq.Domain.SharedKernel.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.DeactivatePackagingVersion
 {
     public record class DeactivatePackagingVersionResponse(
-        ProductIdDto ProductIdDto,
-        PackagingVersionIdDto packagingVersionId,
+        ProductIdDto ProductId,
+        PackagingVersionIdDto PackagingVersionId,
         Status Status,
         byte[] RowVersion);
 }

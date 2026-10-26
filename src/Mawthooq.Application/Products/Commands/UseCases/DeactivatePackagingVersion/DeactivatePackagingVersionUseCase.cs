@@ -26,20 +26,20 @@ namespace Mawthooq.Application.Products.Commands.UseCases.DeactivatePackagingVer
 
             DeactivatePackagingVersionValidator.Validate(request);
 
-            var (product, _) = await _productRepository.GetByIdAsync(request.ProductIdDto.ToDomain(), cancellationToken);
+            var (product, _) = await _productRepository.GetByIdAsync(request.ProductId.ToDomain(), cancellationToken);
 
             if (product is null)
-                throw new ProductNotFoundException(request.ProductIdDto.Value);
+                throw new ProductNotFoundException(request.ProductId.Value);
 
-            product.DeactivatePackagingVersions(request.packagingVersionId.ToDomain());
+            product.DeactivatePackagingVersions(request.PackagingVersionId.ToDomain());
 
             var newRowVersion = await _productRepository.UpdateAsync(product, request.RowVersion, cancellationToken);
 
             return new DeactivatePackagingVersionResponse(
                 product.ProductId.ToDto(),
-                request.packagingVersionId,
+                request.PackagingVersionId,
                 product.PackagingVersions.Single(
-                    pv => pv.PackagingVersionId.Value == request.packagingVersionId.ToDomain().Value).Status,
+                    pv => pv.PackagingVersionId.Value == request.PackagingVersionId.ToDomain().Value).Status,
                 newRowVersion);
         }
     }

@@ -14,15 +14,15 @@ namespace Mawthooq.Application.Products.Commands.UseCases.AddPackagingVersion
         {
             List<string> errors = new();
 
-            if (RequiredValidator.ValidateAndCollect(request.ProductIdDto, nameof(request.ProductIdDto), errors))
-                GuidValidator.ValidateAndCollect(request.ProductIdDto.Value, nameof(request.ProductIdDto), errors);
+            if (RequiredValidator.ValidateAndCollect(request.ProductId, nameof(request.ProductId), errors))
+                GuidValidator.ValidateAndCollect(request.ProductId.Value, nameof(request.ProductId), errors);
 
             EnumValidator.ValidateAndCollect(request.Template, nameof(request.Template), errors);
 
             if (RequiredValidator.ValidateAndCollect(request.Packaging, nameof(request.Packaging), errors))
                 PackagingInformationValidator.ValidateAndCollect(request.Template, request.Packaging, errors);
 
-            RowVersionValidator.ValidateAndCollect(request.ExpectedRowVersion, errors);
+            RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 
             if (errors.Count > 0)
                 throw new ValidationException(errors);

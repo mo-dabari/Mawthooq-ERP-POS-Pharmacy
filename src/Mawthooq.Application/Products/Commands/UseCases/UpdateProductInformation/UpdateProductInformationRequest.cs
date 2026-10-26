@@ -11,9 +11,9 @@ using Mawthooq.Domain.SharedKernel.Enums;
 namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformation
 {
     public record class UpdateProductInformationRequest(
-        ProductIdDto ProductIdDto,
+        ProductIdDto ProductId,
         string TradeName,
-        CategoryIdDto CategoryIdDto,
+        CategoryIdDto CategoryId,
         ImageDto Image,
         bool CanBeReturnedIfOpened,
         int NearExpiryThresholdInDays,

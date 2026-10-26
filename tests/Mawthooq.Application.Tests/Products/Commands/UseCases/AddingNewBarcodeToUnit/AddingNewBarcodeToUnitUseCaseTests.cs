@@ -62,7 +62,7 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.AddingNewBarcode
             var response = await _sut.ExecuteAsync(request);
 
             response.Barcodes.Should().Contain(b => b.Value == barcode.Value);
-            response.NewRowVersion.Should().BeEquivalentTo(newRowVersion);
+            response.RowVersion.Should().BeEquivalentTo(newRowVersion);
 
             _productRepositoryMock.Verify(
                 r => r.UpdateAsync(product, requestRowVersion, It.IsAny<CancellationToken>()),

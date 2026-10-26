@@ -7,6 +7,6 @@ using Mawthooq.Application.Products.Commands.DTOs;
 namespace Mawthooq.Application.Products.Commands.UseCases.AllowReturnIfOpened
 {
     public record class AllowReturnIfOpenedRequest (
-        ProductIdDto ProductIdDto,
+        ProductIdDto ProductId,
         byte[] RowVersion);
 }
