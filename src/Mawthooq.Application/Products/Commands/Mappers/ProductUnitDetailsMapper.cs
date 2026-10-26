@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Application.Products.Commands.UseCases.CreateProduct;
 using Mawthooq.Domain.Products.ValueObjects;
 
