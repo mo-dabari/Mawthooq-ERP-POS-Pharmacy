@@ -16,6 +16,8 @@ namespace Mawthooq.Application.Products.Queries.UseCases.SearchProducts
 
             StringValidator.ValidateAndCollect(query.SearchText, nameof(query.SearchText), errors);
 
+            EnumValidator.ValidateAndCollect(query.SearchBy, nameof(query.SearchBy), errors);
+
             RangeValidator.ValidateRange(query.MaxResults, 1, PagingDefaults.MaxResultsLimit, nameof(query.MaxResults), errors);
 
             if (errors.Count > 0) throw new ValidationException(errors);

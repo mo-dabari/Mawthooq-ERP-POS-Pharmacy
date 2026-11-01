@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mawthooq.Application.Products.Queries.Common.Enums;
 
 namespace Mawthooq.Application.Products.Queries.UseCases.SearchProducts
 {
     public class SearchProductsHandler
     {
-        private readonly ISearchProductsQueryRepository _searchProductsQueryRepository;
-
-        public SearchProductsHandler(ISearchProductsQueryRepository searchProductsQueryRepository)
+        private readonly IReadOnlyDictionary<ProductSearchBy, ISearchProductsQueryRepository> _repositories;
+        public SearchProductsHandler(IEnumerable<ISearchProductsQueryRepository> repositories)
         {
-            ArgumentNullException.ThrowIfNull(searchProductsQueryRepository, nameof(searchProductsQueryRepository));
+            ArgumentNullException.ThrowIfNull(repositories, nameof(repositories));
 
-            _searchProductsQueryRepository = searchProductsQueryRepository;
+            _repositories = repositories.ToDictionary(repository => repository.SearchBy);
         }
 
         public Task<IReadOnlyList<ProductSearchResultDto>> HandleAsync(
@@ -24,7 +24,9 @@ namespace Mawthooq.Application.Products.Queries.UseCases.SearchProducts
 
             SearchProductsQueryValidator.Validate(query);
 
-            return _searchProductsQueryRepository.SearchProductsAsync(query, cancellationToken);
+            return _repositories.TryGetValue(query.SearchBy, out ISearchProductsQueryRepository? repository)
+            ? repository.SearchProductsAsync(query, cancellationToken)
+            : throw new NotSupportedException($"No search implementation is registered for '{query.SearchBy}'.");
         }
     }
 }
