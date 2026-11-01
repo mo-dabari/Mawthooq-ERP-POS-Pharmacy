@@ -8,7 +8,7 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProducts
 {
     internal sealed record DetailsRow(
         Guid ProductId, string TradeName, string Sku, string CategoryName, string ManufacturerName, string LocalAgentName,
-        bool CanBeReturnedIfOpened, byte ProductStatus, string ImageStorageKey,
+        bool CanBeReturnedIfOpened, int NearExpiryThresholdInDays, byte ProductStatus, string ImageStorageKey, byte[] RowVersion,
         Guid PackagingVersionId, int Version, byte PackagingVersionStatus,
         byte Unit, int ConversionRate, byte Rank, string BarcodeValue, byte BarcodeType)
     {
@@ -20,8 +20,10 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProducts
             reader.GetString(reader.GetOrdinal("ManufacturerName")),
             reader.GetString(reader.GetOrdinal("LocalAgentName")),
             reader.GetBoolean(reader.GetOrdinal("CanBeReturnedIfOpened")),
+            reader.GetInt32(reader.GetOrdinal("NearExpiryThresholdInDays")),
             reader.GetByte(reader.GetOrdinal("ProductStatus")),
             reader.GetString(reader.GetOrdinal("ImageStorageKey")),
+            reader.GetFieldValue<byte[]>(reader.GetOrdinal("RowVersion")),
             reader.GetGuid(reader.GetOrdinal("PackagingVersionId")),
             reader.GetInt32(reader.GetOrdinal("Version")),
             reader.GetByte(reader.GetOrdinal("PackagingVersionStatus")),

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
 using Microsoft.Data.SqlClient;
 
-namespace Mawthooq.Infrastructure.ADO.Persistence.Connections
+namespace Mawthooq.Infrastructure.AdoNet.Persistence.Connections
 {
-    internal sealed class DbConnectionProvider : IDbConnectionProvider
+    internal sealed class DbConnectionProvider : IDbConnectionProvider, IAsyncDisposable
     {
         private readonly string _connectionString;
         private SqlConnection? _connection;
@@ -21,15 +20,13 @@ namespace Mawthooq.Infrastructure.ADO.Persistence.Connections
 
         public async Task<SqlConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
         {
-            if (_connection is null)
-            {
-                _connection = new SqlConnection(_connectionString);
+            _connection ??= new SqlConnection(_connectionString);
+
+            if (_connection.State == ConnectionState.Broken)
+                await _connection.CloseAsync();
+
+            if (_connection.State != ConnectionState.Open)
                 await _connection.OpenAsync(cancellationToken);
-            }
-            else if (_connection.State != ConnectionState.Open)
-            {
-                await _connection.OpenAsync(cancellationToken);
-            }
 
             return _connection;
         }
@@ -37,7 +34,10 @@ namespace Mawthooq.Infrastructure.ADO.Persistence.Connections
         public async ValueTask DisposeAsync()
         {
             if (_connection is not null)
+            {
                 await _connection.DisposeAsync();
+                _connection = null;
+            }
         }
     }
 }

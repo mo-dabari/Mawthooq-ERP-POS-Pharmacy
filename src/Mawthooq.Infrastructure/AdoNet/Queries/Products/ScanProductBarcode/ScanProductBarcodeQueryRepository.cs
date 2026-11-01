@@ -11,7 +11,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.ScanProductBarcode
 {
-    public sealed class ScanProductBarcodeQueryRepository : IScanProductBarcodeQueryRepository
+    internal sealed class ScanProductBarcodeQueryRepository : IScanProductBarcodeQueryRepository
     {
         private readonly IDbConnectionProvider _connectionProvider;
 

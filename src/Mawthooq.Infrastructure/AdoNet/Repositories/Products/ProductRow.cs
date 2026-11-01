@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
-namespace Mawthooq.Infrastructure.AdoNet.Repositories
+namespace Mawthooq.Infrastructure.AdoNet.Repositories.Products
 {
     internal sealed record ProductRow(
     Guid ProductId, string TradeName, string Sku, Guid CategoryId, Guid ManufacturerId, Guid LocalAgentId,

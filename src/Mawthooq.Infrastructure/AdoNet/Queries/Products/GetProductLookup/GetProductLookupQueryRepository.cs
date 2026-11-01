@@ -5,11 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Queries.UseCases.GetProductLookup;
 using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
+using Mawthooq.Infrastructure.AdoNet.Shared;
 using Microsoft.Data.SqlClient;
 
 namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductLookup
 {
-    public class GetProductLookupQueryRepository : IGetProductLookupQueryRepository
+    internal sealed class GetProductLookupQueryRepository : IGetProductLookupQueryRepository
     {
         private readonly IDbConnectionProvider _connectionProvider;
 
@@ -26,7 +27,7 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductLookup
 
             var whereSql = string.IsNullOrWhiteSpace(query.SearchText)
                 ? ""
-                : "WHERE p.TradeName LIKE @SearchText";
+                : "WHERE p.TradeName LIKE @SearchText ESCAPE '\'";
 
             string sql = $"""
                     SELECT TOP (@MaxResults)
@@ -36,39 +37,50 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductLookup
                         dbo.Products p
 
                     CROSS APPLY
-                    (
-                        SELECT
-                            TOP (1) b.Value
+                        (
+                            SELECT
+                                TOP (1) b.Value
 
-                        FROM
-                            dbo.PackagingVersions pv
+                            FROM
+                                dbo.PackagingVersions pv
 
-                        INNER JOIN
-                            dbo.ProductUnits pu
-                        ON pu.PackagingVersionId = pv.PackagingVersionId
+                            INNER JOIN
+                                dbo.ProductUnits pu
+                            ON
+                                pu.PackagingVersionId = pv.PackagingVersionId
+                            AND
+                                pu.Rank = 1
 
-                        INNER JOIN
-                            dbo.Barcodes b
-                        ON b.ProductUnitId = pu.ProductUnitId
+                            INNER JOIN
+                                dbo.Barcodes b
+                            ON
+                                b.ProductUnitId = pu.ProductUnitId
+                            AND
+                                b.Type = 6
 
-                        WHERE
-                            pv.ProductId = p.ProductId
-                        AND
-                            pv.Status = 1
-                        AND
-                            pu.Rank = 1
-                        AND
-                            b.Type = 6
-                    ) ib
+                            WHERE
+                                    pv.ProductId = p.ProductId
+
+                            ORDER BY
+                                CASE WHEN
+                                    pv.Status = 1
+                                        THEN 0
+                                        ELSE 1
+                                END,
+                                    pv.Version DESC
+                        ) ib
+
                     {whereSql}
-                    ORDER BY p.TradeName;
+
+                    ORDER BY
+                        p.TradeName, p.ProductId;
                     """;
 
             await using SqlCommand command = new(sql, connection);
             command.Parameters.Add("@MaxResults", SqlDbType.Int).Value = query.MaxResults;
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))
-                command.Parameters.Add("@SearchText", SqlDbType.NVarChar, 100).Value = $"{query.SearchText}%";
+                command.Parameters.Add("@SearchText", SqlDbType.NVarChar, 100).Value = $"{SqlLike.Escape(query.SearchText)}%";
 
             List<GetProductLookupItemDto> items = [];
 
