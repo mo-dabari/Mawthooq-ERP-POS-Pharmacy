@@ -10,6 +10,5 @@ namespace Mawthooq.Domain.Categories
     public interface ICategoryRepository : IBaseRepository<Category, CategoryId>
     {
         Task<bool> ExistsAndActiveAsync(CategoryId categoryId, CancellationToken cancellationToken = default);
-        Task<Category?> GetByNameAsync(string categoryName, CancellationToken cancellationToken = default);
     }
 }
