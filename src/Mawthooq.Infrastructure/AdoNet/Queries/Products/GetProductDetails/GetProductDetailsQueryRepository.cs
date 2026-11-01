@@ -13,7 +13,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
 {
-    public class GetProductDetailsQueryRepository : IGetProductDetailsQueryRepository
+    internal sealed class GetProductDetailsQueryRepository : IGetProductDetailsQueryRepository
     {
         private readonly IDbConnectionProvider _connectionProvider;
 
@@ -31,65 +31,74 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
             SqlConnection connection = await _connectionProvider.GetConnectionAsync(cancellationToken);
 
             const string sql = """
-            SELECT
-                P.ProductId, P.TradeName, P.Sku, P.CategoryId, P.ManufacturerId, P.LocalAgentId, P.RequiresExpiryTracking,
-                P.CanBeReturnedIfOpened, P.NearExpiryThresholdInDays, P.Status as ProductStatus, P.ImageStorageKey,P.ImageFileName,P.ImageMimeType,P.RowVersion,
+                SELECT
+                    P.ProductId, P.TradeName, P.Sku, P.CategoryId, P.ManufacturerId, P.LocalAgentId, P.RequiresExpiryTracking,
 
-                Pv.PackagingVersionId, Pv.Version, Pv.Status as PackagingVersionStatus,
+                    P.CanBeReturnedIfOpened, P.NearExpiryThresholdInDays, P.Status AS ProductStatus,
 
-                Pu.ProductUnitId, Pu.Unit, Pu.ConversionRate, Pu.Rank,
+                    P.ImageStorageKey, P.ImageFileName, P.ImageMimeType, P.RowVersion,
 
-                Pb.BarcodeId, Pb.Value as BarcodeValue, Pb.Type as BarcodeType,
+                    Pv.PackagingVersionId, Pv.Version, Pv.Status AS PackagingVersionStatus,
 
-                C.Name as CategoryName,
+                    Pu.ProductUnitId, Pu.Unit, Pu.ConversionRate, Pu.Rank,
 
-                M.Name as ManufacturerName,
+                    Pb.BarcodeId, Pb.Value AS BarcodeValue, Pb.Type AS BarcodeType,
 
-                La.Name as LocalAgentName,
+                    C.Name AS CategoryName,
 
-            FROM
-                dbo.Products as P
+                    M.Name AS ManufacturerName,
 
-            INNER JOIN
-                dbo.PackagingVersions as Pv
-            ON
-                P.ProductId = Pv.ProductId
+                    La.Name AS LocalAgentName
 
-            INNER JOIN
-                dbo.ProductUnits as Pu
-            ON
-                Pv.PackagingVersionId = Pu.PackagingVersionId
+                FROM
+                    dbo.Products AS P
 
-            INNER JOIN
-                dbo.ProductUnitId as Pb
-            ON
-                Pu.ProductUnitId = Pb.ProductUnitId
+                INNER JOIN
+                    dbo.PackagingVersions AS Pv
+                ON
+                    Pv.ProductId = P.ProductId
 
-            INNER JOIN
-                dbo.Categories C
-            ON C.CategoryId = P.CategoryId
+                INNER JOIN
+                    dbo.ProductUnits AS Pu
+                ON
+                    Pu.PackagingVersionId = Pv.PackagingVersionId
 
-            INNER JOIN
-                dbo.Manufacturers M
-            ON M.ManufacturerId = P.ManufacturerId
+                INNER JOIN
+                    dbo.Barcodes AS Pb
+                ON
+                    Pb.ProductUnitId = Pu.ProductUnitId
 
-            INNER JOIN
-                dbo.LocalAgents La
-            ON La.LocalAgentId = P.LocalAgentId
+                INNER JOIN
+                    dbo.Categories AS C
+                ON
+                    C.CategoryId = P.CategoryId
 
-            WHERE
-                P.ProductId = @ProductId
+                INNER JOIN
+                    dbo.Manufacturers AS M
+                ON
+                    M.ManufacturerId = P.ManufacturerId
+
+                INNER JOIN
+                    dbo.LocalAgents AS La
+                ON
+                    La.LocalAgentId = P.LocalAgentId
+
+                WHERE
+                    P.ProductId = @ProductId
+
+                ORDER BY
+                    Pv.Version, Pu.Rank, Pb.BarcodeId
             """;
 
             await using SqlCommand command = new(sql, connection);
 
-            command.Parameters.Add("@ProductId", SqlDbType.UniqueIdentifier).Value = query.ProductId;
+            command.Parameters.Add("@ProductId", SqlDbType.UniqueIdentifier).Value = query.ProductId.Value;
 
-            var reader = await command.ExecuteReaderAsync();
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
             List<DetailsRow> rows = [];
 
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync(cancellationToken))
             {
                 rows.Add(DetailsRow.FromReader(reader));
             }
@@ -115,9 +124,11 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
                 first.ManufacturerName,
                 first.LocalAgentName,
                 first.CanBeReturnedIfOpened,
+                first.NearExpiryThresholdInDays,
                 (Status)first.ProductStatus,
                 first.ImageStorageKey,
-                packagingVersions);
+                packagingVersions,
+                 first.RowVersion);
         }
 
         private static IReadOnlyList<PackagingVersionDto> MapPackagingVersions(IReadOnlyList<DetailsRow> rows)

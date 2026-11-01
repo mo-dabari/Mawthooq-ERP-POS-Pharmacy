@@ -5,16 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Products.Queries.Common.Enums;
 using Mawthooq.Application.Products.Queries.Common.Pagination;
-using Mawthooq.Application.Products.Queries.UseCases.GetProducs;
 using Mawthooq.Application.Products.Queries.UseCases.GetProducts;
 using Mawthooq.Application.Products.Queries.UseCases.GetProducts.Enums;
 using Mawthooq.Domain.SharedKernel.Enums;
 using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
 using Microsoft.Data.SqlClient;
+using Mawthooq.Infrastructure.AdoNet.Shared;
 
 namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProducts
 {
-    public class GetProductsQueryRepository : IGetProductsQueryRepository
+    internal sealed class GetProductsQueryRepository : IGetProductsQueryRepository
     {
         private readonly IDbConnectionProvider _connectionProvider;
 
@@ -35,19 +35,19 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProducts
 
             if (!string.IsNullOrWhiteSpace(query.SearchText))
             {
-                whereClauses.Add("p.TradeName LIKE @SearchText");
-                command.Parameters.Add("@SearchText", SqlDbType.NVarChar, 100).Value = $"%{query.SearchText}%";
+                whereClauses.Add("p.TradeName LIKE @SearchText ESCAPE '\'");
+                command.Parameters.Add("@SearchText", SqlDbType.NVarChar, 100).Value = $"%{SqlLike.Escape(query.SearchText)}%";
             }
 
             if (query.FilterByCategoryId is Guid categoryId)
             {
-                whereClauses.Add("c.CategoryName = @CategoryName");
+                whereClauses.Add("p.CategoryId = @CategoryId");
                 command.Parameters.Add("@CategoryId", SqlDbType.UniqueIdentifier).Value = categoryId;
             }
 
             if (query.FilterByManufacturerId is Guid manufacturerId)
             {
-                whereClauses.Add("m.ManufacturerName = @ManufacturerName");
+                whereClauses.Add("p.ManufacturerId = @ManufacturerId");
                 command.Parameters.Add("@ManufacturerId", SqlDbType.UniqueIdentifier).Value = manufacturerId;
             }
 
@@ -85,25 +85,40 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProducts
 
                             CROSS APPLY
                             (
-                                SELECT TOP (1) b.Value
+                                SELECT
+                                    TOP (1) b.Value
 
                                 FROM
                                     dbo.PackagingVersions pv
 
                                 INNER JOIN
-                                    dbo.ProductUnits pu ON pu.PackagingVersionId = pv.PackagingVersionId
+                                    dbo.ProductUnits pu
+                                ON
+                                    pu.PackagingVersionId = pv.PackagingVersionId
+                                AND
+                                    pu.Rank = 1
 
                                 INNER JOIN
-                                    dbo.Barcodes b ON b.ProductUnitId = pu.ProductUnitId
+                                    dbo.Barcodes b
+                                ON
+                                    b.ProductUnitId = pu.ProductUnitId
+                                AND
+                                    b.Type = 6
 
                                 WHERE
-                                    pv.ProductId = p.ProductId AND pv.Status = 1 AND pu.Rank = 1 AND b.Type = 6
+                                     pv.ProductId = p.ProductId
+                                ORDER BY
+                                    CASE WHEN pv.Status = 1
+                                        THEN 0
+                                        ELSE 1
+                                    END,
+                                        pv.Version DESC
                             ) ib
 
                             {whereSql}
 
                             ORDER BY
-                                {orderColumn} {orderDirection}
+                                {orderColumn} {orderDirection}, p.ProductId
 
                             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
                             """;

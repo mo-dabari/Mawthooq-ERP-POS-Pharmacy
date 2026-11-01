@@ -9,7 +9,7 @@ using Mawthooq.Infrastructure.AdoNet.Persistence.Connections;
 
 namespace Mawthooq.Infrastructure.Services
 {
-    public class SqlInternalBarcodeSequenceGenerator : IInternalBarcodeSequenceGenerator
+    internal sealed class SqlInternalBarcodeSequenceGenerator : IInternalBarcodeSequenceGenerator
     {
         private readonly IDbConnectionProvider _connectionProvider;
 
