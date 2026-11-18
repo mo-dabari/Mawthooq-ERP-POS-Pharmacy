@@ -1,6 +1,5 @@
 namespace Mawthooq.Domain.SharedKernel.Enums
 {
-    [Flags]
     public enum PhoneType : byte
     {
         Primary = 1,

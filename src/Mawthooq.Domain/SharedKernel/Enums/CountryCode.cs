@@ -2,7 +2,7 @@ namespace Mawthooq.Domain.SharedKernel.Enums
 {
     public enum CountryCode
     {
-        EG = 02,
+        EG = 20,
         JO = 962,
         KW = 965,
         SA = 966,
