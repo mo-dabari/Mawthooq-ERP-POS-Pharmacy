@@ -21,18 +21,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.RemoveCompanyBarcodeTo
 
             EnumValidator.ValidateAndCollect(request.Unit, nameof(request.Unit), errors);
 
-            if (RequiredValidator.ValidateAndCollect(request.Barcode, nameof(request.Barcode), errors))
-            {
-                RequiredValidator.ValidateAndCollect(
-                            request.Barcode.Value,
-                            nameof(request.Barcode.Value),
-                            errors);
-
-                EnumValidator.ValidateAndCollect(
-                    request.Barcode.Type,
-                    nameof(request.Barcode.Type),
-                    errors);
-            }
+            BarcodeValidator.Validate(request.Barcode, nameof(request.Barcode), errors);
 
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 

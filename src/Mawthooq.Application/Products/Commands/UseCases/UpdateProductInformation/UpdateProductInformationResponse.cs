@@ -13,7 +13,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
         string TradeName,
         CategoryIdDto CategoryId,
         ImageDto Image,
-        bool CanBeReturnedIfOpened,
+        bool? CanBeReturnedIfOpened,
         int NearExpiryThresholdInDays,
         byte[] RowVersion);
 }

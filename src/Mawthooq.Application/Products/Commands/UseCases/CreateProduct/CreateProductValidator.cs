@@ -23,7 +23,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                 StringValidator.ValidateAndCollect(
                     request.ProductInformation.TradeName,
                     nameof(request.ProductInformation.TradeName),
-                    50,
+                    Product.MaxTradeNameLength,
                     errors);
 
                 if (RequiredValidator.ValidateAndCollect(
@@ -75,28 +75,22 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                     nameof(request.ProductInformation.Template),
                     errors);
 
-                if (RequiredValidator.ValidateAndCollect(
-                request.ProductInformation.Image,
-                nameof(request.ProductInformation.Image),
-                errors))
-                {
-                    RequiredValidator.ValidateAndCollect(
-                    request.ProductInformation.Image.StorageKey,
-                    nameof(request.ProductInformation.Image.StorageKey),
+                ImageValidator.Validate(
+                    request.ProductInformation.Image,
+                    nameof(request.ProductInformation.Image),
                     errors);
 
-                    RequiredValidator.ValidateAndCollect(
-                    request.ProductInformation.Image.FileName,
-                    nameof(request.ProductInformation.Image.FileName),
+                NullableValidator.ValidateRequired(
+                    request.ProductInformation.RequiresExpiryTracking,
+                    nameof(request.ProductInformation.RequiresExpiryTracking),
                     errors);
 
-                    RequiredValidator.ValidateAndCollect(
-                    request.ProductInformation.Image.MimeType,
-                    nameof(request.ProductInformation.Image.MimeType),
+                NullableValidator.ValidateRequired(
+                    request.ProductInformation.CanBeReturnedIfOpened,
+                    nameof(request.ProductInformation.CanBeReturnedIfOpened),
                     errors);
-                }
 
-                if (request.ProductInformation.RequiresExpiryTracking)
+                if (request.ProductInformation.RequiresExpiryTracking == true)
                 {
                     RangeValidator.ValidateRange(
                         request.ProductInformation.NearExpiryThresholdInDays,
@@ -120,7 +114,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                             nameof(userBarcode.Unit),
                             errors);
 
-                        RequiredValidator.ValidateAndCollect(
+                        BarcodeValidator.Validate(
                             userBarcode.Barcode,
                             nameof(userBarcode.Barcode),
                             errors);

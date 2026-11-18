@@ -12,7 +12,7 @@ namespace Mawthooq.Application.Common.DTOs.Mappers
         {
             ArgumentNullException.ThrowIfNull(address, nameof(address));
 
-            return new AddressDto(address.BuildingNumber, address.Street, address.City, address.Governorate, address.Country);
+            return new AddressDto(address.BuildingNumber, address.Street, address.Neighborhood, address.Governorate, address.Country);
         }
 
         public static Address ToAddressDomain(this AddressDto addressDto)

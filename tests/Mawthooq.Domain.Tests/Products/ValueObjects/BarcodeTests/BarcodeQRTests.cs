@@ -36,6 +36,14 @@ namespace Mawthooq.Domain.Tests.Products.ValueObjects.BarcodeTests
 
                 act.Should().Throw<ArgumentException>();
             }
+
+            [Fact]
+            public void Should_Throw_When_TheValueExceedsTheMaxLength()
+            {
+                var act = () => BarcodeQR.New(new string('a', Barcode.MaxValueLength + 1));
+
+                act.Should().Throw<ArgumentException>();
+            }
         }
 
         public class Equality

@@ -4,6 +4,9 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using Mawthooq.Application.Categories.Commands.DTOs;
+using Mawthooq.Application.Common.DTOs;
+using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Application.Products.Queries.UseCases.GetProductDetails;
 using Mawthooq.Domain.Products.Enums;
 using Mawthooq.Domain.SharedKernel.Enums;
@@ -106,7 +109,7 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
             return rows.Count == 0 ? null : MapProductDetailsDto(rows);
         }
 
-        private static GetProductDetailsDto MapProductDetailsDto(IReadOnlyList<DetailsRow> rows)
+        internal static GetProductDetailsDto MapProductDetailsDto(IReadOnlyList<DetailsRow> rows)
         {
             ArgumentNullException.ThrowIfNull(rows, nameof(rows));
             if (rows.Count == 0)
@@ -117,18 +120,22 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
             var packagingVersions = MapPackagingVersions(rows);
 
             return new GetProductDetailsDto(
-                first.ProductId,
+                new ProductIdDto(first.ProductId),
                 first.TradeName,
                 first.Sku,
+                new CategoryIdDto(first.CategoryId),
                 first.CategoryName,
+                new(first.ManufacturerId),
                 first.ManufacturerName,
+                new(first.LocalAgentId),
                 first.LocalAgentName,
+                first.RequiresExpiryTracking,
                 first.CanBeReturnedIfOpened,
                 first.NearExpiryThresholdInDays,
                 (Status)first.ProductStatus,
-                first.ImageStorageKey,
+                new ImageDto(first.ImageStorageKey, first.ImageFileName, first.ImageMimeType),
                 packagingVersions,
-                 first.RowVersion);
+                first.RowVersion);
         }
 
         private static IReadOnlyList<PackagingVersionDto> MapPackagingVersions(IReadOnlyList<DetailsRow> rows)
@@ -146,9 +153,9 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
                 var units = MapUnits(versionGroup);
 
                 return new PackagingVersionDto(
-                    versionRow.PackagingVersionId,
+                    new PackagingVersionIdDto(versionRow.PackagingVersionId),
                     versionRow.Version,
-                    ((Status)versionRow.PackagingVersionStatus).ToString(),
+                    ((Status)versionRow.PackagingVersionStatus),
                     units);
             }).ToList();
         }
@@ -163,9 +170,9 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
                     var barcodes = MapBarcodes(unitGroup);
 
                     return new ProductUnitDetailsDto(
-                        ((UnitOfMeasure)unitRow.Unit).ToString(),
+                        ((UnitOfMeasure)unitRow.Unit),
                         unitRow.ConversionRate,
-                        ((UnitRank)unitRow.Rank).ToString(),
+                        ((UnitRank)unitRow.Rank),
                         barcodes);
                 })
                 .ToList();
@@ -174,7 +181,7 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProductDetails
         private static IReadOnlyList<BarcodeDto> MapBarcodes(IEnumerable<DetailsRow> unitGroup)
         {
             return unitGroup
-                .Select(r => new BarcodeDto(r.BarcodeValue, ((BarcodeType)r.BarcodeType).ToString()))
+                .Select(r => new BarcodeDto(r.BarcodeValue, ((BarcodeType)r.BarcodeType)))
                 .ToList();
         }
     }

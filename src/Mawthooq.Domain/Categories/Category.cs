@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Mawthooq.Domain.Categories.ValueObjects;
 using Mawthooq.Domain.SharedKernel.Enums;
+using Mawthooq.Domain.SharedKernel.Primitives;
 
 namespace Mawthooq.Domain.Categories
 {
     public class Category
     {
+        public const int MaxNameLength = 100;
+        public const int MaxDescriptionLength = 500;
         public CategoryId CategoryId { get; }
         public string Name { get; private set; }
         public string Description { get; private set; }
@@ -19,9 +19,15 @@ namespace Mawthooq.Domain.Categories
         {
             ValidateArguments(categoryId, name, description);
 
+            name = name.Trim();
+            LengthGuard.MaxLength(name, MaxNameLength, nameof(name));
+
+            description = description.Trim();
+            LengthGuard.MaxLength(description, MaxDescriptionLength, nameof(description));
+
             CategoryId = categoryId;
             Name = name;
-            Description = description.Trim();
+            Description = description;
             Status = Status.Active;
         }
 
@@ -36,6 +42,8 @@ namespace Mawthooq.Domain.Categories
 
             name = name.Trim();
 
+            LengthGuard.MaxLength(name, MaxNameLength, nameof(name));
+
             if (string.Equals(Name, name, StringComparison.OrdinalIgnoreCase))
                 return;
 
@@ -45,7 +53,10 @@ namespace Mawthooq.Domain.Categories
         public void ChangeDescription(string description)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(description, nameof(description));
+
             description = description.Trim();
+
+            LengthGuard.MaxLength(description, MaxDescriptionLength, nameof(description));
 
             if (Description == description)
                 return;

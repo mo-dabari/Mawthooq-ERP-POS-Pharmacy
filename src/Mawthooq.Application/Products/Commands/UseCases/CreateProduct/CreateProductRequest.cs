@@ -39,8 +39,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             LocalAgentIdDto LocalAgentId,
             PackagingTemplate Template,
             ImageDto Image,
-            bool RequiresExpiryTracking,
-            bool CanBeReturnedIfOpened,
+            bool? RequiresExpiryTracking,
+            bool? CanBeReturnedIfOpened,
             int NearExpiryThresholdInDays);
 
 }

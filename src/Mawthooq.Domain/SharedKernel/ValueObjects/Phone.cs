@@ -63,6 +63,6 @@ namespace Mawthooq.Domain.SharedKernel.ValueObjects
             CountryCode = countryCode;
             PhoneType = phoneType;
         }
-        public override string ToString() => $"+{(int)CountryCode}{Value}";
+        public override string ToString() => $"+{(int)CountryCode}{(Value.StartsWith('0') ? Value[1..]: Value)}";
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Infrastructure.AdoNet.DependencyInjection.Categories;
+using Mawthooq.Infrastructure.AdoNet.DependencyInjection.LocalAgents;
+using Mawthooq.Infrastructure.AdoNet.DependencyInjection.Manufacturers;
 using Mawthooq.Infrastructure.AdoNet.DependencyInjection.Products;
 using Mawthooq.Infrastructure.AdoNet.Persistence.Connections.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +21,8 @@ namespace Mawthooq.Infrastructure.AdoNet.DependencyInjection
             services.AddDatabaseContext(configuration);
             services.AddProductsPersistence();
             services.AddCategoriesPersistence();
+            services.AddLocalAgentsPersistence();
+            services.AddManufacturersPersistence();
 
             return services;
         }

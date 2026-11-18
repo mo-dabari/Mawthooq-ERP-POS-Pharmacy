@@ -10,6 +10,8 @@ using Mawthooq.Application.Products.Queries.UseCases.GetProducts;
 using Mawthooq.Application.Products.Queries.UseCases.ScanProductBarcode;
 using Mawthooq.Application.Products.Queries.UseCases.SearchProducts;
 using Mawthooq.Domain.Categories;
+using Mawthooq.Domain.LocalAgents;
+using Mawthooq.Domain.Manufacturers;
 using Mawthooq.Domain.Products;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -26,6 +28,8 @@ namespace Mawthooq.Application.Tests.DependencyInjection
 
         services.AddScoped(_ => Mock.Of<IProductRepository>());
         services.AddScoped(_ => Mock.Of<ICategoryRepository>());
+        services.AddScoped(_ => Mock.Of<IManufacturerRepository>());
+        services.AddScoped(_ => Mock.Of<ILocalAgentRepository>());
         services.AddScoped(_ => Mock.Of<IInternalBarcodeSequenceGenerator>());
         services.AddScoped(_ => Mock.Of<IGetProductDetailsQueryRepository>());
         services.AddScoped(_ => Mock.Of<IGetProductsQueryRepository>());
@@ -43,7 +47,7 @@ namespace Mawthooq.Application.Tests.DependencyInjection
             .ToList();
 
         types.Should().HaveCount(21);
-        
+
         foreach (Type type in types)
             scope.ServiceProvider.GetRequiredService(type).Should().NotBeNull(type.Name);
     }

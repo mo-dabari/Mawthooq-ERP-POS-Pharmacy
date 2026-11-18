@@ -8,12 +8,18 @@ using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Common.DTOs;
 using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Application.LocalAgents.DTOs;
+using Mawthooq.Application.LocalAgents.Exceptions;
 using Mawthooq.Application.Manufacturers.DTOs;
+using Mawthooq.Application.Manufacturers.Exceptions;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Commands.UseCases.CreateProduct;
 using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Categories;
 using Mawthooq.Domain.Categories.ValueObjects;
+using Mawthooq.Domain.LocalAgents;
+using Mawthooq.Domain.LocalAgents.ValueObjects;
+using Mawthooq.Domain.Manufacturers;
+using Mawthooq.Domain.Manufacturers.ValueObjects;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.Enums;
 using Mawthooq.Domain.Products.Services;
@@ -27,6 +33,8 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
     {
         private readonly Mock<IProductRepository> _productRepositoryMock;
         private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
+        private readonly Mock<IManufacturerRepository> _manufacturerRepositoryMock;
+        private readonly Mock<ILocalAgentRepository> _localAgentRepositoryMock;
         private readonly Mock<IInternalBarcodeSequenceGenerator> _barcodeGeneratorMock;
         private readonly ProductFactory _productFactory;
         private readonly CreateProductUseCase _sut;
@@ -35,12 +43,16 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
         {
             _productRepositoryMock = new Mock<IProductRepository>();
             _categoryRepositoryMock = new Mock<ICategoryRepository>();
+            _manufacturerRepositoryMock = new Mock<IManufacturerRepository>();
+            _localAgentRepositoryMock = new Mock<ILocalAgentRepository>();
             _barcodeGeneratorMock = new Mock<IInternalBarcodeSequenceGenerator>();
             _productFactory = new ProductFactory(_barcodeGeneratorMock.Object);
 
             _sut = new CreateProductUseCase(
                 _productRepositoryMock.Object,
                 _categoryRepositoryMock.Object,
+                _manufacturerRepositoryMock.Object,
+                _localAgentRepositoryMock.Object,
                 _productFactory);
         }
 
@@ -52,6 +64,12 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
             _categoryRepositoryMock
                 .Setup(cr => cr.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((category, null));
+
+            _manufacturerRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<ManufacturerId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+            _localAgentRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<LocalAgentId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
             _productRepositoryMock
                 .Setup(pr => pr.ExistsBySkuAsync(It.IsAny<SKU>(), It.IsAny<CancellationToken>()))
@@ -93,6 +111,12 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
             _categoryRepositoryMock
                 .Setup(cr => cr.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((category, null));
+
+            _manufacturerRepositoryMock
+            .Setup(r => r.ExistsAndActiveAsync(It.IsAny<ManufacturerId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+            _localAgentRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<LocalAgentId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
             _productRepositoryMock
                 .Setup(pr => pr.ExistsBySkuAsync(It.IsAny<SKU>(), It.IsAny<CancellationToken>()))
@@ -164,12 +188,68 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
         }
 
         [Fact]
+        public async Task Should_ThrowManufacturerNotFoundException_And_NotReserveBarcodes_When_TheManufacturerIsMissingOrInactive()
+        {
+            var category = Category.Create(CategoryId.New(), "Pharmaceuticals", "General category");
+
+            _categoryRepositoryMock
+                .Setup(cr => cr.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((category, null));
+
+            _manufacturerRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<ManufacturerId>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var request = CreateValidRequest(category.CategoryId);
+
+            Func<Task> act = () => _sut.ExecuteAsync(request);
+
+            await act.Should().ThrowAsync<ManufacturerNotFoundException>();
+
+            _productRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()),
+             Times.Never);
+        }
+
+        [Fact]
+        public async Task Should_ThrowLocalAgentNotFoundException_And_NotReserveBarcodes_When_TheLocalAgentIsMissingOrInactive()
+        {
+            var category = Category.Create(CategoryId.New(), "Pharmaceuticals", "General category");
+
+            _categoryRepositoryMock
+                .Setup(cr => cr.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((category, null));
+
+            _manufacturerRepositoryMock.Setup(pr => pr.ExistsAndActiveAsync(It.IsAny<ManufacturerId>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+            _localAgentRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<LocalAgentId>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var request = CreateValidRequest(category.CategoryId);
+
+            Func<Task> act = () => _sut.ExecuteAsync(request);
+
+            await act.Should().ThrowAsync<LocalAgentNotFoundException>();
+
+            _productRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()),
+             Times.Never);
+        }
+
+        [Fact]
         public async Task Should_ThrowDuplicateSkuException_When_SkuAlreadyExists()
         {
             var category = Category.Create(CategoryId.New(), "Pharmaceuticals", "General category");
 
             _categoryRepositoryMock.Setup(cr => cr.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((category, null));
+
+            _manufacturerRepositoryMock.Setup(pr => pr.ExistsAndActiveAsync(It.IsAny<ManufacturerId>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+
+            _localAgentRepositoryMock.Setup(pr => pr.ExistsAndActiveAsync(It.IsAny<LocalAgentId>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
             _productRepositoryMock.Setup(pr => pr.ExistsBySkuAsync(It.IsAny<SKU>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -191,6 +271,12 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
 
             _categoryRepositoryMock.Setup(cr => cr.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((category, null));
+
+            _manufacturerRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<ManufacturerId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+            _localAgentRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<LocalAgentId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
             _productRepositoryMock.Setup(pr => pr.ExistsBySkuAsync(It.IsAny<SKU>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -216,6 +302,12 @@ namespace Mawthooq.Application.Tests.Products.Commands.UseCases.CreateProduct
             _categoryRepositoryMock
                 .Setup(cr => cr.GetByIdAsync(It.IsAny<CategoryId>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((category, null));
+
+            _manufacturerRepositoryMock
+            .Setup(r => r.ExistsAndActiveAsync(It.IsAny<ManufacturerId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+            _localAgentRepositoryMock
+                .Setup(r => r.ExistsAndActiveAsync(It.IsAny<LocalAgentId>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
             _productRepositoryMock
                 .Setup(pr => pr.ExistsBySkuAsync(It.IsAny<SKU>(), It.IsAny<CancellationToken>()))

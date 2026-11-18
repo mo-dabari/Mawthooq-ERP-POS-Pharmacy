@@ -12,5 +12,6 @@ namespace Mawthooq.Application.Products.Queries.Common.Pagination
         public const int MaxPageSize = 100;
         public const int DefaultMaxResults = 20;
         public const int MaxResultsLimit = 100;
+        public const int MaxSearchTextLength = 100;
     }
 }
