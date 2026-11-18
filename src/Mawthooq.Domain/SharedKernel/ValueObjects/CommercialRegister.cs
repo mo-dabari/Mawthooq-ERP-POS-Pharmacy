@@ -24,8 +24,7 @@ namespace Mawthooq.Domain.SharedKernel.ValueObjects
 
                 throw new InvalidOperationException("The commercial registration number is invalid in terms of length.");
 
-                Value = commercialRegister;
-
+                Value = cleanCommercialRegister;
         }
     }
 }
