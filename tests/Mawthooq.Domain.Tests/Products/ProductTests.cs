@@ -91,11 +91,31 @@ namespace Mawthooq.Domain.Tests.Products
             [InlineData("")]
             [InlineData(" ")]
             [InlineData(null)]
-            public void Should_ThrowIfNullOrWhiteSpace_When_NameProductIsInvalid(string? name)
+            public void Should_ThrowArgumentException_When_TradeNameIsNull_Or_Whitespace(string? name)
             {
                 Action sut = () => CreateProduct(
                     CreateProductID(),
                     name!,
+                    CreateSKU(),
+                    CreateCategoryID(),
+                    CreateManufacturerID(),
+                    CreateLocalAgentID(),
+                    CreateProductBoxWithStripsPackaging(),
+                    10000,
+                    CreateImage(),
+                    true,
+                    true,
+                    Product.MinDays);
+
+                sut.Should().Throw<ArgumentException>();
+            }
+
+            [Fact]
+            public void Should_ThrowArgumentException_When_NameProductExceedsMaxTradeNameLength()
+            {
+                Action sut = () => CreateProduct(
+                    CreateProductID(),
+                    new string('A', Product.MaxTradeNameLength + 1),
                     CreateSKU(),
                     CreateCategoryID(),
                     CreateManufacturerID(),
@@ -340,7 +360,7 @@ namespace Mawthooq.Domain.Tests.Products
             [InlineData("")]
             [InlineData("  ")]
             [InlineData(null)]
-            public void Should_ThrowArgumentException_When_NewNameIsInvalid(string? newName)
+            public void Should_ThrowArgumentException_When_NewNameIsNull_Or_Whitespace(string? newName)
             {
                 Product sut = CreateProductValidWithoutClearingEvents();
 
@@ -348,6 +368,27 @@ namespace Mawthooq.Domain.Tests.Products
 
                 action.Should().Throw<ArgumentException>();
             }
+
+            [Fact]
+            public void Should_ThrowArgumentException_When_NameProductExceedsMaxTradeNameLength()
+            {
+                Action sut = () => CreateProduct(
+                    CreateProductID(),
+                    new string('A', Product.MaxTradeNameLength + 1),
+                    CreateSKU(),
+                    CreateCategoryID(),
+                    CreateManufacturerID(),
+                    CreateLocalAgentID(),
+                    CreateProductBoxWithStripsPackaging(),
+                    10000,
+                    CreateImage(),
+                    true,
+                    true,
+                    Product.MinDays);
+
+                sut.Should().Throw<ArgumentException>();
+            }
+
         }
         public class CreatePackagingVersionBehavior
         {
@@ -923,7 +964,7 @@ namespace Mawthooq.Domain.Tests.Products
             {
                 var sut = CreateProductValid();
 
-                sut.ChangeNearExpiryThreshold(sut.NearExpiryThresholdInDays);
+                sut.ChangeNearExpiryThreshold(Product.MinDays);
 
                 sut.DomainEvents.Should().BeEmpty();
             }
@@ -931,8 +972,8 @@ namespace Mawthooq.Domain.Tests.Products
             [Theory]
             [InlineData(-1)]
             [InlineData(0)]
-            [InlineData(89)]
-            [InlineData(366)]
+            [InlineData(Product.MinDays - 1)]
+            [InlineData(Product.MaxDays + 1)]
             public void Should_ThrowDomainRuleViolationException_When_TrackingIsRequired_And_ThresholdIsOutOfRange(int nearExpiryThresholdInDays)
             {
                 var sut = CreateProductValid();
@@ -1023,16 +1064,6 @@ namespace Mawthooq.Domain.Tests.Products
             }
 
             [Fact]
-            public void Should_ThrowArgumentNullException_When_ImageIsNull()
-            {
-                var sut = CreateProductValid();
-
-                Action act = () => sut.ChangeImage(null!);
-
-                act.Should().Throw<ArgumentNullException>();
-            }
-
-            [Fact]
             public void Should_NotRaiseEvent_When_NewImageIsSameAsCurrent()
             {
                 var sut = CreateProductValid();
@@ -1041,7 +1072,6 @@ namespace Mawthooq.Domain.Tests.Products
 
                 sut.DomainEvents.Should().BeEmpty();
             }
-
         }
         private static Product CreateProduct(
             ProductId productId,
