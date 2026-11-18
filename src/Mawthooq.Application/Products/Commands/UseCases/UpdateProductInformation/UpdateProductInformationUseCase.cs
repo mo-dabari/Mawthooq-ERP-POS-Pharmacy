@@ -56,7 +56,7 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
 
             product.ChangeCategory(category.CategoryId);
 
-            if (request.CanBeReturnedIfOpened)
+            if (request.CanBeReturnedIfOpened == true)
                 product.AllowReturnIfOpened();
             else
                 product.DisallowReturnIfOpened();

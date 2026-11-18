@@ -14,11 +14,20 @@ namespace Mawthooq.Application.Products.Queries.UseCases.SearchProducts
         {
             List<string> errors = new();
 
-            StringValidator.ValidateAndCollect(query.SearchText, nameof(query.SearchText), errors);
+            StringValidator.ValidateAndCollect(
+                query.SearchText,
+                nameof(query.SearchText),
+                PagingDefaults.MaxSearchTextLength,
+                errors);
 
             EnumValidator.ValidateAndCollect(query.SearchBy, nameof(query.SearchBy), errors);
 
-            RangeValidator.ValidateRange(query.MaxResults, 1, PagingDefaults.MaxResultsLimit, nameof(query.MaxResults), errors);
+            RangeValidator.ValidateRange(
+                query.MaxResults,
+                1,
+                PagingDefaults.MaxResultsLimit,
+                nameof(query.MaxResults),
+                errors);
 
             if (errors.Count > 0) throw new ValidationException(errors);
         }

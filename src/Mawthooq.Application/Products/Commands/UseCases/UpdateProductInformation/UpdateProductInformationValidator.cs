@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mawthooq.Application.Common.Exceptions;
 using Mawthooq.Application.Common.Validation;
+using Mawthooq.Domain.Products;
 
 namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformation
 {
@@ -14,33 +15,29 @@ namespace Mawthooq.Application.Products.Commands.UseCases.UpdateProductInformati
             List<string> errors = new();
 
             if (RequiredValidator.ValidateAndCollect(request.ProductId, nameof(request.ProductId), errors))
-                GuidValidator.ValidateAndCollect(request.ProductId.Value, nameof(request.ProductId.Value), errors);
+                GuidValidator.ValidateAndCollect(
+                    request.ProductId.Value,
+                    nameof(request.ProductId.Value),
+                    errors);
 
-            StringValidator.ValidateAndCollect(request.TradeName, nameof(request.TradeName), 50, errors);
+            StringValidator.ValidateAndCollect(
+                request.TradeName,
+                nameof(request.TradeName),
+                Product.MaxTradeNameLength,
+                errors);
 
             if (RequiredValidator.ValidateAndCollect(request.CategoryId, nameof(request.CategoryId), errors))
-                GuidValidator.ValidateAndCollect(request.CategoryId.Value, nameof(request.CategoryId.Value), errors);
+                GuidValidator.ValidateAndCollect(
+                    request.CategoryId.Value,
+                    nameof(request.CategoryId.Value),
+                    errors);
 
-            if (RequiredValidator.ValidateAndCollect(
-            request.Image,
-            nameof(request.Image),
-            errors))
-            {
-                RequiredValidator.ValidateAndCollect(
-                request.Image.StorageKey,
-                nameof(request.Image.StorageKey),
-                errors);
+            ImageValidator.Validate(request.Image, nameof(request.Image), errors);
 
-                RequiredValidator.ValidateAndCollect(
-                request.Image.FileName,
-                nameof(request.Image.FileName),
+            NullableValidator.ValidateRequired(
+                request.CanBeReturnedIfOpened,
+                nameof(request.CanBeReturnedIfOpened),
                 errors);
-
-                RequiredValidator.ValidateAndCollect(
-                request.Image.MimeType,
-                nameof(request.Image.MimeType),
-                errors);
-            }
 
             RowVersionValidator.ValidateAndCollect(request.RowVersion, errors);
 

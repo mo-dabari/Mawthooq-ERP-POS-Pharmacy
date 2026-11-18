@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 using Mawthooq.Application.Categories.Commands.Mappers;
 using Mawthooq.Application.Categories.Exceptions;
 using Mawthooq.Application.Common.Mappers;
+using Mawthooq.Application.LocalAgents.Exceptions;
+using Mawthooq.Application.Manufacturers.Exceptions;
 using Mawthooq.Application.Products.Commands.Mappers;
 using Mawthooq.Application.Products.Exceptions;
 using Mawthooq.Domain.Categories;
+using Mawthooq.Domain.LocalAgents;
 using Mawthooq.Domain.LocalAgents.ValueObjects;
+using Mawthooq.Domain.Manufacturers;
 using Mawthooq.Domain.Manufacturers.ValueObjects;
 using Mawthooq.Domain.Products;
 using Mawthooq.Domain.Products.Services;
@@ -21,19 +25,27 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ILocalAgentRepository _localAgentRepository;
+        private readonly IManufacturerRepository _manufacturerRepository;
         private readonly ProductFactory _productFactory;
 
         public CreateProductUseCase(
             IProductRepository productRepository,
             ICategoryRepository categoryRepository,
+            IManufacturerRepository manufacturerRepository,
+            ILocalAgentRepository localAgentRepository,
             ProductFactory productFactory)
         {
             ArgumentNullException.ThrowIfNull(productRepository, nameof(productRepository));
             ArgumentNullException.ThrowIfNull(categoryRepository, nameof(categoryRepository));
+            ArgumentNullException.ThrowIfNull(manufacturerRepository, nameof(manufacturerRepository));
+            ArgumentNullException.ThrowIfNull(localAgentRepository, nameof(localAgentRepository));
             ArgumentNullException.ThrowIfNull(productFactory, nameof(productFactory));
 
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _localAgentRepository = localAgentRepository;
+            _manufacturerRepository = manufacturerRepository;
             _productFactory = productFactory;
         }
 
@@ -54,6 +66,14 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
 
             if (category == null)
                 throw new CategoryNotFoundException(info.CategoryId.Value);
+
+            ManufacturerId manufacturerId = ManufacturerId.From(info.ManufacturerId.Value);
+            if (!await _manufacturerRepository.ExistsAndActiveAsync(manufacturerId, cancellationToken))
+                throw new ManufacturerNotFoundException(info.ManufacturerId.Value);
+
+            LocalAgentId localAgentId = LocalAgentId.From(info.LocalAgentId.Value);
+            if (!await _localAgentRepository.ExistsAndActiveAsync(localAgentId, cancellationToken))
+                throw new LocalAgentNotFoundException(info.LocalAgentId.Value);
 
             SKU sKU = info.Sku.ToDomain();
 
@@ -77,12 +97,6 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
             var packaging =
                 request.ToPackagingDomain();
 
-            var manufacturerId =
-                ManufacturerId.From(info.ManufacturerId.Value);
-
-            var localAgentId =
-                LocalAgentId.From(info.LocalAgentId.Value);
-
             var image =
                 info.Image.ToDomain();
 
@@ -97,8 +111,8 @@ namespace Mawthooq.Application.Products.Commands.UseCases.CreateProduct
                     localAgentId,
                     packaging,
                     image,
-                    info.RequiresExpiryTracking,
-                    info.CanBeReturnedIfOpened,
+                    info.RequiresExpiryTracking!.Value,
+                    info.CanBeReturnedIfOpened!.Value,
                     info.NearExpiryThresholdInDays,
                     cancellationToken);
 

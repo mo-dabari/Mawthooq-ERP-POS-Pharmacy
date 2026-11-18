@@ -3,41 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Mawthooq.Application.Categories.Commands.DTOs;
+using Mawthooq.Application.Common.DTOs;
+using Mawthooq.Application.LocalAgents.DTOs;
+using Mawthooq.Application.Manufacturers.DTOs;
+using Mawthooq.Application.Products.Commands.DTOs;
 using Mawthooq.Domain.SharedKernel.Enums;
 
 namespace Mawthooq.Application.Products.Queries.UseCases.GetProductDetails
 {
     public record class GetProductDetailsDto(
-    Guid ProductId,
+    ProductIdDto ProductId,
     string TradeName,
     string SKU,
+    CategoryIdDto CategoryId,
     string CategoryName,
+    ManufacturerIdDto ManufacturerId,
     string ManufacturerName,
+    LocalAgentIdDto LocalAgentId,
     string LocalAgentName,
+    bool RequiresExpiryTracking,
     bool CanBeReturnedIfOpened,
     int NearExpiryThresholdInDays,
     Status Status,
-    string? ImageStorageKey,
+    ImageDto Image,
     IReadOnlyList<PackagingVersionDto> PackagingVersions,
     byte[] RowVersion);
-
-    public record class PackagingVersionDto(
-        Guid PackagingVersionId,
-        int Version,
-        string Status,
-        IReadOnlyList<ProductUnitDetailsDto> ProductUnits
-    );
-
-    public record class ProductUnitDetailsDto(
-        string UnitName,
-        int ConversionRate,
-        string RankName,
-        IReadOnlyList<BarcodeDto> Barcodes
-    );
-
-    public record class BarcodeDto(
-        string Value,
-        string TypeName
-    );
 
 }
