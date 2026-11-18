@@ -21,6 +21,7 @@ namespace Mawthooq.Domain.Products
 {
     public class Product : AggregateRoot
     {
+        public const int MaxTradeNameLength = 50;
         public const int MinDays = 90;
         public const int MaxDays = 365;
         public const int NotTracked = 0;
@@ -99,6 +100,9 @@ namespace Mawthooq.Domain.Products
                 image);
 
             string trimmedName = name.Trim();
+            
+            LengthGuard.MaxLength(trimmedName, MaxTradeNameLength, nameof(trimmedName));
+
             Product product = new Product(
                 productId,
                 trimmedName,
@@ -336,6 +340,8 @@ namespace Mawthooq.Domain.Products
             ArgumentException.ThrowIfNullOrWhiteSpace(newName, nameof(newName));
 
             newName = newName.Trim();
+
+            LengthGuard.MaxLength(newName, MaxTradeNameLength, nameof(newName));
 
             if (TradeName.Equals(newName, StringComparison.OrdinalIgnoreCase))
                 return;
