@@ -7,8 +7,11 @@ using Microsoft.Data.SqlClient;
 namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProducts
 {
     internal sealed record DetailsRow(
-        Guid ProductId, string TradeName, string Sku, string CategoryName, string ManufacturerName, string LocalAgentName,
-        bool CanBeReturnedIfOpened, int NearExpiryThresholdInDays, byte ProductStatus, string ImageStorageKey, byte[] RowVersion,
+        Guid ProductId, string TradeName, string Sku,
+        Guid CategoryId, string CategoryName, Guid ManufacturerId, string ManufacturerName,
+        Guid LocalAgentId, string LocalAgentName,
+        bool RequiresExpiryTracking, bool CanBeReturnedIfOpened, int NearExpiryThresholdInDays, byte ProductStatus,
+        string ImageStorageKey, string ImageFileName, string ImageMimeType, byte[] RowVersion,
         Guid PackagingVersionId, int Version, byte PackagingVersionStatus,
         byte Unit, int ConversionRate, byte Rank, string BarcodeValue, byte BarcodeType)
     {
@@ -16,13 +19,19 @@ namespace Mawthooq.Infrastructure.AdoNet.Queries.Products.GetProducts
             reader.GetGuid(reader.GetOrdinal("ProductId")),
             reader.GetString(reader.GetOrdinal("TradeName")),
             reader.GetString(reader.GetOrdinal("Sku")),
+            reader.GetGuid(reader.GetOrdinal("CategoryId")),
             reader.GetString(reader.GetOrdinal("CategoryName")),
+            reader.GetGuid(reader.GetOrdinal("ManufacturerId")),
             reader.GetString(reader.GetOrdinal("ManufacturerName")),
+            reader.GetGuid(reader.GetOrdinal("LocalAgentId")),
             reader.GetString(reader.GetOrdinal("LocalAgentName")),
+            reader.GetBoolean(reader.GetOrdinal("RequiresExpiryTracking")),
             reader.GetBoolean(reader.GetOrdinal("CanBeReturnedIfOpened")),
             reader.GetInt32(reader.GetOrdinal("NearExpiryThresholdInDays")),
             reader.GetByte(reader.GetOrdinal("ProductStatus")),
             reader.GetString(reader.GetOrdinal("ImageStorageKey")),
+            reader.GetString(reader.GetOrdinal("ImageFileName")),
+            reader.GetString(reader.GetOrdinal("ImageMimeType")),
             reader.GetFieldValue<byte[]>(reader.GetOrdinal("RowVersion")),
             reader.GetGuid(reader.GetOrdinal("PackagingVersionId")),
             reader.GetInt32(reader.GetOrdinal("Version")),
